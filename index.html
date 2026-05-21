@@ -3,30 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Academia de Tenis — Rúbricas</title>
+<title>mi tenis — sistema de rendimiento</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --court:      #1e3d18;
-  --court-mid:  #2d5a1b;
-  --court-l:    #3d7a26;
-  --ball:       #c8d42b;
-  --bg:         #f5f3ec;
+  --blue:       #5170ff;
+  --blue-d:     #3a52d6;
+  --yellow:     #f3fe76;
+  --court:      #5170ff;
+  --court-mid:  #3a52d6;
+  --court-l:    #6d86ff;
+  --ball:       #f3fe76;
+  --bg:         #f3fe76;
   --surf:       #ffffff;
-  --surf2:      #ede9df;
-  --border:     rgba(0,0,0,0.07);
-  --text:       #1a1a14;
-  --muted:      #7a7868;
-  --hint:       #b5b0a0;
-  /* Áreas */
-  --tec:        #1a5fb4; --tec-bg:#dde8f7;
-  --tac:        #7a3b00; --tac-bg:#fde8c8;
-  --fis:        #1e6640; --fis-bg:#d4edda;
-  --men:        #5b21b6; --men-bg:#ede9fe;
-  /* Niveles */
-  --lv1:        #dc2626; --lv1-bg:#fde8e8;
-  --lv2:        #d97706; --lv2-bg:#fef3c7;
-  --lv3:        #16a34a; --lv3-bg:#dcfce7;
+  --surf2:      #eef0ff;
+  --border:     rgba(81,112,255,0.14);
+  --text:       #20223a;
+  --muted:      #6b6f8a;
+  --hint:       #a9adc4;
+  /* Áreas — identidad única azul */
+  --tec:        #5170ff; --tec-bg:#e7ebff;
+  --tac:        #5170ff; --tac-bg:#e7ebff;
+  --fis:        #5170ff; --fis-bg:#e7ebff;
+  --men:        #5170ff; --men-bg:#e7ebff;
+  /* Niveles — escala monocroma azul (claro=bajo, intenso=alto) */
+  --lv1:        #aab4e0; --lv1-bg:#eef0f7;
+  --lv2:        #8b9bff; --lv2-bg:#e7ebff;
+  --lv3:        #5170ff; --lv3-bg:#e0e6ff;
   --radius:     16px;
   --radius-sm:  10px;
 }
@@ -35,25 +38,25 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* LANDING */
 .landing{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;position:relative;overflow:hidden;}
-.landing-bg{position:absolute;inset:0;background:linear-gradient(150deg,#0f2409 0%,#1e3d18 45%,#152d10 100%);}
-.court-lines{position:absolute;inset:0;opacity:.06;}
-.court-lines::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(255,255,255,.6) 59px,rgba(255,255,255,.6) 61px);}
-.court-lines::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(255,255,255,.6) 59px,rgba(255,255,255,.6) 61px);}
+.landing-bg{position:absolute;inset:0;background:var(--yellow);}
+.court-lines{position:absolute;inset:0;opacity:1;}
+.court-lines::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(81,112,255,0.10) 59px,rgba(81,112,255,0.10) 61px);}
+.court-lines::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(81,112,255,0.10) 59px,rgba(81,112,255,0.10) 61px);}
 .landing-content{position:relative;z-index:2;text-align:center;max-width:540px;width:100%;}
-.logo-ball{width:56px;height:56px;border-radius:50%;background:var(--ball);margin:0 auto 1.4rem;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 8px rgba(200,212,43,.15),0 8px 28px rgba(200,212,43,.3);}
-.logo-ball svg{width:32px;height:32px;}
-.landing-title{font-family:'Inter',sans-serif;font-size:clamp(30px,7vw,50px);font-weight:800;color:#fff;line-height:1.05;letter-spacing:-.02em;margin-bottom:6px;}
-.landing-title span{color:var(--ball);}
-.landing-sub{font-size:14px;color:rgba(255,255,255,.5);margin-bottom:2.5rem;letter-spacing:.03em;}
-.select-card{background:rgba(255,255,255,.07);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:1.5rem;width:100%;}
-.select-label{font-size:11px;font-weight:500;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;text-align:left;}
+.logo-ball{margin:0 auto 1.4rem;display:flex;align-items:center;justify-content:center;}
+.logo-ball svg{width:62px;height:86px;}
+.landing-title{font-family:'Inter',sans-serif;font-size:clamp(36px,9vw,60px);font-weight:400;color:var(--blue);line-height:1.0;letter-spacing:-.03em;margin-bottom:8px;}
+.landing-title span{font-weight:800;}
+.landing-sub{font-size:14px;color:rgba(81,112,255,.8);margin-bottom:2.5rem;letter-spacing:.01em;}
+.select-card{background:var(--surf);border:1px solid var(--border);border-radius:20px;padding:1.5rem;width:100%;box-shadow:0 10px 34px rgba(81,112,255,0.14);}
+.select-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;text-align:left;}
 .player-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.player-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;text-align:left;}
-.player-btn:hover{background:rgba(255,255,255,.13);border-color:rgba(200,212,43,.35);transform:translateY(-2px);}
+.player-btn{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;text-align:left;}
+.player-btn:hover{background:var(--surf2);border-color:var(--blue);transform:translateY(-2px);}
 .pb-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:#fff;}
-.pb-name{font-size:13px;font-weight:500;color:#fff;}
-.pb-meta{font-size:11px;color:rgba(255,255,255,.38);}
-.loading-state{color:rgba(255,255,255,.5);font-size:13px;padding:1rem;text-align:center;}
+.pb-name{font-size:13px;font-weight:600;color:var(--text);}
+.pb-meta{font-size:11px;color:var(--muted);}
+.loading-state{color:var(--muted);font-size:13px;padding:1rem;text-align:center;}
 
 /* APP */
 .app{display:none;min-height:100vh;flex-direction:column;}
@@ -187,7 +190,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .chart-wrap{position:relative;width:100%;height:220px;}
 
 /* NOTA */
-.nota{background:linear-gradient(135deg,#e8f5e9,#f1f8e9);border:1px solid #a5d6a7;border-radius:var(--radius-sm);padding:10px 13px;font-size:12px;color:#2e7d32;margin-bottom:14px;line-height:1.55;}
+.nota{background:var(--surf2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 13px;font-size:12px;color:var(--text);margin-bottom:14px;line-height:1.55;}
 
 /* EMPTY / SPINNER */
 .empty{text-align:center;padding:2rem;color:var(--hint);font-size:13px;}
@@ -324,6 +327,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .perf-cat{font-size:11px;color:var(--hint);margin-top:7px;}
 @media(min-width:760px){.perf-grid{grid-template-columns:1fr 1fr;}}
 
+
+/* === mi tenis: ajustes de marca === */
+.radar-wrap{background:transparent;border:none;margin-bottom:16px;padding:2px 0 8px;}
+.mc-delta.down{color:var(--muted);}
+.perf-delta.neg{color:var(--muted);}
+.perf-tick{background:var(--blue-d);opacity:.75;}
+.cat-dot{box-shadow:0 0 0 2px rgba(255,255,255,.7);}
+
 </style>
 </head>
 <body>
@@ -334,15 +345,15 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div class="court-lines"></div>
   <div class="landing-content">
     <div class="logo-ball">
-      <svg viewBox="0 0 32 32" fill="none">
-        <circle cx="16" cy="16" r="14" stroke="#1a3a0e" stroke-width="2"/>
-        <path d="M2 16 Q8 8 16 16 Q24 24 30 16" stroke="#1a3a0e" stroke-width="2" fill="none"/>
+      <svg viewBox="0 0 80 110" fill="none" aria-label="mi tenis">
+        <rect x="8" y="56" width="46" height="48" rx="23" fill="#f3fe76" stroke="#5170ff" stroke-width="7" stroke-linejoin="round"/>
+        <rect x="44" y="8" width="30" height="96" rx="15" fill="#f3fe76" stroke="#5170ff" stroke-width="7" stroke-linejoin="round"/>
       </svg>
     </div>
-    <div class="landing-title">mi tenis</div>
-    <div class="landing-sub">sistema de rendimiento · temporada 2026</div>
+    <div class="landing-title"><span>mi</span> tenis</div>
+    <div class="landing-sub">sistema de rendimiento para jugadores de tenis</div>
     <div class="select-card">
-      <div class="select-label">seleccioná un jugador</div>
+      <div class="select-label">Seleccioná un jugador</div>
       <div class="player-grid" id="player-grid">
         <div class="loading-state">Cargando jugadores…</div>
       </div>
@@ -448,7 +459,7 @@ let COL = {...COL_DEFAULT};
 
 const INFO_DEFAULT = { alumno:0, brazo:1, altura:2, edad:3, categoria:4, objetivo:5 };
 let INFO = {...INFO_DEFAULT};
-const AVATAR_COLORS = ['#1e3d18','#c2784a','#2563eb','#7c3aed','#b45309','#dc2626','#0891b2','#059669'];
+const AVATAR_COLORS = ['#5170ff','#3a52d6','#6d86ff','#2f3fb0','#5170ff','#3a52d6','#6d86ff','#2f3fb0'];
 
 // Alias de encabezados (se normalizan: minúsculas, sin acentos, solo alfanumérico)
 const HEADER_ALIASES = {
@@ -766,7 +777,7 @@ function calcBench(playerName){
 // INIT
 // ══════════════════════════════════════
 async function init(){
-  if(window.Chart){ Chart.defaults.font.family="'Inter', sans-serif"; Chart.defaults.color='#7a7868'; }
+  if(window.Chart){ Chart.defaults.font.family="'Inter', sans-serif"; Chart.defaults.color='#6b6f8a'; }
   try{
     const [dataMatrix, infoMatrix] = await Promise.all([
       fetchSheet(DATA_SHEET),
@@ -942,9 +953,9 @@ function buildResumen(){
     <div class="mc-cat">${monthLabel(curMonth)} · ${curSess.length} ses.</div>
   </div>`;
 
-  const radarHTML=`<div class="card">
-    <div class="card-title">Perfil — ${monthLabel(curMonth)}${prevMonth?` vs ${prevLbl}`:''}</div>
-    <div class="chart-wrap" style="height:360px;"><canvas id="ch-radar"></canvas></div>
+  const radarHTML=`<div class="radar-wrap">
+    <div class="card-title" style="text-align:center;margin-bottom:6px;">Perfil — ${monthLabel(curMonth)}${prevMonth?` vs ${prevLbl}`:''}</div>
+    <div class="chart-wrap" style="height:380px;"><canvas id="ch-radar"></canvas></div>
   </div>`;
 
   el.innerHTML = fichaHTML + chips + `<div class="metrics-row">${cards}${totalCard}</div>` + radarHTML;
@@ -956,13 +967,13 @@ function buildResumen(){
     charts['radar']=new Chart(document.getElementById('ch-radar'),{
       type:'radar',
       data:{labels:['Técnica','Táctica','Físico','Mental'],datasets:[
-        ...(prevMonth?[{label:prevLbl,data:prv,borderColor:'#b5b0a0',backgroundColor:'rgba(181,176,160,0.10)',borderDash:[5,4],borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#b5b0a0'}]:[]),
-        {label:monthLabel(curMonth),data:cur,borderColor:'#1e3d18',backgroundColor:'rgba(45,90,27,0.18)',borderWidth:2,pointRadius:5,pointBackgroundColor:'#c8d42b',pointBorderColor:'#1e3d18'}
+        ...(prevMonth?[{label:prevLbl,data:prv,borderColor:'#20223a',backgroundColor:'rgba(32,34,58,0.05)',borderDash:[5,4],borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#20223a'}]:[]),
+        {label:monthLabel(curMonth),data:cur,borderColor:'#5170ff',backgroundColor:'rgba(81,112,255,0.22)',borderWidth:2,pointRadius:5,pointBackgroundColor:'#5170ff',pointBorderColor:'#5170ff'}
       ]},
       options:{responsive:true,maintainAspectRatio:false,
         plugins:{legend:{display:true,position:'bottom',labels:{font:{size:12},boxWidth:10,padding:14}},
           tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${(c.raw||0).toFixed(1)} / 3`}}},
-        scales:{r:{min:0,max:3,ticks:{stepSize:1,backdropColor:'transparent',font:{size:10},callback:v=>['','A desarrollar','Funcional','Arma'][v]||''},grid:{color:'rgba(0,0,0,0.08)'},angleLines:{color:'rgba(0,0,0,0.08)'},pointLabels:{color:'#1a1a14',font:{size:13,weight:'600'}}}}
+        scales:{r:{min:0,max:3,ticks:{stepSize:1,backdropColor:'transparent',color:'rgba(32,34,58,0.5)',font:{size:10},callback:v=>['','A desarrollar','Funcional','Arma'][v]||''},grid:{color:'rgba(81,112,255,0.18)'},angleLines:{color:'rgba(81,112,255,0.18)'},pointLabels:{color:'#20223a',font:{size:13,weight:'700'}}}}
       }
     });
   }
