@@ -215,6 +215,32 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 @media(min-width:480px){.metrics-row{grid-template-columns:repeat(4,1fr);}.app-content{padding:24px 24px 48px;}}
 @media(min-width:700px){.player-grid{grid-template-columns:repeat(3,1fr);}}
+
+/* TENDENCIA */
+.trend{font-size:10px;font-family:'DM Mono',monospace;margin-top:4px;display:inline-block;font-weight:500;}
+.trend.up{color:var(--lv3);}
+.trend.down{color:var(--lv1);}
+.trend.flat{color:var(--hint);}
+
+/* PLAN DE ACCIÓN */
+.plan-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;}
+.plan-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:11px;flex-wrap:wrap;}
+.plan-chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:7px;}
+.plan-step{margin-bottom:9px;}
+.plan-step:last-child{margin-bottom:0;}
+.plan-step-lbl{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--hint);margin-bottom:4px;}
+.plan-meta-lbl{color:var(--fis);}
+.plan-now{font-size:12px;color:var(--muted);line-height:1.55;border-left:3px solid var(--lv1);padding-left:10px;}
+.plan-now.now2{border-color:var(--lv2);}
+.plan-meta{font-size:12px;color:var(--text);line-height:1.55;border-left:3px solid var(--lv3);padding-left:10px;font-weight:500;}
+.plan-group-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:20px 0 11px;display:flex;align-items:center;gap:8px;}
+.plan-group-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.plan-arma{display:inline-flex;align-items:center;gap:5px;background:var(--lv3-bg);color:var(--lv3);padding:6px 11px;border-radius:8px;font-size:12px;font-weight:500;margin:0 6px 6px 0;}
+.plan-armas-wrap{display:flex;flex-wrap:wrap;}
+
+/* ERROR INLINE */
+.err-box{background:var(--lv1-bg);border:1px solid var(--lv1);border-radius:var(--radius-sm);padding:12px 14px;color:var(--lv1);font-size:13px;line-height:1.5;}
+.err-box strong{display:block;margin-bottom:3px;}
 </style>
 </head>
 <body>
@@ -258,6 +284,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <nav class="app-tabs">
       <button class="tab-btn active" onclick="switchTab('resumen',this)">Resumen</button>
       <button class="tab-btn" onclick="switchTab('rubrica',this)">Rúbrica</button>
+      <button class="tab-btn" onclick="switchTab('plan',this)">Plan de acción</button>
       <button class="tab-btn" onclick="switchTab('progreso',this)">Progreso</button>
       <button class="tab-btn" onclick="switchTab('historial',this)">Historial</button>
     </nav>
@@ -270,6 +297,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="tab-view" id="tab-rubrica">
       <div class="loading-view" id="loading-rubrica"><div class="spinner"></div><p>Cargando…</p></div>
       <div id="content-rubrica" style="display:none;"></div>
+    </div>
+    <div class="tab-view" id="tab-plan">
+      <div class="loading-view" id="loading-plan"><div class="spinner"></div><p>Cargando…</p></div>
+      <div id="content-plan" style="display:none;"></div>
     </div>
     <div class="tab-view" id="tab-progreso">
       <div class="loading-view" id="loading-progreso"><div class="spinner"></div><p>Cargando…</p></div>
@@ -319,7 +350,7 @@ const INFO_SHEET = 'informacion';
 // 23 descripcion
 // 24 obs_profe
 // ══════════════════════════════════════
-const COL = {
+const COL_DEFAULT = {
   fecha:0, alumno:1, tipo:2,
   Drive_Preparacion:3, Drive_control:4, Drive_Direccion:5,
   Reves_Estabilidad:6, Reves_slice:7,
@@ -330,9 +361,48 @@ const COL = {
   Error:19, Presion:20, Comunicacion:21, Concentracion:22,
   descripcion:23, obs_profe:24
 };
+let COL = {...COL_DEFAULT};
 
-const INFO = { alumno:0, brazo:1, altura:2, edad:3, categoria:4, objetivo:5 };
+const INFO_DEFAULT = { alumno:0, brazo:1, altura:2, edad:3, categoria:4, objetivo:5 };
+let INFO = {...INFO_DEFAULT};
 const AVATAR_COLORS = ['#1e3d18','#c2784a','#2563eb','#7c3aed','#b45309','#dc2626','#0891b2','#059669'];
+
+// Alias de encabezados (se normalizan: minúsculas, sin acentos, solo alfanumérico)
+const HEADER_ALIASES = {
+  fecha:['Marca temporal','Timestamp','Fecha'],
+  alumno:['Alumno','Jugador','Nombre'],
+  tipo:['Tipo de sesión','Tipo de sesion','Tipo'],
+  Drive_Preparacion:['Drive_Preparación','Drive Preparación','Drive preparacion'],
+  Drive_control:['Drive_control','Drive control'],
+  Drive_Direccion:['Drive_Dirección','Drive Dirección','Drive direccion'],
+  Reves_Estabilidad:['Revés_Estabilidad','Reves Estabilidad'],
+  Reves_slice:['Revés_slice','Reves slice'],
+  Saque_Primero:['Saque_Primero','Saque Primero','Primer saque'],
+  Saque_Segundo:['Saque_Segundo','Saque Segundo','Segundo saque'],
+  Volea_subida:['Volea_subida','Volea subida'],
+  Volea_Ejecucion:['Volea_Ejecución','Volea Ejecucion'],
+  Punto:['Punto','Construcción del punto'],
+  Rival:['Rival','Lectura del rival'],
+  Marcador:['Marcador','Gestión del marcador'],
+  Resistencia:['Resistencia'],
+  Velocidad:['Velocidad'],
+  Agilidad:['Agilidad'],
+  Fuerza:['Fuerza'],
+  Error:['Error','Tolerancia al error'],
+  Presion:['Presión','Presion','Presión en momentos clave'],
+  Comunicacion:['Comunicación','Comunicacion'],
+  Concentracion:['Concentración','Concentracion'],
+  descripcion:['descripcion','descripción','Descripción de la sesión'],
+  obs_profe:['obs_profe','Observación del profe','Observación del coach','Observaciones']
+};
+const INFO_ALIASES = {
+  alumno:['alumno','Jugador','Nombre'],
+  brazo:['brazo','brazo hábil','Mano hábil'],
+  altura:['altura'],
+  edad:['edad'],
+  categoria:['categoria','categoría'],
+  objetivo:['objetivo','objetivos']
+};
 
 // ══════════════════════════════════════
 // RÚBRICAS — descriptores por nivel 1/2/3
@@ -396,6 +466,14 @@ const AREA_KEYS = {
   mental:   ['Error','Presion','Comunicacion','Concentracion']
 };
 
+// Metadatos de área (para chips y agrupaciones del plan)
+const AREA_META = {
+  tecnica:{nombre:'Técnica',emoji:'🎾',cls:'tec'},
+  tactica:{nombre:'Táctica',emoji:'♟️',cls:'tac'},
+  fisico:{nombre:'Físico',emoji:'⚡',cls:'fis'},
+  mental:{nombre:'Mental',emoji:'🧠',cls:'men'}
+};
+
 // ══════════════════════════════════════
 // ESTADO GLOBAL
 // ══════════════════════════════════════
@@ -406,28 +484,72 @@ let allRows=[], infoRows=[], currentPlayer=null, playerSessions=[], charts={};
 // ══════════════════════════════════════
 async function fetchSheet(name){
   const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}`;
-  const res=await fetch(url);
-  if(!res.ok) throw new Error(`No se pudo cargar la hoja: "${name}"`);
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(), 15000);
+  let res;
+  try{
+    res=await fetch(url,{signal:ctrl.signal});
+  }catch(e){
+    throw new Error(e.name==='AbortError' ? `Tiempo de espera agotado al cargar "${name}"` : `Error de red al cargar "${name}"`);
+  }finally{
+    clearTimeout(timer);
+  }
+  if(!res.ok) throw new Error(`No se pudo cargar la hoja "${name}" (HTTP ${res.status})`);
   return parseCSV(await res.text());
 }
 
+// Parser CSV robusto: respeta comillas, comas y saltos de línea dentro de celdas,
+// y comillas dobles escapadas (""). Devuelve TODAS las filas, incluida la cabecera.
 function parseCSV(text){
-  return text.trim().split('\n').slice(1).map(line=>{
-    const cols=[]; let cur='', inQ=false;
-    for(const ch of line){
-      if(ch==='"'){inQ=!inQ; continue;}
-      if(ch===','&&!inQ){cols.push(cur.trim()); cur='';}
+  const s=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  const rows=[]; let row=[], cur='', inQ=false;
+  for(let i=0;i<s.length;i++){
+    const ch=s[i];
+    if(inQ){
+      if(ch==='"'){ if(s[i+1]==='"'){cur+='"'; i++;} else inQ=false; }
+      else cur+=ch;
+    }else{
+      if(ch==='"') inQ=true;
+      else if(ch===','){ row.push(cur); cur=''; }
+      else if(ch==='\n'){ row.push(cur); rows.push(row); row=[]; cur=''; }
       else cur+=ch;
     }
-    cols.push(cur.trim());
-    return cols;
-  }).filter(r=>r[0]&&r[0].length>0);
+  }
+  if(cur.length || row.length){ row.push(cur); rows.push(row); }
+  return rows.map(r=>r.map(x=>x.trim()));
 }
 
 // ══════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════
 function n(v){ return parseFloat((v+'').replace(',','.'))||0; }
+
+// Normaliza encabezados para comparar (sin acentos, sin separadores, minúsculas)
+function normHeader(s){
+  return (s||'').toString().toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^a-z0-9]/g,'');
+}
+// Mapea claves lógicas a índice de columna por nombre de encabezado; si no encuentra, usa el índice por defecto
+function buildColMap(headerRow, defaults, aliases){
+  const map={...defaults};
+  const norm=(headerRow||[]).map(normHeader);
+  for(const key of Object.keys(defaults)){
+    const wanted=(aliases&&aliases[key])||[];
+    for(const a of wanted){
+      const idx=norm.indexOf(normHeader(a));
+      if(idx>=0){ map[key]=idx; break; }
+    }
+  }
+  return map;
+}
+// Flecha de tendencia: compara promedio de la última vs la sesión anterior
+function trendArrow(d){
+  if(d===null||d===undefined) return '';
+  if(d>0.05)  return `<span class="trend up" title="Mejoró vs sesión anterior">▲ ${d.toFixed(1)}</span>`;
+  if(d<-0.05) return `<span class="trend down" title="Bajó vs sesión anterior">▼ ${Math.abs(d).toFixed(1)}</span>`;
+  return `<span class="trend flat" title="Sin cambios vs sesión anterior">＝ igual</span>`;
+}
 
 // Convierte valor 1–3 directo (del forms) → nivel 1–3
 // Si el forms ya entrega 1, 2 o 3 usamos directo.
@@ -535,10 +657,14 @@ function calcBench(playerName){
 // ══════════════════════════════════════
 async function init(){
   try{
-    [allRows, infoRows] = await Promise.all([
+    const [dataMatrix, infoMatrix] = await Promise.all([
       fetchSheet(DATA_SHEET),
       fetchSheet(INFO_SHEET).catch(()=>[])
     ]);
+    if(dataMatrix.length) COL  = buildColMap(dataMatrix[0], COL_DEFAULT,  HEADER_ALIASES);
+    if(infoMatrix.length) INFO = buildColMap(infoMatrix[0], INFO_DEFAULT, INFO_ALIASES);
+    allRows  = dataMatrix.slice(1).filter(r=>r[COL.alumno] && r[COL.alumno].length>0);
+    infoRows = infoMatrix.length ? infoMatrix.slice(1).filter(r=>r[INFO.alumno] && r[INFO.alumno].length>0) : [];
     const players=[...new Set(allRows.map(r=>r[COL.alumno]))].filter(Boolean).sort();
     const grid=document.getElementById('player-grid');
     if(!players.length){
@@ -586,10 +712,15 @@ function selectPlayer(name){
   document.getElementById('tab-resumen').classList.add('active');
   Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});
   charts={};
-  buildResumen();
-  buildRubrica();
-  buildProgreso();
-  buildHistorial();
+  [['resumen',buildResumen],['rubrica',buildRubrica],['plan',buildPlan],['progreso',buildProgreso],['historial',buildHistorial]]
+    .forEach(([id,fn])=>{
+      try{ fn(); }
+      catch(err){
+        const ld=document.getElementById('loading-'+id), ct=document.getElementById('content-'+id);
+        if(ld) ld.style.display='none';
+        if(ct){ ct.style.display='block'; ct.innerHTML='<div class="err-box"><strong>No se pudo construir esta vista.</strong>'+(err&&err.message?err.message:err)+'</div>'; }
+      }
+    });
 }
 function goBack(){
   document.getElementById('landing').style.display='';
@@ -636,6 +767,14 @@ function buildResumen(){
   const avgTac=Math.round(avgLvlKeys(last,AREA_KEYS.tactica));
   const avgFis=Math.round(avgLvlKeys(last,AREA_KEYS.fisico));
   const avgMen=Math.round(avgLvlKeys(last,AREA_KEYS.mental));
+
+  // Promedios crudos (0-3) y comparación con la sesión anterior
+  const prev = sess.length>=2 ? sess[sess.length-2] : null;
+  const rawTec=avgLvlKeys(last,AREA_KEYS.tecnica), rawTac=avgLvlKeys(last,AREA_KEYS.tactica), rawFis=avgLvlKeys(last,AREA_KEYS.fisico), rawMen=avgLvlKeys(last,AREA_KEYS.mental);
+  const pTec=prev?avgLvlKeys(prev,AREA_KEYS.tecnica):0, pTac=prev?avgLvlKeys(prev,AREA_KEYS.tactica):0, pFis=prev?avgLvlKeys(prev,AREA_KEYS.fisico):0, pMen=prev?avgLvlKeys(prev,AREA_KEYS.mental):0;
+  const dlt=(cur,prv)=> (prev && cur>0 && prv>0) ? (cur-prv) : null;
+  const dTec=dlt(rawTec,pTec), dTac=dlt(rawTac,pTac), dFis=dlt(rawFis,pFis), dMen=dlt(rawMen,pMen);
+  const radarHTML=`<div class="card"><div class="card-title">Perfil — 4 áreas (última vs anterior)</div><div class="chart-wrap" style="height:280px;"><canvas id="ch-radar"></canvas></div></div>`;
 
   // 4 tarjetas de área con variables + benchmark
   const areaConfig=[
@@ -719,20 +858,37 @@ function buildResumen(){
 
   // Tarjetas de métricas top (4 áreas)
   const metricsHTML=`<div class="metrics-row">
-    <div class="metric-card"><div class="metric-label">Técnica</div><div class="metric-icon">🎾</div><div class="nivel-badge ${lvlClass(avgTec)}">${avgTec>0?lvlLabel(avgTec):'—'}</div></div>
-    <div class="metric-card"><div class="metric-label">Táctica</div><div class="metric-icon">♟️</div><div class="nivel-badge ${lvlClass(avgTac)}">${avgTac>0?lvlLabel(avgTac):'—'}</div></div>
-    <div class="metric-card"><div class="metric-label">Físico</div><div class="metric-icon">⚡</div><div class="nivel-badge ${lvlClass(avgFis)}">${avgFis>0?lvlLabel(avgFis):'—'}</div></div>
-    <div class="metric-card"><div class="metric-label">Mental</div><div class="metric-icon">🧠</div><div class="nivel-badge ${lvlClass(avgMen)}">${avgMen>0?lvlLabel(avgMen):'—'}</div></div>
+    <div class="metric-card"><div class="metric-label">Técnica</div><div class="metric-icon">🎾</div><div class="nivel-badge ${lvlClass(avgTec)}">${avgTec>0?lvlLabel(avgTec):'—'}</div>${trendArrow(dTec)}</div>
+    <div class="metric-card"><div class="metric-label">Táctica</div><div class="metric-icon">♟️</div><div class="nivel-badge ${lvlClass(avgTac)}">${avgTac>0?lvlLabel(avgTac):'—'}</div>${trendArrow(dTac)}</div>
+    <div class="metric-card"><div class="metric-label">Físico</div><div class="metric-icon">⚡</div><div class="nivel-badge ${lvlClass(avgFis)}">${avgFis>0?lvlLabel(avgFis):'—'}</div>${trendArrow(dFis)}</div>
+    <div class="metric-card"><div class="metric-label">Mental</div><div class="metric-icon">🧠</div><div class="nivel-badge ${lvlClass(avgMen)}">${avgMen>0?lvlLabel(avgMen):'—'}</div>${trendArrow(dMen)}</div>
   </div>`;
 
   el.innerHTML = fichaHTML
     + `<div class="nota">📌 Última sesión: <strong>${fmtDate(last[COL.fecha])}</strong> · ${last[COL.tipo]||'Sesión'}</div>`
     + metricsHTML
+    + radarHTML
     + areaCards
     + (last[COL.descripcion]?`<div class="card"><div class="card-title">Descripción de la sesión</div><div class="feedback-block">${last[COL.descripcion]}</div></div>`:'')
     + (last[COL.obs_profe]?`<div class="card"><div class="card-title">Observación del coach</div><div class="feedback-block feedback-coach">${last[COL.obs_profe]}</div></div>`:'');
 
   ldEl.style.display='none'; el.style.display='block';
+
+  // Radar de las 4 áreas (última vs sesión anterior)
+  if(document.getElementById('ch-radar')){
+    charts['radar']=new Chart(document.getElementById('ch-radar'),{
+      type:'radar',
+      data:{labels:['Técnica','Táctica','Físico','Mental'],datasets:[
+        ...(prev?[{label:'Sesión anterior',data:[pTec,pTac,pFis,pMen],borderColor:'#b5b0a0',backgroundColor:'rgba(181,176,160,0.10)',borderDash:[5,4],borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#b5b0a0'}]:[]),
+        {label:'Última sesión',data:[rawTec,rawTac,rawFis,rawMen],borderColor:'#1e3d18',backgroundColor:'rgba(45,90,27,0.20)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#c8d42b',pointBorderColor:'#1e3d18'}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:true,position:'bottom',labels:{color:'#7a7868',font:{size:11},boxWidth:10,padding:12}},
+          tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${(c.raw||0).toFixed(1)} / 3`}}},
+        scales:{r:{min:0,max:3,ticks:{stepSize:1,color:'#b5b0a0',backdropColor:'transparent',font:{size:9},callback:v=>['','A dev.','Func.','Arma'][v]||''},grid:{color:'rgba(0,0,0,0.08)'},angleLines:{color:'rgba(0,0,0,0.08)'},pointLabels:{color:'#1a1a14',font:{size:12,weight:'600'}}}}
+      }
+    });
+  }
 }
 
 // ══════════════════════════════════════
@@ -781,6 +937,59 @@ function buildRubrica(){
     ${renderSection('Físico','⚡',RUBRICAS.fisico)}
     ${renderSection('Mental','🧠',RUBRICAS.mental)}
   `;
+  ldEl.style.display='none'; el.style.display='block';
+}
+
+// ══════════════════════════════════════
+// PLAN DE ACCIÓN — focos prioritarios derivados de la rúbrica
+// ══════════════════════════════════════
+function buildPlan(){
+  const el=document.getElementById('content-plan');
+  const ldEl=document.getElementById('loading-plan');
+  const sess=playerSessions;
+  if(!sess.length){
+    ldEl.style.display='none'; el.style.display='block';
+    el.innerHTML='<div class="empty">No hay sesiones para generar el plan.</div>'; return;
+  }
+  const last=sess[sess.length-1];
+  const info=getInfo(currentPlayer);
+
+  const items=[];
+  Object.keys(RUBRICAS).forEach(areaId=>{
+    RUBRICAS[areaId].forEach(v=>{
+      const lv=toLvl(last[COL[v.key]]);
+      if(lv>0) items.push({...AREA_META[areaId], nombre:v.nombre, lv, desc:v.desc});
+    });
+  });
+  const prioritarios=items.filter(i=>i.lv===1);
+  const consolidar=items.filter(i=>i.lv===2);
+  const armas=items.filter(i=>i.lv===3);
+
+  const chip=it=>`<span class="plan-chip pill-${it.cls}">${it.emoji} ${it.nombre}</span>`;
+  const focoCard=it=>{
+    const tgt=it.lv+1;
+    return `<div class="plan-card">
+      <div class="plan-card-top">${chip(it)}<span class="nivel-badge ${lvlClass(it.lv)}">Nivel ${it.lv} · ${lvlLabel(it.lv)}</span></div>
+      <div class="plan-step"><span class="plan-step-lbl">Hoy</span><div class="plan-now${it.lv===2?' now2':''}">${it.desc[it.lv-1]}</div></div>
+      <div class="plan-step"><span class="plan-step-lbl plan-meta-lbl">Meta · nivel ${tgt} (${lvlLabel(tgt)})</span><div class="plan-meta">${it.desc[tgt-1]}</div></div>
+    </div>`;
+  };
+
+  const objetivoHTML = (info && info[INFO.objetivo])
+    ? `<div class="card"><div class="card-title">🎯 Objetivo del jugador</div><div class="feedback-block feedback-coach">${info[INFO.objetivo]}</div></div>` : '';
+
+  let body='';
+  if(prioritarios.length) body += `<div class="plan-group-title">🔴 Focos prioritarios · nivel 1</div>` + prioritarios.map(focoCard).join('');
+  if(consolidar.length)   body += `<div class="plan-group-title">🟡 Para consolidar · nivel 2</div>` + consolidar.map(focoCard).join('');
+  if(armas.length)        body += `<div class="plan-group-title">🟢 Fortalezas · mantener como recurso</div><div class="plan-armas-wrap">` + armas.map(it=>`<span class="plan-arma">${it.emoji} ${it.nombre}</span>`).join('') + `</div>`;
+  if(!prioritarios.length && !consolidar.length)
+    body = `<div class="nota">Todas las variables evaluadas están en nivel 3 (Arma). El foco ahora es sostener el nivel y subir la exigencia de contexto (partido / torneo).</div>` + body;
+
+  el.innerHTML = objetivoHTML
+    + `<div class="nota">Plan sugerido a partir de la evaluación del <strong>${fmtDate(last[COL.fecha])}</strong>. Se priorizan las variables más bajas y se muestra la <strong>conducta meta</strong> del nivel siguiente.</div>`
+    + body
+    + (last[COL.obs_profe]?`<div class="card"><div class="card-title">Observación del coach</div><div class="feedback-block feedback-coach">${last[COL.obs_profe]}</div></div>`:'');
+
   ldEl.style.display='none'; el.style.display='block';
 }
 
