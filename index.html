@@ -26,10 +26,14 @@
   --tac:        #5170ff; --tac-bg:#e7ebff;
   --fis:        #5170ff; --fis-bg:#e7ebff;
   --men:        #5170ff; --men-bg:#e7ebff;
-  /* Niveles — escala monocroma azul (claro=bajo, intenso=alto) */
-  --lv1:        #aab4e0; --lv1-bg:#eef0f7;
-  --lv2:        #8b9bff; --lv2-bg:#e7ebff;
-  --lv3:        #5170ff; --lv3-bg:#e0e6ff;
+  /* Niveles (semáforo) — Plan de acción */
+  --lv1:        #dc2626; --lv1-bg:#fde8e8;
+  --lv2:        #e0a200; --lv2-bg:#fef3c7;
+  --lv3:        #16a34a; --lv3-bg:#dcfce7;
+  /* Rendimiento — foco (amarillo) -> fortaleza (azul) */
+  --pf1:        #f3fe76; --pf1-bg:#fbffcf;
+  --pf2:        #a9b6ff; --pf2-bg:#e7ebff;
+  --pf3:        #5170ff; --pf3-bg:#e0e6ff;
   --radius:     16px;
   --radius-sm:  10px;
 }
@@ -322,7 +326,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .perf-delta.pos{color:var(--lv3);} .perf-delta.neg{color:var(--lv1);} .perf-delta.eq{color:var(--hint);}
 .perf-track{position:relative;height:8px;background:var(--surf2);border-radius:999px;}
 .perf-fill{height:100%;border-radius:999px;transition:width .6s cubic-bezier(.34,1.2,.64,1);}
-.fill-1{background:var(--lv1);} .fill-2{background:var(--lv2);} .fill-3{background:var(--lv3);} .fill-0{background:var(--hint);}
+.fill-1{background:var(--pf1);} .fill-2{background:var(--pf2);} .fill-3{background:var(--pf3);} .fill-0{background:var(--hint);}
 .perf-tick{position:absolute;top:-3px;width:2px;height:14px;background:var(--text);opacity:.5;border-radius:2px;}
 .perf-cat{font-size:11px;color:var(--hint);margin-top:7px;}
 @media(min-width:760px){.perf-grid{grid-template-columns:1fr 1fr;}}
@@ -334,6 +338,25 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .perf-delta.neg{color:var(--muted);}
 .perf-tick{background:var(--blue-d);opacity:.75;}
 .cat-dot{box-shadow:0 0 0 2px rgba(255,255,255,.7);}
+
+
+/* === v7: dot base, deltas on-brand, última actualización, modal PIN === */
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:middle;}
+.mc-delta.up{color:var(--pf3);}
+.perf-delta.pos{color:var(--pf3);}
+.last-update{margin-top:14px;font-size:11px;color:var(--muted);text-align:center;}
+.pin-overlay{position:fixed;inset:0;background:rgba(32,34,58,.45);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:1000;padding:1.5rem;}
+.pin-overlay.show{display:flex;}
+.pin-modal{background:var(--surf);border-radius:var(--radius);padding:24px;width:100%;max-width:320px;box-shadow:0 20px 60px rgba(32,34,58,.3);}
+.pin-title{font-weight:700;font-size:17px;color:var(--text);margin-bottom:4px;}
+.pin-sub{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.pin-input{width:100%;border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:18px;font-family:'Inter',sans-serif;letter-spacing:.2em;text-align:center;color:var(--text);outline:none;}
+.pin-input:focus{border-color:var(--blue);}
+.pin-err{font-size:12px;color:var(--lv1);min-height:16px;margin-top:8px;}
+.pin-actions{display:flex;gap:10px;margin-top:16px;}
+.pin-btn{flex:1;border:none;border-radius:10px;padding:11px;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;}
+.pin-cancel{background:var(--surf2);color:var(--text);}
+.pin-ok{background:var(--blue);color:#fff;}
 
 </style>
 </head>
@@ -357,6 +380,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div class="player-grid" id="player-grid">
         <div class="loading-state">Cargando jugadores…</div>
       </div>
+      <div class="last-update" id="last-update"></div>
     </div>
   </div>
 </div>
@@ -405,6 +429,19 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div id="content-historial" style="display:none;"></div>
     </div>
   </main>
+</div>
+
+<div class="pin-overlay" id="pin-overlay">
+  <div class="pin-modal">
+    <div class="pin-title">Acceso del jugador</div>
+    <div class="pin-sub" id="pin-sub">Ingresá el PIN</div>
+    <input class="pin-input" id="pin-input" type="password" inputmode="numeric" autocomplete="off" maxlength="8" placeholder="PIN" onkeydown="if(event.key==='Enter')submitPin()">
+    <div class="pin-err" id="pin-err"></div>
+    <div class="pin-actions">
+      <button class="pin-btn pin-cancel" onclick="closePin()">Cancelar</button>
+      <button class="pin-btn pin-ok" onclick="submitPin()">Entrar</button>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -457,7 +494,7 @@ const COL_DEFAULT = {
 };
 let COL = {...COL_DEFAULT};
 
-const INFO_DEFAULT = { alumno:0, brazo:1, altura:2, edad:3, categoria:4, objetivo:5 };
+const INFO_DEFAULT = { alumno:0, brazo:1, altura:2, edad:3, categoria:4, objetivo:5, pin:6 };
 let INFO = {...INFO_DEFAULT};
 const AVATAR_COLORS = ['#5170ff','#3a52d6','#6d86ff','#2f3fb0','#5170ff','#3a52d6','#6d86ff','#2f3fb0'];
 
@@ -495,7 +532,8 @@ const INFO_ALIASES = {
   altura:['altura'],
   edad:['edad'],
   categoria:['categoria','categoría'],
-  objetivo:['objetivo','objetivos']
+  objetivo:['objetivo','objetivos'],
+  pin:['pin','clave','codigo','código','contraseña','password']
 };
 
 // ══════════════════════════════════════
@@ -776,42 +814,83 @@ function calcBench(playerName){
 // ══════════════════════════════════════
 // INIT
 // ══════════════════════════════════════
+const CACHE_KEY='mitenis_cache_v1';
+function fmtUpdated(ts){ const d=new Date(ts); return isNaN(d)?'':d.toLocaleString('es-AR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }
+function setUpdated(ts){ const e=document.getElementById('last-update'); if(e) e.textContent = ts ? ('Última actualización: '+fmtUpdated(ts)) : ''; }
+function applyData(dataMatrix, infoMatrix){
+  if(dataMatrix.length) COL  = buildColMap(dataMatrix[0], COL_DEFAULT,  HEADER_ALIASES);
+  if(infoMatrix && infoMatrix.length) INFO = buildColMap(infoMatrix[0], INFO_DEFAULT, INFO_ALIASES);
+  allRows  = dataMatrix.slice(1).filter(r=>r[COL.alumno] && r[COL.alumno].length>0);
+  infoRows = (infoMatrix && infoMatrix.length) ? infoMatrix.slice(1).filter(r=>r[INFO.alumno] && r[INFO.alumno].length>0) : [];
+}
+function renderPlayers(){
+  const players=[...new Set(allRows.map(r=>r[COL.alumno]))].filter(Boolean).sort();
+  const grid=document.getElementById('player-grid');
+  if(!grid) return;
+  if(!players.length){ grid.innerHTML='<div class="loading-state">No hay jugadores cargados.</div>'; return; }
+  grid.innerHTML=players.map((name,i)=>{
+    const ini=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const color=AVATAR_COLORS[i%AVATAR_COLORS.length];
+    const ns=allRows.filter(r=>r[COL.alumno]===name).length;
+    return `<button class="player-btn" onclick="selectPlayer('${name.replace(/'/g,"\\'")}')">
+      <div class="pb-avatar" style="background:${color};">${ini}</div>
+      <div><div class="pb-name">${name}</div><div class="pb-meta">${ns} sesión${ns!==1?'es':''}</div></div>
+    </button>`;
+  }).join('');
+}
 async function init(){
   if(window.Chart){ Chart.defaults.font.family="'Inter', sans-serif"; Chart.defaults.color='#6b6f8a'; }
+  // 1) Cache para pintado instantáneo
+  try{
+    const raw=localStorage.getItem(CACHE_KEY);
+    if(raw){ const cc=JSON.parse(raw); if(cc && cc.data){ applyData(cc.data, cc.info||[]); renderPlayers(); setUpdated(cc.ts); } }
+  }catch(e){}
+  // 2) Refresco en vivo desde el Sheet
   try{
     const [dataMatrix, infoMatrix] = await Promise.all([
       fetchSheet(DATA_SHEET),
       fetchSheet(INFO_SHEET).catch(()=>[])
     ]);
-    if(dataMatrix.length) COL  = buildColMap(dataMatrix[0], COL_DEFAULT,  HEADER_ALIASES);
-    if(infoMatrix.length) INFO = buildColMap(infoMatrix[0], INFO_DEFAULT, INFO_ALIASES);
-    allRows  = dataMatrix.slice(1).filter(r=>r[COL.alumno] && r[COL.alumno].length>0);
-    infoRows = infoMatrix.length ? infoMatrix.slice(1).filter(r=>r[INFO.alumno] && r[INFO.alumno].length>0) : [];
-    const players=[...new Set(allRows.map(r=>r[COL.alumno]))].filter(Boolean).sort();
-    const grid=document.getElementById('player-grid');
-    if(!players.length){
-      grid.innerHTML='<div class="loading-state">No hay jugadores cargados.</div>';
-      return;
-    }
-    grid.innerHTML=players.map((name,i)=>{
-      const ini=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-      const color=AVATAR_COLORS[i%AVATAR_COLORS.length];
-      const ns=allRows.filter(r=>r[COL.alumno]===name).length;
-      return `<button class="player-btn" onclick="selectPlayer('${name.replace(/'/g,"\\'")}')">
-        <div class="pb-avatar" style="background:${color};">${ini}</div>
-        <div><div class="pb-name">${name}</div><div class="pb-meta">${ns} sesión${ns!==1?'es':''}</div></div>
-      </button>`;
-    }).join('');
+    applyData(dataMatrix, infoMatrix);
+    renderPlayers();
+    const ts=Date.now(); setUpdated(ts);
+    try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ts, data:dataMatrix, info:infoMatrix})); }catch(e){}
   }catch(e){
-    document.getElementById('player-grid').innerHTML=
-      `<div class="loading-state" style="color:#ffaaaa;">Error: ${e.message}</div>`;
+    if(!allRows.length){
+      const g=document.getElementById('player-grid');
+      if(g) g.innerHTML=`<div class="loading-state" style="color:#ffdddd;">Error: ${e.message}</div>`;
+    }
   }
 }
 
 // ══════════════════════════════════════
 // SELECT PLAYER
 // ══════════════════════════════════════
+let __pendingPlayer=null;
 function selectPlayer(name){
+  const info=getInfo(name);
+  const pin=(info && info[INFO.pin]!=null) ? String(info[INFO.pin]).trim() : '';
+  if(pin){
+    __pendingPlayer=name;
+    document.getElementById('pin-sub').textContent='Ingresá el PIN de '+name;
+    const inp=document.getElementById('pin-input'); inp.value='';
+    document.getElementById('pin-err').textContent='';
+    document.getElementById('pin-overlay').classList.add('show');
+    setTimeout(()=>{try{inp.focus();}catch(e){}},60);
+    return;
+  }
+  openPlayer(name);
+}
+function closePin(){ document.getElementById('pin-overlay').classList.remove('show'); __pendingPlayer=null; }
+function submitPin(){
+  const name=__pendingPlayer; if(!name) return;
+  const info=getInfo(name);
+  const pin=(info && info[INFO.pin]!=null) ? String(info[INFO.pin]).trim() : '';
+  const val=(document.getElementById('pin-input').value||'').trim();
+  if(val===pin){ document.getElementById('pin-overlay').classList.remove('show'); __pendingPlayer=null; openPlayer(name); }
+  else { document.getElementById('pin-err').textContent='PIN incorrecto. Probá de nuevo.'; }
+}
+function openPlayer(name){
   currentPlayer=name;
   selectedMonth='all';
   playerSessions=allRows
@@ -1027,9 +1106,9 @@ function buildRubrica(){
   }).join('');
 
   const legend=`<div class="sem-legend" style="margin-bottom:14px;">
-    <span class="sem-leg" style="background:var(--lv1-bg);color:var(--lv1);"><span class="dot dot-1"></span> A desarrollar</span>
-    <span class="sem-leg" style="background:var(--lv2-bg);color:var(--lv2);"><span class="dot dot-2"></span> Funcional</span>
-    <span class="sem-leg" style="background:var(--lv3-bg);color:var(--lv3);"><span class="dot dot-3"></span> Arma</span>
+    <span class="sem-leg" style="background:var(--pf1-bg);color:#8a7e00;"><span class="dot" style="background:var(--pf1);"></span> A desarrollar</span>
+    <span class="sem-leg" style="background:var(--pf2-bg);color:var(--blue-d);"><span class="dot" style="background:var(--pf2);"></span> Funcional</span>
+    <span class="sem-leg" style="background:var(--pf3-bg);color:var(--blue);"><span class="dot" style="background:var(--pf3);"></span> Arma</span>
   </div>`;
 
   el.innerHTML = legend + `<div class="perf-grid">${cards}</div>`;
@@ -1078,7 +1157,7 @@ function buildPlan(){
 }
 
 // ══════════════════════════════════════
-// PROGRESO — gráficos de evolución por área
+// PROGRESO — evolución del promedio por área (tonos de azul)
 // ══════════════════════════════════════
 function buildProgreso(){
   const el=document.getElementById('content-progreso');
@@ -1089,68 +1168,34 @@ function buildProgreso(){
     el.innerHTML='<div class="empty">Necesitás al menos 2 sesiones para ver la evolución.</div>'; return;
   }
   const labels=sess.map(s=>fmtDate(s[COL.fecha]));
-
   el.innerHTML=`
-    <div class="nota">Evolución de niveles: <strong>1</strong> = A desarrollar · <strong>2</strong> = Funcional · <strong>3</strong> = Arma</div>
-    <div class="card"><div class="card-title">🎾 Técnica — evolución</div><div class="chart-wrap"><canvas id="ch-tec"></canvas></div></div>
-    <div class="card"><div class="card-title">♟️ Táctica — evolución</div><div class="chart-wrap" style="height:160px;"><canvas id="ch-tac"></canvas></div></div>
-    <div class="card"><div class="card-title">⚡ Físico — evolución</div><div class="chart-wrap"><canvas id="ch-fis"></canvas></div></div>
-    <div class="card"><div class="card-title">🧠 Mental — evolución</div><div class="chart-wrap"><canvas id="ch-men"></canvas></div></div>
+    <div class="nota">Evolución del promedio por área · 1 A desarrollar · 2 Funcional · 3 Arma</div>
+    <div class="card"><div class="card-title">Evolución por área</div><div class="chart-wrap" style="height:320px;"><canvas id="ch-areas"></canvas></div></div>
   `;
   ldEl.style.display='none'; el.style.display='block';
-
-  const baseOpts=()=>({
-    responsive:true, maintainAspectRatio:false,
-    plugins:{legend:{display:true,position:'bottom',labels:{color:'#7a7868',font:{size:10},boxWidth:8,padding:10}}},
-    scales:{
-      y:{min:0,max:3,ticks:{stepSize:1,color:'#b5b0a0',font:{size:10},
-        callback:v=>v===0?'':v===1?'A dev.':v===2?'Func.':v===3?'Arma':''},
-        grid:{color:'rgba(0,0,0,0.04)'}},
-      x:{ticks:{color:'#b5b0a0',font:{size:10},maxRotation:40,autoSkip:true,maxTicksLimit:7},
-        grid:{color:'rgba(0,0,0,0.04)'}}
+  const areas=[
+    {id:'tecnica', nombre:'Técnica', color:'#5170ff', dash:[]},
+    {id:'tactica', nombre:'Táctica', color:'#2f3fb0', dash:[6,4]},
+    {id:'fisico',  nombre:'Físico',  color:'#9aa8ff', dash:[]},
+    {id:'mental',  nombre:'Mental',  color:'#20223a', dash:[6,4]}
+  ];
+  charts['areas']=new Chart(document.getElementById('ch-areas'),{
+    type:'line',
+    data:{labels, datasets:areas.map(a=>({
+      label:a.nombre,
+      data:sess.map(s=>{const v=avgLvlKeys(s,AREA_KEYS[a.id]); return v>0?v:null;}),
+      borderColor:a.color, backgroundColor:a.color, borderDash:a.dash,
+      tension:.35, pointRadius:4, pointBackgroundColor:a.color, spanGaps:true, borderWidth:2.5
+    }))},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:'bottom',labels:{font:{size:11},boxWidth:14,padding:14,usePointStyle:true}},
+        tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${(c.raw||0).toFixed(1)} / 3`}}},
+      scales:{
+        y:{min:0,max:3,ticks:{stepSize:1,font:{size:10},callback:v=>['','A desarrollar','Funcional','Arma'][v]||''},grid:{color:'rgba(81,112,255,0.10)'}},
+        x:{ticks:{font:{size:10},maxRotation:40,autoSkip:true,maxTicksLimit:7},grid:{color:'rgba(81,112,255,0.06)'}}
+      }
     }
   });
-
-  // TÉCNICA
-  const tecColors=['#1a5fb4','#dc2626','#1e6640','#b45309','#7c3aed','#0891b2','#c47000','#059669','#6d28d9'];
-  charts['tec']=new Chart(document.getElementById('ch-tec'),{type:'line',data:{labels,datasets:
-    RUBRICAS.tecnica.map((item,i)=>({
-      label:item.nombre,
-      data:sess.map(s=>{const l=toLvl(s[COL[item.key]]);return l||null;}),
-      borderColor:tecColors[i%tecColors.length],
-      tension:.35, pointRadius:4, spanGaps:true, borderWidth:2
-    }))
-  },options:baseOpts()});
-
-  // TÁCTICA
-  charts['tac']=new Chart(document.getElementById('ch-tac'),{type:'line',data:{labels,datasets:
-    RUBRICAS.tactica.map((item,i)=>({
-      label:item.nombre,
-      data:sess.map(s=>{const l=toLvl(s[COL[item.key]]);return l||null;}),
-      borderColor:['#b45309','#7a3b00','#c47000'][i],
-      tension:.35, pointRadius:5, spanGaps:true, borderWidth:2
-    }))
-  },options:baseOpts()});
-
-  // FÍSICO
-  charts['fis']=new Chart(document.getElementById('ch-fis'),{type:'line',data:{labels,datasets:
-    RUBRICAS.fisico.map((item,i)=>({
-      label:item.nombre,
-      data:sess.map(s=>{const l=toLvl(s[COL[item.key]]);return l||null;}),
-      borderColor:['#1e6640','#1a5fb4','#b45309','#7c3aed'][i],
-      tension:.35, pointRadius:5, spanGaps:true, borderWidth:2
-    }))
-  },options:baseOpts()});
-
-  // MENTAL
-  charts['men']=new Chart(document.getElementById('ch-men'),{type:'line',data:{labels,datasets:
-    RUBRICAS.mental.map((item,i)=>({
-      label:item.nombre,
-      data:sess.map(s=>{const l=toLvl(s[COL[item.key]]);return l||null;}),
-      borderColor:['#5b21b6','#dc2626','#1a5fb4','#1e6640'][i],
-      tension:.35, pointRadius:5, spanGaps:true, borderWidth:2
-    }))
-  },options:baseOpts()});
 }
 
 // ══════════════════════════════════════
