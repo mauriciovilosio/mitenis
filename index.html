@@ -464,6 +464,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .av-pick::after{content:'';position:absolute;left:-22%;right:-22%;top:17%;height:66%;border:2px solid rgba(255,255,255,.6);border-top:none;border-bottom:none;border-radius:50%;pointer-events:none;}
 .av-pick.active{border-color:var(--blue);box-shadow:0 0 0 3px rgba(81,112,255,.25),inset 0 2px 6px rgba(255,255,255,.45);}
 
+
+/* === v10: avatar clickeable === */
+.header-avatar{cursor:pointer;transition:outline .12s;}
+.header-avatar:hover{outline:2px solid rgba(32,34,58,.3);outline-offset:1px;}
 </style>
 </head>
 <body>
@@ -497,7 +501,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="header-top">
       <button class="header-back" onclick="goBack()">← Volver</button>
       <div class="header-player">
-        <div class="header-avatar" id="h-avatar"></div>
+        <div class="header-avatar" id="h-avatar" onclick="openAvatarPicker()" title="Cambiar foto de perfil"></div>
         <div>
           <div class="header-name" id="h-name"></div>
           <div class="header-meta" id="h-meta"></div>
@@ -552,6 +556,15 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <button class="pin-btn pin-cancel" onclick="closePin()">Cancelar</button>
       <button class="pin-btn pin-ok" onclick="submitPin()">Entrar</button>
     </div>
+  </div>
+</div>
+
+<div class="pin-overlay" id="av-overlay">
+  <div class="pin-modal">
+    <div class="pin-title">Tu foto de perfil</div>
+    <div class="pin-sub">Elegí tu pelota</div>
+    <div class="av-picker" id="av-grid" style="justify-content:center;margin:8px 0 2px;"></div>
+    <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeAvatarPicker()">Listo</button></div>
   </div>
 </div>
 
@@ -1062,6 +1075,15 @@ function toggleAcc(head){
   const acc=head.closest('.acc');
   if(acc) acc.classList.toggle('open');
 }
+function openAvatarPicker(){
+  if(!currentPlayer) return;
+  const cur=avatarColor(currentPlayer);
+  const grid=document.getElementById('av-grid');
+  if(grid) grid.innerHTML=BALL_COLORS.map(col=>`<button class="av-pick${col===cur?' active':''}" data-c="${col}" style="background:${col};" onclick="chooseAvatar('${col}')" aria-label="Elegir color"></button>`).join('');
+  const ov=document.getElementById('av-overlay'); if(ov) ov.classList.add('show');
+}
+function chooseAvatar(color){ if(currentPlayer) setAvatarColor(currentPlayer,color); closeAvatarPicker(); }
+function closeAvatarPicker(){ const ov=document.getElementById('av-overlay'); if(ov) ov.classList.remove('show'); }
 
 // ══════════════════════════════════════
 // RESUMEN — pantallazo con filtro por mes
@@ -1166,7 +1188,7 @@ function buildResumen(){
     <div class="chart-wrap" style="height:380px;"><canvas id="ch-radar"></canvas></div>
   </div>`;
 
-  el.innerHTML = fichaHTML + avatarPickerHTML() + chips + `<div class="metrics-row">${cards}${totalCard}</div>` + radarHTML;
+  el.innerHTML = fichaHTML + chips + `<div class="metrics-row">${cards}${totalCard}</div>` + radarHTML;
   ldEl.style.display='none'; el.style.display='block';
 
   if(document.getElementById('ch-radar')){
