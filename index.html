@@ -1272,7 +1272,7 @@ function buildCoach(){
   const dPts=(cur,prev)=>{ if(!prevMonth||cur<=0||prev<=0) return '<div class="mc-delta flat">—</div>'; const d=cur-prev; if(d>=0.05) return `<div class="mc-delta up">↑ +${d.toFixed(1)}</div>`; if(d<=-0.05) return `<div class="mc-delta down">↓ ${d.toFixed(1)}</div>`; return '<div class="mc-delta flat">= igual</div>'; };
   const dCount=(cur,prev)=>{ if(!prevMonth) return '<div class="mc-delta flat">—</div>'; const d=cur-prev; if(d>0) return `<div class="mc-delta up">↑ +${d}</div>`; if(d<0) return `<div class="mc-delta down">↓ ${d}</div>`; return '<div class="mc-delta flat">= igual</div>'; };
 
-  const obsCard=`<div class="metric-card"><div class="mc-label">📝 Con observación</div><div class="mc-value">${obsCur}<span class="mc-max"> / ${players.length}</span></div>${dCount(obsCur,obsPrev)}</div>`;
+  const obsCard=`<div class="metric-card"><div class="mc-label">👤 Alumnos registrados</div><div class="mc-value">${players.length}</div></div>`;
   const areaCards=areas.map(a=>`<div class="metric-card"><div class="mc-label">${AREA_META[a].emoji} ${meta[a]}</div><div class="mc-value">${cAvg[a]>0?cAvg[a].toFixed(1):'—'}<span class="mc-max"> / 3</span></div>${dPts(cAvg[a],pAvg[a]||0)}</div>`).join('');
   const totCard=`<div class="metric-card mc-hl"><div class="mc-label">Promedio clase</div><div class="mc-value">${cTot>0?cTot.toFixed(1):'—'}<span class="mc-max"> / 3</span></div>${dPts(cTot,pTot)}<div class="mc-cat">${players.length} alumnos</div></div>`;
 
