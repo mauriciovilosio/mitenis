@@ -515,6 +515,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .dot-1{background:var(--n1);} .dot-2{background:var(--n2);} .dot-3{background:var(--n3);}
 .prio-row.lv1{border-left-color:var(--n1);}
 .prio-row.lv2{border-left-color:var(--n2);}
+
+/* === v16: columna de pulgares alineada === */
+.ball-row{justify-content:flex-start;}
+.ball-name{flex:1;}
+.balls{width:70px;justify-content:flex-start;flex-shrink:0;}
+.ball-label{width:104px;flex-shrink:0;text-align:center;}
 </style>
 </head>
 <body>
@@ -1231,7 +1237,7 @@ function buildCoach(){
   const cAvg={}; areas.forEach(a=>{ const v=data.map(d=>d.av[a]).filter(x=>x>0); cAvg[a]=v.length?v.reduce((x,y)=>x+y,0)/v.length:0; });
   const ctv=areas.map(a=>cAvg[a]).filter(v=>v>0); const cTot=ctv.length?ctv.reduce((x,y)=>x+y,0)/ctv.length:0;
   const withAt=data.filter(d=>d.at); const met=withAt.filter(d=>d.at.met).length;
-  const classCards=areas.map(a=>`<div class="metric-card"><div class="mc-label">${meta[a]}</div><div class="mc-value">${cAvg[a]>0?cAvg[a].toFixed(1):'—'}<span class="mc-max"> / 3</span></div></div>`).join('')
+  const classCards=areas.map(a=>`<div class="metric-card"><div class="mc-label">${AREA_META[a].emoji} ${meta[a]}</div><div class="mc-value">${cAvg[a]>0?cAvg[a].toFixed(1):'—'}<span class="mc-max"> / 3</span></div></div>`).join('')
     + `<div class="metric-card"><div class="mc-label">Promedio clase</div><div class="mc-value">${cTot>0?cTot.toFixed(1):'—'}<span class="mc-max"> / 3</span></div><div class="mc-cat">${players.length} alumnos</div></div>`;
   const studRows=data.slice().sort((a,b)=>b.overall-a.overall).map(d=>{
     const a=d.at;
@@ -1343,7 +1349,7 @@ function buildResumen(){
         :`<div class="mc-delta flat">= vs ${prevLbl}</div>`);
     const cat=bench?(bench['avg_'+a.id]||0):0;
     return `<div class="metric-card">
-      <div class="mc-label">${a.nombre}</div>
+      <div class="mc-label">${AREA_META[a.id].emoji} ${a.nombre}</div>
       <div class="mc-value">${v>0?`${v.toFixed(1)}<span class="mc-max"> / 3</span>`:'—'}</div>
       ${deltaHTML}
       ${cat>0?`<div class="mc-cat">Cat.: ${cat.toFixed(1)}</div>`:''}
@@ -1416,13 +1422,13 @@ function buildRubrica(){
       return `<div class="ball-item">
         <div class="ball-row">
           <span class="ball-name">${g.nombre}</span>
-          <span class="ball-right"><span class="balls">${balls(lv)}</span><span class="ball-label lb${lv}">${lvlLabel(lv)}</span></span>
+          <span class="balls">${balls(lv)}</span>
+          <span class="ball-label lb${lv}">${lvlLabel(lv)}</span>
         </div>
-        ${catLv?`<div class="ball-cat">Promedio categoría ${catName||''}: <strong>${lvlLabel(catLv)}</strong></div>`:''}
       </div>`;
     }).filter(Boolean).join('');
     if(!rows) return '';
-    return `<div class="perf-card"><div class="perf-card-title">${a.nombre}</div>${rows}</div>`;
+    return `<div class="perf-card"><div class="perf-card-title">${AREA_META[a.id].emoji} ${a.nombre}</div>${rows}</div>`;
   }).join('');
   const legend=`<div class="nota">El rendimiento se mide en <strong>3 niveles</strong> — sumá pulgares 👍 a medida que mejorás:</div>
     <div class="sem-legend" style="margin-bottom:14px;">
