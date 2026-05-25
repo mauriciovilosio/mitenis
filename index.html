@@ -482,6 +482,31 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* === v13: sufijo "/ 3" en el score === */
 .mc-max{font-size:0.56em;font-weight:600;color:var(--hint);letter-spacing:0;}
+
+/* === v14: pulgares + botón info Liga === */
+.balls{display:inline-flex;align-items:center;gap:3px;}
+.thumb{font-size:18px;line-height:1;}
+.thumb.off{opacity:.22;filter:grayscale(1);}
+.lg-info-btn{background:var(--surf);border:1px solid var(--border);border-radius:999px;padding:8px 15px;font-size:12px;font-weight:600;color:var(--blue);font-family:'Inter',sans-serif;cursor:pointer;margin-bottom:14px;transition:background .15s;}
+.lg-info-btn:hover{background:var(--surf2);}
+
+/* === v14: Modo Profe === */
+.coach{display:none;min-height:100vh;flex-direction:column;}
+.coach.visible{display:flex;}
+.coach-btn{margin-top:16px;width:100%;background:transparent;border:1.5px solid var(--blue);color:var(--blue);border-radius:12px;padding:12px 18px;font-size:14px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s;}
+.coach-btn:hover{background:var(--blue);color:#fff;}
+.cz-h{color:#fff;font-weight:700;font-size:14px;margin:4px 2px 10px;}
+.cz-row{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--border);}
+.cz-row:last-child{border-bottom:none;}
+.cz-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;box-shadow:inset 0 3px 6px rgba(255,255,255,.32),inset 0 -4px 8px rgba(0,0,0,.16);}
+.cz-info{flex:1;min-width:0;}
+.cz-name{font-size:13px;font-weight:600;color:var(--text);}
+.cz-sub{font-size:10.5px;color:var(--muted);margin-top:2px;}
+.cz-right{text-align:right;flex-shrink:0;}
+.cz-score{font-size:16px;font-weight:800;color:var(--text);}
+.cz-score span{font-size:10px;color:var(--hint);font-weight:600;}
+.cz-at{font-size:10px;font-weight:600;margin-top:2px;}
+.cz-at.ok{color:var(--lv3);} .cz-at.low{color:var(--lv2);}
 </style>
 </head>
 <body>
@@ -514,6 +539,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       </div>
       <div class="last-update" id="last-update"></div>
     </div>
+    <button class="coach-btn" onclick="openCoach()">👨‍🏫 Modo Profe</button>
   </div>
 </div>
 
@@ -568,6 +594,17 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </main>
 </div>
 
+<div class="coach" id="coach">
+  <header class="app-header">
+    <div class="header-top">
+      <button class="header-back" onclick="closeCoach()">← Volver</button>
+      <div class="header-player"><div class="header-name">👨‍🏫 Modo Profe</div></div>
+      <div style="width:60px;"></div>
+    </div>
+  </header>
+  <main class="app-content"><div id="coach-content"></div></main>
+</div>
+
 <div class="pin-overlay" id="pin-overlay">
   <div class="pin-modal">
     <div class="pin-title">Acceso del jugador</div>
@@ -587,6 +624,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="pin-sub">Elegí tu pelota</div>
     <div class="av-picker" id="av-grid" style="justify-content:center;margin:8px 0 2px;"></div>
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeAvatarPicker()">Listo</button></div>
+  </div>
+</div>
+
+<div class="pin-overlay" id="liga-info-overlay">
+  <div class="pin-modal" style="max-width:380px;">
+    <div class="pin-title">🏆 Cómo funciona la Liga</div>
+    <div id="liga-info-body" style="font-size:13px;color:var(--text);line-height:1.6;text-align:left;"></div>
+    <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeLigaInfo()">Entendido</button></div>
   </div>
 </div>
 
@@ -647,6 +692,7 @@ const ASIST_DEFAULT = { fecha:0, jugador:1, cumplidas:2, objetivo:3 };
 let ASIST = {...ASIST_DEFAULT};
 const AVATAR_COLORS = ['#5170ff','#3a52d6','#6d86ff','#2f3fb0','#5170ff','#3a52d6','#6d86ff','#2f3fb0'];
 const BALL_COLORS=['#c8d42b','#5170ff','#ff5d5d','#ff9f43','#8e5cff','#17b890','#ff6fb5'];
+const COACH_PIN_FALLBACK='';
 function avatarStore(){ try{ return JSON.parse(localStorage.getItem('mitenis_avatar')||'{}'); }catch(e){ return {}; } }
 function avatarColor(name){
   const s=avatarStore(); if(s[name]) return s[name];
@@ -903,7 +949,7 @@ function toLvl(v){
   return 3;
 }
 
-function lvlLabel(l){ return l===3?'Arma':l===2?'Funcional':l===1?'A desarrollar':'—'; }
+function lvlLabel(l){ return l===3?'Excelente':l===2?'Funciona':l===1?'A trabajar':'—'; }
 function lvlClass(l){ return l===3?'n3':l===2?'n2':l===1?'n1':'n0'; }
 function lvlColor(l){ return l===3?'var(--lv3)':l===2?'var(--lv2)':l===1?'var(--lv1)':'var(--hint)'; }
 
@@ -1047,12 +1093,12 @@ async function init(){
 // ══════════════════════════════════════
 // SELECT PLAYER
 // ══════════════════════════════════════
-let __pendingPlayer=null;
+let __pendingPlayer=null, __pinMode='player';
 function selectPlayer(name){
   const info=getInfo(name);
   const pin=(info && info[INFO.pin]!=null) ? String(info[INFO.pin]).trim() : '';
   if(pin){
-    __pendingPlayer=name;
+    __pendingPlayer=name; __pinMode='player';
     document.getElementById('pin-sub').textContent='Ingresá el PIN de '+name;
     const inp=document.getElementById('pin-input'); inp.value='';
     document.getElementById('pin-err').textContent='';
@@ -1064,10 +1110,15 @@ function selectPlayer(name){
 }
 function closePin(){ document.getElementById('pin-overlay').classList.remove('show'); __pendingPlayer=null; }
 function submitPin(){
+  const val=(document.getElementById('pin-input').value||'').trim();
+  if(__pinMode==='coach'){
+    if(val===coachPin()){ document.getElementById('pin-overlay').classList.remove('show'); openCoachView(); }
+    else { document.getElementById('pin-err').textContent='PIN incorrecto. Probá de nuevo.'; }
+    return;
+  }
   const name=__pendingPlayer; if(!name) return;
   const info=getInfo(name);
   const pin=(info && info[INFO.pin]!=null) ? String(info[INFO.pin]).trim() : '';
-  const val=(document.getElementById('pin-input').value||'').trim();
   if(val===pin){ document.getElementById('pin-overlay').classList.remove('show'); __pendingPlayer=null; openPlayer(name); }
   else { document.getElementById('pin-err').textContent='PIN incorrecto. Probá de nuevo.'; }
 }
@@ -1118,6 +1169,77 @@ function openAvatarPicker(){
 }
 function chooseAvatar(color){ if(currentPlayer) setAvatarColor(currentPlayer,color); closeAvatarPicker(); }
 function closeAvatarPicker(){ const ov=document.getElementById('av-overlay'); if(ov) ov.classList.remove('show'); }
+function openLigaInfo(){
+  const b=document.getElementById('liga-info-body');
+  if(b) b.innerHTML=`<p style="margin-bottom:10px;">La Liga es una <strong>competencia amistosa</strong> que premia el <strong>esfuerzo y la mejora</strong>, no solo el nivel. Te motiva a venir, progresar mes a mes y cuidar tu cabeza dentro de la cancha.</p>
+    <p style="margin:0 0 6px;font-weight:600;">Cómo se suman los puntos:</p>
+    <ul style="margin:0 0 0 18px;padding:0;">
+      <li style="margin-bottom:5px;"><strong>+${LG.ATTEND}</strong> al mes si cumplís tu objetivo de asistencia 📅</li>
+      <li style="margin-bottom:5px;"><strong>+${LG.IMPROVE}</strong> por cada nivel que subís de un mes al otro 📈</li>
+      <li><strong>+${LG.MENTAL_BONUS}</strong> si tu área <strong>Mental</strong> llega a Excelente 👍 🧠</li>
+    </ul>`;
+  const ov=document.getElementById('liga-info-overlay'); if(ov) ov.classList.add('show');
+}
+function closeLigaInfo(){ const ov=document.getElementById('liga-info-overlay'); if(ov) ov.classList.remove('show'); }
+function coachPin(){
+  for(const r of infoRows){ const nm=(r[INFO.alumno]||'').toLowerCase(); if(/profe|coach|entrenad|admin/.test(nm)){ const p=r[INFO.pin]!=null?String(r[INFO.pin]).trim():''; if(p) return p; } }
+  return COACH_PIN_FALLBACK;
+}
+function openCoach(){
+  const pin=coachPin();
+  if(pin){ __pinMode='coach'; document.getElementById('pin-sub').textContent='Ingresá el PIN de profe'; const inp=document.getElementById('pin-input'); inp.value=''; document.getElementById('pin-err').textContent=''; document.getElementById('pin-overlay').classList.add('show'); setTimeout(()=>{try{inp.focus();}catch(e){}},60); return; }
+  openCoachView();
+}
+function openCoachView(){
+  selectedMonth='all';
+  document.getElementById('landing').style.display='none';
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('coach').classList.add('visible');
+  try{ buildCoach(); }catch(e){ const el=document.getElementById('coach-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir Modo Profe.</strong>'+(e&&e.message?e.message:e)+'</div>'; }
+}
+function closeCoach(){ document.getElementById('coach').classList.remove('visible'); document.getElementById('landing').style.display=''; }
+function setMonthCoach(m){ selectedMonth=m; openCoachView(); }
+function buildCoach(){
+  const el=document.getElementById('coach-content');
+  const players=[...new Set(allRows.map(r=>r[COL.alumno]))].filter(Boolean).sort();
+  if(!players.length){ el.innerHTML='<div class="empty">No hay jugadores cargados.</div>'; return; }
+  const allMonths=[...new Set(allRows.map(monthKey).filter(Boolean))].sort();
+  const curMonth=(selectedMonth==='all'||allMonths.indexOf(selectedMonth)<0)?(allMonths[allMonths.length-1]||''):selectedMonth;
+  const chips=`<div class="card"><div class="card-title">Filtrar por mes</div><div class="month-filter">
+    <button class="mf-chip ${selectedMonth==='all'?'active':''}" onclick="setMonthCoach('all')">Todos</button>
+    ${allMonths.map(m=>`<button class="mf-chip ${selectedMonth===m?'active':''}" onclick="setMonthCoach('${m}')">${monthLabel(m)}</button>`).join('')}
+  </div></div>`;
+  const areas=['tecnica','tactica','fisico','mental'];
+  const meta={tecnica:'Técnica',tactica:'Táctica',fisico:'Físico',mental:'Mental'};
+  const data=players.map(p=>{
+    const ps=allRows.filter(r=>r[COL.alumno]===p).sort((a,b)=>new Date(parseDate(a[COL.fecha]))-new Date(parseDate(b[COL.fecha])));
+    const scope=selectedMonth==='all'?ps:ps.filter(s=>monthKey(s)===selectedMonth);
+    const use=scope.length?scope:ps;
+    const lastS=use[use.length-1];
+    const av={}; areas.forEach(a=>av[a]=lastS?avgLvlKeys(lastS,AREA_KEYS[a]):0);
+    const tv=areas.map(a=>av[a]).filter(v=>v>0); const overall=tv.length?tv.reduce((x,y)=>x+y,0)/tv.length:0;
+    return {p, av, overall, at:attendanceFor(p,curMonth), n:scope.length};
+  });
+  const cAvg={}; areas.forEach(a=>{ const v=data.map(d=>d.av[a]).filter(x=>x>0); cAvg[a]=v.length?v.reduce((x,y)=>x+y,0)/v.length:0; });
+  const ctv=areas.map(a=>cAvg[a]).filter(v=>v>0); const cTot=ctv.length?ctv.reduce((x,y)=>x+y,0)/ctv.length:0;
+  const withAt=data.filter(d=>d.at); const met=withAt.filter(d=>d.at.met).length;
+  const classCards=areas.map(a=>`<div class="metric-card"><div class="mc-label">${meta[a]}</div><div class="mc-value">${cAvg[a]>0?cAvg[a].toFixed(1):'—'}<span class="mc-max"> / 3</span></div></div>`).join('')
+    + `<div class="metric-card"><div class="mc-label">Promedio clase</div><div class="mc-value">${cTot>0?cTot.toFixed(1):'—'}<span class="mc-max"> / 3</span></div><div class="mc-cat">${players.length} alumnos</div></div>`;
+  const studRows=data.slice().sort((a,b)=>b.overall-a.overall).map(d=>{
+    const a=d.at;
+    return `<div class="cz-row">
+      <div class="cz-av" style="background:${avatarColor(d.p)};"></div>
+      <div class="cz-info"><div class="cz-name">${d.p}</div>
+        <div class="cz-sub">🎾 ${d.av.tecnica?lvlLabel(Math.round(d.av.tecnica)):'—'} · ♟️ ${d.av.tactica?lvlLabel(Math.round(d.av.tactica)):'—'} · ⚡ ${d.av.fisico?lvlLabel(Math.round(d.av.fisico)):'—'} · 🧠 ${d.av.mental?lvlLabel(Math.round(d.av.mental)):'—'}</div></div>
+      <div class="cz-right"><div class="cz-score">${d.overall>0?d.overall.toFixed(1):'—'}<span> /3</span></div>${a?`<div class="cz-at ${a.met?'ok':'low'}">${a.pct}% asist.</div>`:''}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML = chips
+    + `<div class="cz-h">Promedio de la clase${curMonth?' · '+monthLabel(curMonth):''}</div>`
+    + `<div class="metrics-row">${classCards}</div>`
+    + `<div class="card"><div class="card-title">Asistencia del mes</div><div class="nota" style="margin:0;">${withAt.length?(met+' de '+withAt.length+' alumnos cumplieron su objetivo de asistencia.'):'Sin datos de asistencia para este mes.'}</div></div>`
+    + `<div class="card"><div class="card-title">Alumnos · ${players.length}</div>${studRows}</div>`;
+}
 
 // ══════════════════════════════════════
 // RESUMEN — pantallazo con filtro por mes
@@ -1250,7 +1372,7 @@ function buildResumen(){
       options:{responsive:true,maintainAspectRatio:false,
         plugins:{legend:{display:true,position:'bottom',labels:{color:'#ffffff',font:{size:12},boxWidth:10,padding:14}},
           tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${(c.raw||0).toFixed(1)} / 3`}}},
-        scales:{r:{min:0,max:3,ticks:{stepSize:1,backdropColor:'transparent',color:'rgba(255,255,255,0.75)',font:{size:10},callback:v=>['','A desarrollar','Funcional','Arma'][v]||''},grid:{color:'rgba(255,255,255,0.22)'},angleLines:{color:'rgba(255,255,255,0.22)'},pointLabels:{color:'#ffffff',font:{size:13,weight:'700'}}}}
+        scales:{r:{min:0,max:3,ticks:{stepSize:1,backdropColor:'transparent',color:'rgba(255,255,255,0.75)',font:{size:10},callback:v=>['','A trabajar','Funciona','Excelente'][v]||''},grid:{color:'rgba(255,255,255,0.22)'},angleLines:{color:'rgba(255,255,255,0.22)'},pointLabels:{color:'#ffffff',font:{size:13,weight:'700'}}}}
       }
     });
   }
@@ -1273,7 +1395,7 @@ function buildRubrica(){
   const info=getInfo(currentPlayer);
   const catName=info?info[INFO.categoria]:'';
   const areas=[{id:'tecnica',nombre:'Técnica'},{id:'tactica',nombre:'Táctica'},{id:'fisico',nombre:'Físico'},{id:'mental',nombre:'Mental'}];
-  const balls=(lv)=>[1,2,3].map(i=>`<span class="ball ${i<=lv?('bf'+lv):'be'}"></span>`).join('');
+  const balls=(lv)=>[1,2,3].map(i=>`<span class="thumb ${i<=lv?'on':'off'}">👍</span>`).join('');
   const cards=areas.map(a=>{
     const grupos=RESUMEN_GROUPS[a.id];
     const rows=grupos.map(g=>{
@@ -1294,11 +1416,11 @@ function buildRubrica(){
     if(!rows) return '';
     return `<div class="perf-card"><div class="perf-card-title">${a.nombre}</div>${rows}</div>`;
   }).join('');
-  const legend=`<div class="nota">El rendimiento se mide en <strong>3 niveles</strong>; se rellenan las pelotas según el nivel alcanzado:</div>
+  const legend=`<div class="nota">El rendimiento se mide en <strong>3 niveles</strong> — sumá pulgares 👍 a medida que mejorás:</div>
     <div class="sem-legend" style="margin-bottom:14px;">
-      <span class="sem-leg" style="background:#eef0f7;color:var(--muted);"><span class="ball bf1" style="margin-right:6px;"></span>1 · A desarrollar</span>
-      <span class="sem-leg" style="background:var(--pf3-bg);color:var(--blue);"><span class="ball bf2" style="margin-right:6px;"></span>2 · Funcional</span>
-      <span class="sem-leg" style="background:var(--pf1-bg);color:#8a7e00;"><span class="ball bf3" style="margin-right:6px;"></span>3 · Arma</span>
+      <span class="sem-leg" style="background:#eef0f7;color:var(--muted);">👍 A trabajar</span>
+      <span class="sem-leg" style="background:var(--pf3-bg);color:var(--blue);">👍👍 Funciona</span>
+      <span class="sem-leg" style="background:var(--pf1-bg);color:#8a7e00;">👍👍👍 Excelente</span>
     </div>`;
   el.innerHTML = monthChipsHTML() + legend + `<div class="perf-grid">${cards}</div>`;
   ldEl.style.display='none'; el.style.display='block';
@@ -1340,9 +1462,8 @@ function buildPlan(){
   const obs=last[COL.obs_profe];
   const obsHTML = `<div class="card"><div class="card-title">Observación del profe · ${fmtDate(last[COL.fecha])}</div><div class="feedback-block feedback-coach">${obs?obs:'Sin observación registrada en la última sesión.'}</div></div>`;
   const legend=`<div class="sem-legend" style="margin-bottom:14px;">
-    <span class="sem-leg" style="background:var(--lv1-bg);color:var(--lv1);">🔴 A mejorar</span>
+    <span class="sem-leg" style="background:var(--lv1-bg);color:var(--lv1);">🔴 A trabajar</span>
     <span class="sem-leg" style="background:var(--lv2-bg);color:var(--lv2);">🟡 En progreso</span>
-    <span class="sem-leg" style="background:var(--lv3-bg);color:var(--lv3);">🟢 Fortaleza</span>
   </div>`;
   const pl=currentPlayer.replace(/'/g,"\\'");
   const planAcc=(titulo,arr,dotc,lvc,open)=>{
@@ -1368,9 +1489,8 @@ function buildPlan(){
   el.innerHTML = monthChipsHTML() + objetivoHTML + obsHTML
     + `<div class="nota">Marcá con el casillero las variables que vas a priorizar en las próximas semanas.</div>`
     + legend
-    + planAcc('A mejorar', g1,'dot-1','lv1',true)
-    + planAcc('En progreso', g2,'dot-2','lv2',true)
-    + fort;
+    + planAcc('A trabajar', g1,'dot-1','lv1',true)
+    + planAcc('En progreso', g2,'dot-2','lv2',true);
   ldEl.style.display='none'; el.style.display='block';
 }
 
@@ -1387,7 +1507,7 @@ function buildProgreso(){
   }
   const labels=sess.map(s=>fmtDate(s[COL.fecha]));
   el.innerHTML=monthChipsHTML()+`
-    <div class="nota">Evolución del promedio por área · 1 A desarrollar · 2 Funcional · 3 Arma</div>
+    <div class="nota">Evolución del promedio por área · 1 A trabajar · 2 Funciona · 3 Excelente</div>
     <div class="card"><div class="card-title">Evolución por área</div><div class="chart-wrap" style="height:320px;"><canvas id="ch-areas"></canvas></div></div>
   `;
   ldEl.style.display='none'; el.style.display='block';
@@ -1409,7 +1529,7 @@ function buildProgreso(){
       plugins:{legend:{display:true,position:'bottom',labels:{font:{size:11},boxWidth:14,padding:14,usePointStyle:true}},
         tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${(c.raw||0).toFixed(1)} / 3`}}},
       scales:{
-        y:{min:0,max:3,ticks:{stepSize:1,font:{size:10},callback:v=>['','A desarrollar','Funcional','Arma'][v]||''},grid:{color:'rgba(81,112,255,0.10)'}},
+        y:{min:0,max:3,ticks:{stepSize:1,font:{size:10},callback:v=>['','A trabajar','Funciona','Excelente'][v]||''},grid:{color:'rgba(81,112,255,0.10)'}},
         x:{ticks:{font:{size:10},maxRotation:40,autoSkip:true,maxTicksLimit:7},grid:{color:'rgba(81,112,255,0.06)'}}
       }
     }
@@ -1462,7 +1582,7 @@ function buildHistorial(){
 // ══════════════════════════════════════
 // LIGA — puntaje: asistencia + mejora mensual + bonus mental
 // ══════════════════════════════════════
-const LG = { ATTEND:10, IMPROVE:2, MENTAL_BONUS:10 };
+const LG = { ATTEND:10, IMPROVE:2, MENTAL_BONUS:15 };
 const LG_KEYS=[...AREA_KEYS.tecnica,...AREA_KEYS.tactica,...AREA_KEYS.fisico,...AREA_KEYS.mental];
 function sessionsOf(name){
   return allRows.filter(r=>r[COL.alumno]===name)
@@ -1497,7 +1617,7 @@ function scorePlayer(name, period){
   const mejora=gained*LG.IMPROVE;
   const mAvg=mentalAvgScope(name,period);
   const mentalLvl=mAvg>0?Math.round(mAvg):0;
-  const mentalBonus=mentalLvl>=2?LG.MENTAL_BONUS:0;
+  const mentalBonus=mentalLvl===3?LG.MENTAL_BONUS:0;
   return {name, asistencia, mejora, mentalBonus, gained, mentalLvl, sesiones:sessScope.length, total:asistencia+mejora+mentalBonus};
 }
 function areaTier(name, areaId){
@@ -1526,7 +1646,7 @@ function buildLiga(){
   let board=allPlayers.map(p=>scorePlayer(p, period)).filter(s=>s.sesiones>0);
   board.sort((a,b)=> b.total-a.total || b.mejora-a.mejora || b.asistencia-a.asistencia);
 
-  const explain=`<div class="nota">El puntaje premia el <strong>esfuerzo</strong>, no solo el nivel. Suma: <strong>+${LG.ATTEND}</strong> al mes si cumplís tu <strong>objetivo de asistencia</strong> · <strong>+${LG.IMPROVE}</strong> por cada <strong>nivel que sube</strong> de un mes al otro · <strong>+${LG.MENTAL_BONUS}</strong> si el promedio del área <strong>Mental</strong> es Funcional o Arma.</div>`;
+  const explain=`<button class="lg-info-btn" onclick="openLigaInfo()">ℹ️ ¿Cómo funciona la Liga?</button>`;
 
   const meScore=board.find(s=>s.name===currentPlayer);
   let meHTML;
