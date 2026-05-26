@@ -548,6 +548,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* === v22: pregunta-guía por variable === */
 .ball-q{font-size:11px;color:var(--muted);margin-top:3px;font-style:italic;}
+
+/* === v23: Rendimiento masonry (cards parejas) === */
+.perf-grid{display:block;}
+.perf-card{break-inside:avoid;-webkit-column-break-inside:avoid;margin-bottom:16px;}
+@media(min-width:760px){.perf-grid{column-count:2;column-gap:16px;}}
 </style>
 </head>
 <body>
@@ -814,40 +819,30 @@ const RUBRICAS = {
   ],
   tactica: [
     { key:'Punto', nombre:'Construcción del punto',
-      desc:['Golpea sin plan, reacciona solo','Patrón de 2–3 golpes en situación simple','Construye con variación de ritmo, dirección y profundidad']},
-    { key:'Rival', nombre:'Lectura del rival',
-      desc:['No ajusta aunque el rival tenga patrón claro','Ajusta pero tarde (2do o 3er set)','Detecta el patrón del rival y ajusta dentro del mismo set']},
-    { key:'Marcador', nombre:'Gestión del marcador',
-      desc:['Juega igual en 40-0 que en 30-40','Leve cambio, más conservador en puntos clave','Diferencia claramente cuándo arriesgar y cuándo construir']}
+      desc:['Golpea sin plan, reacciona solo','Patrón de 2–3 golpes en situación simple','Construye con variación de ritmo, dirección y profundidad']}
   ],
   fisico: [
-    { key:'Resistencia', nombre:'Resistencia',
-      desc:['Errores no forzados aumentan notablemente en el 3er set','Mantiene nivel hasta el 2do set, cae al final','Igual o más intenso en sets largos; no pierde velocidad de golpe']},
     { key:'Velocidad', nombre:'Velocidad / 1er paso',
       desc:['No llega a bolas que debería alcanzar','Llega pero sin tiempo para preparar el golpe','Llega con equilibrio y tiempo de preparación cómodo']},
-    { key:'Agilidad', nombre:'Agilidad',
-      desc:['Pierde balance en cambios de dirección cortos','Recupera posición central con demora visible','Recuperación rápida; posición central siempre lista']},
-    { key:'Fuerza', nombre:'Fuerza funcional',
-      desc:['Golpes se acortan notablemente bajo fatiga','Leve pérdida de velocidad al final de la práctica','Mantiene velocidad y profundidad durante toda la sesión']}
+    { key:'Resistencia', nombre:'Resistencia',
+      desc:['Errores no forzados aumentan notablemente en el 3er set','Mantiene nivel hasta el 2do set, cae al final','Igual o más intenso en sets largos; no pierde velocidad de golpe']}
   ],
   mental: [
     { key:'Error', nombre:'Tolerancia al error',
       desc:['Se cierra o cambia el juego tras 2 errores seguidos','Se recupera pero tarda 1–2 games en estabilizarse','Resetea entre puntos, sin arrastre emocional visible']},
-    { key:'Presion', nombre:'Presión en momentos clave',
-      desc:['Se apura y acorta el swing en puntos importantes','Juega seguro pero sin arriesgar en break points','Mantiene o sube el nivel en momentos decisivos']},
     { key:'Comunicacion', nombre:'Comunicación no verbal',
       desc:['Raquetazo, cabeza baja, hombros caídos con frecuencia','Neutral, pocas señales positivas o negativas','Postura activa, lenguaje corporal abierto y positivo']},
-    { key:'Concentracion', nombre:'Concentración',
-      desc:['Se distrae con ruido externo o jugadores de otros campos','Irregular: viene y va durante el mismo set','Presente en sets completos; resetea rápido entre puntos']}
+    { key:'Presion', nombre:'Presión en momentos clave',
+      desc:['Se apura y acorta el swing en puntos importantes','Juega seguro pero sin arriesgar en break points','Mantiene o sube el nivel en momentos decisivos']}
   ]
 };
 
 // Grupos de keys por área (para promedios y gráficos)
 const AREA_KEYS = {
   tecnica:  ['Drive_Preparacion','Drive_control','Drive_Direccion','Reves_Estabilidad','Reves_slice','Saque_Primero','Saque_Segundo','Volea_subida','Volea_Ejecucion'],
-  tactica:  ['Punto','Rival','Marcador'],
-  fisico:   ['Resistencia','Velocidad','Agilidad','Fuerza'],
-  mental:   ['Error','Presion','Comunicacion','Concentracion']
+  tactica:  ['Punto'],
+  fisico:   ['Velocidad','Resistencia'],
+  mental:   ['Error','Comunicacion','Presion']
 };
 
 // Metadatos de área (para chips y agrupaciones del plan)
@@ -867,21 +862,16 @@ const RESUMEN_GROUPS = {
     {nombre:'Volea', keys:['Volea_subida','Volea_Ejecucion']}
   ],
   tactica:[
-    {nombre:'Construcción del punto', keys:['Punto']},
-    {nombre:'Lectura del rival', keys:['Rival']},
-    {nombre:'Gestión del marcador', keys:['Marcador']}
+    {nombre:'Construcción del punto', keys:['Punto']}
   ],
   fisico:[
-    {nombre:'Resistencia', keys:['Resistencia']},
     {nombre:'Velocidad', keys:['Velocidad']},
-    {nombre:'Agilidad', keys:['Agilidad']},
-    {nombre:'Fuerza', keys:['Fuerza']}
+    {nombre:'Resistencia', keys:['Resistencia']}
   ],
   mental:[
     {nombre:'Tolerancia al error', keys:['Error']},
-    {nombre:'Presión', keys:['Presion']},
     {nombre:'Comunicación', keys:['Comunicacion']},
-    {nombre:'Concentración', keys:['Concentracion']}
+    {nombre:'Presión', keys:['Presion']}
   ]
 };
 
