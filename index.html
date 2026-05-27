@@ -1302,7 +1302,7 @@ function buildCoach(){
     const dd=areas.map(a=>{ const vals=studs.map(p=>{const s=lastInMonth(p,curMonth); return s?avgLvlKeys(s,AREA_KEYS[a]):0;}).filter(v=>v>0); return vals.length?vals.reduce((x,y)=>x+y,0)/vals.length:0; });
     return {label:ct, data:dd, color:catColorHex(ct,i)};
   });
-  el.innerHTML = `<div class="cz-intro"><div class="cz-intro-t">🧢 Modo Profe</div><div class="cz-intro-d">Panorama de toda la clase: mirá el promedio por área, compará las categorías, seguí la asistencia y el ranking de los alumnos para detectar quién va bien y a quién darle foco. Usá los filtros de mes y categoría para acotar lo que ves.</div></div>`
+  el.innerHTML = `<div class="cz-intro"><div class="cz-intro-t">🧢 Modo Profe</div><div class="cz-intro-d">¡Hola Profe! En esta sección podés observar un resumen del rendimiento de todos los alumnos registrados en Mi Tenis. Podés comparar las distintas categorías, hacer un seguimiento de asistencia a clases y ver un ranking para ver qué alumno viene bien y a quién hay que darle más foco.</div></div>`
     + `<div class="cz-filters">${monthChips}${catChips}</div>`
     + `<div class="cz-h">Promedio de la clase${curMonth?' · '+mLabelFull(curMonth):''}</div>`
     + `<div class="metrics-row">${obsCard}${areaCards}${totCard}</div>`
