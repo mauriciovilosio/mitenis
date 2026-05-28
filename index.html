@@ -538,7 +538,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 /* === v19: Modo Profe radar + ranking compacto === */
 .cz-bottom{display:grid;grid-template-columns:1fr;gap:16px;align-items:start;}
 @media(min-width:760px){.cz-bottom{grid-template-columns:1fr 1fr;}}
-.cz-radar{background:transparent;}
 .cz-ind{margin-left:auto;display:flex;flex-direction:column;gap:4px;}
 .cz-ind-row{display:flex;align-items:baseline;justify-content:flex-end;gap:8px;}
 .cz-ind-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
@@ -566,6 +565,17 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .cz-stat-val span{font-size:12px;color:var(--hint);font-weight:600;}
 .cz-stat-lbl{font-size:11px;color:var(--muted);margin-top:5px;}
 .cz-rank{font-size:15px;font-weight:800;color:var(--muted);width:20px;text-align:center;flex-shrink:0;}
+
+/* === v27: tooltips KPI + historial obs + ranking asist menor === */
+.mc-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;}
+.mc-head .mc-label{margin-bottom:0;}
+.mc-info{position:relative;display:inline-block;}
+.mc-info-btn{width:18px;height:18px;border-radius:50%;border:1px solid var(--border);background:var(--surf2);color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;padding:0;line-height:16px;font-family:'Inter',sans-serif;}
+.mc-info-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
+.mc-tip{position:absolute;top:calc(100% + 6px);right:0;background:#20223a;color:#fff;font-size:11px;font-weight:500;padding:9px 11px;border-radius:8px;width:max-content;max-width:240px;box-shadow:0 10px 26px rgba(32,34,58,.32);opacity:0;pointer-events:none;transform:translateY(-4px);transition:all .15s;z-index:60;line-height:1.45;text-align:left;}
+.mc-info:hover .mc-tip,.mc-info.open .mc-tip{opacity:1;pointer-events:auto;transform:translateY(0);}
+.cz-ind-val-sm{font-size:13px;}
+.hist-obs-h{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:8px;margin-bottom:3px;}
 </style>
 </head>
 <body>
@@ -670,6 +680,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="pin-sub">Elegí tu pelota</div>
     <div class="av-picker" id="av-grid" style="justify-content:center;margin:8px 0 2px;"></div>
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeAvatarPicker()">Listo</button></div>
+  </div>
+</div>
+
+<div class="pin-overlay" id="coach-info-overlay">
+  <div class="pin-modal" style="max-width:380px;">
+    <div class="pin-title">🧢 Modo Profe</div>
+    <div id="coach-info-body" style="font-size:13px;color:var(--text);line-height:1.6;text-align:left;"></div>
+    <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeCoachInfo()">Entendido</button></div>
   </div>
 </div>
 
@@ -1188,6 +1206,18 @@ function toggleAcc(head){
   const acc=head.closest('.acc');
   if(acc) acc.classList.toggle('open');
 }
+function toggleTip(btn){
+  const w=btn.parentElement; if(!w) return;
+  const cur=w.classList.contains('open');
+  document.querySelectorAll('.mc-info.open').forEach(e=>e.classList.remove('open'));
+  if(!cur) w.classList.add('open');
+}
+function openCoachInfo(){
+  const b=document.getElementById('coach-info-body');
+  if(b) b.innerHTML='¡Hola Profe! En esta sección podés observar un resumen del rendimiento de todos los alumnos registrados en Mi Tenis. Podés comparar las distintas categorías, hacer un seguimiento de asistencia a clases y ver un ranking para ver qué alumno viene bien y a quién hay que darle más foco.';
+  const ov=document.getElementById('coach-info-overlay'); if(ov) ov.classList.add('show');
+}
+function closeCoachInfo(){ const ov=document.getElementById('coach-info-overlay'); if(ov) ov.classList.remove('show'); }
 function openAvatarPicker(){
   if(!currentPlayer) return;
   const cur=avatarColor(currentPlayer);
@@ -1275,9 +1305,11 @@ function buildCoach(){
   const dPts=(cur,prev)=>{ if(!prevMonth||cur<=0||prev<=0) return '<div class="mc-delta flat">—</div>'; const d=cur-prev; if(d>=0.05) return `<div class="mc-delta up">↑ +${d.toFixed(1)}</div>`; if(d<=-0.05) return `<div class="mc-delta down">↓ ${d.toFixed(1)}</div>`; return '<div class="mc-delta flat">= igual</div>'; };
   const dCount=(cur,prev)=>{ if(!prevMonth) return '<div class="mc-delta flat">—</div>'; const d=cur-prev; if(d>0) return `<div class="mc-delta up">↑ +${d}</div>`; if(d<0) return `<div class="mc-delta down">↓ ${d}</div>`; return '<div class="mc-delta flat">= igual</div>'; };
 
-  const obsCard=`<div class="metric-card"><div class="mc-label">👤 Alumnos CDyCA</div><div class="mc-value">${players.length}</div></div>`;
-  const areaCards=areas.map(a=>`<div class="metric-card"><div class="mc-label">${AREA_META[a].emoji} ${meta[a]}</div><div class="mc-value">${cAvg[a]>0?cAvg[a].toFixed(1):'—'}<span class="mc-max"> / 3</span></div>${dPts(cAvg[a],pAvg[a]||0)}</div>`).join('');
-  const totCard=`<div class="metric-card mc-hl"><div class="mc-label">Promedio clase</div><div class="mc-value">${cTot>0?cTot.toFixed(1):'—'}<span class="mc-max"> / 3</span></div>${dPts(cTot,pTot)}<div class="mc-cat">${players.length} alumnos</div></div>`;
+  const TIPS={tecnica:'Promedio de los golpes: Drive, Revés, Volea y Saque.',tactica:'Construcción del punto.',fisico:'Resistencia y Velocidad.',mental:'Tolerancia al error y Presión.'};
+  const tipBtn=(t)=>`<span class="mc-info"><button class="mc-info-btn" onclick="toggleTip(this)" aria-label="info">i</button><span class="mc-tip">${t}</span></span>`;
+  const obsCard=`<div class="metric-card"><div class="mc-head"><div class="mc-label">👤 Alumnos CDyCA</div>${tipBtn('Cantidad de alumnos registrados en CDyCA (según el filtro de categoría).')}</div><div class="mc-value">${players.length}</div></div>`;
+  const areaCards=areas.map(a=>`<div class="metric-card"><div class="mc-head"><div class="mc-label">${AREA_META[a].emoji} ${meta[a]}</div>${tipBtn(TIPS[a])}</div><div class="mc-value">${cAvg[a]>0?cAvg[a].toFixed(1):'—'}<span class="mc-max"> / 3</span></div>${dPts(cAvg[a],pAvg[a]||0)}</div>`).join('');
+  const totCard=`<div class="metric-card mc-hl"><div class="mc-head"><div class="mc-label">Promedio clase</div>${tipBtn('Promedio general de las 4 áreas (Técnica, Táctica, Físico y Mental).')}</div><div class="mc-value">${cTot>0?cTot.toFixed(1):'—'}<span class="mc-max"> / 3</span></div>${dPts(cTot,pTot)}<div class="mc-cat">${players.length} alumnos</div></div>`;
 
   const studRows=data.slice().sort((a,b)=>b.overall-a.overall).map((d,i)=>{
     const a=d.at;
@@ -1287,7 +1319,7 @@ function buildCoach(){
       <div class="cz-name">${d.p}</div>
       <div class="cz-ind">
         <div class="cz-ind-row"><span class="cz-ind-lbl">Promedio total</span><span class="cz-ind-val">${d.overall>0?d.overall.toFixed(1):'—'}<span>/3</span></span></div>
-        <div class="cz-ind-row"><span class="cz-ind-lbl">Asistencia</span><span class="cz-ind-val ${a?(a.met?'ok':'low'):''}">${a?a.pct+'%':'—'}</span></div>
+        <div class="cz-ind-row"><span class="cz-ind-lbl">Asistencia</span><span class="cz-ind-val cz-ind-val-sm ${a?(a.met?'ok':'low'):''}">${a?a.pct+'%':'—'}</span></div>
       </div>
     </div>`;
   }).join('');
@@ -1302,23 +1334,23 @@ function buildCoach(){
     const dd=areas.map(a=>{ const vals=studs.map(p=>{const s=lastInMonth(p,curMonth); return s?avgLvlKeys(s,AREA_KEYS[a]):0;}).filter(v=>v>0); return vals.length?vals.reduce((x,y)=>x+y,0)/vals.length:0; });
     return {label:ct, data:dd, color:catColorHex(ct,i)};
   });
-  el.innerHTML = `<div class="cz-intro"><div class="cz-intro-t">🧢 Modo Profe</div><div class="cz-intro-d">¡Hola Profe! En esta sección podés observar un resumen del rendimiento de todos los alumnos registrados en Mi Tenis. Podés comparar las distintas categorías, hacer un seguimiento de asistencia a clases y ver un ranking para ver qué alumno viene bien y a quién hay que darle más foco.</div></div>`
+  el.innerHTML = `<button class="lg-info-btn" onclick="openCoachInfo()" style="margin-bottom:14px;">ℹ️ ¿Qué muestra esta sección?</button>`
     + `<div class="cz-filters">${monthChips}${catChips}</div>`
     + `<div class="cz-h">Promedio de la clase${curMonth?' · '+mLabelFull(curMonth):''}</div>`
     + `<div class="metrics-row">${obsCard}${areaCards}${totCard}</div>`
     + `<div class="card"><div class="card-title">Asistencia del mes</div>${withAt.length?`<div class="cz-asist"><div class="cz-stat"><div class="cz-stat-val">${genPct}%</div><div class="cz-stat-lbl">Asistencia general</div></div><div class="cz-stat"><div class="cz-stat-val">${metN}<span> / ${withAt.length}</span></div><div class="cz-stat-lbl">Cumplieron su objetivo</div></div></div>`:'<div class="nota" style="margin:0;">Sin datos de asistencia para este mes.</div>'}</div>`
     + `<div class="cz-bottom">
-        <div class="cz-radar"><div class="cz-h" style="margin:0 0 4px;">Comparación por categoría${curMonth?' · '+mLabelFull(curMonth):''}</div><div class="chart-wrap" style="height:300px;"><canvas id="ch-coach-radar"></canvas></div></div>
+        <div class="card cz-radar"><div class="card-title">Comparación por categoría${curMonth?' · '+mLabelFull(curMonth):''}</div><div class="chart-wrap" style="height:320px;margin-top:10px;"><canvas id="ch-coach-radar"></canvas></div></div>
         <div class="card cz-rank-card"><div class="card-title">Ranking de alumnos · ${players.length}</div>${studRows||'<div class="empty" style="color:var(--muted);">Sin alumnos en este filtro.</div>'}</div>
       </div>`;
   if(charts['coachRadar']){ try{charts['coachRadar'].destroy();}catch(e){} }
   const _cv=document.getElementById('ch-coach-radar');
   if(_cv && catData.length){
     charts['coachRadar']=new Chart(_cv,{type:'radar',
-      data:{labels:['🎾 Técnica','♟️ Táctica','⚡ Físico','🧠 Mental'],datasets:catData.map(cd=>({label:cd.label,data:cd.data,borderColor:cd.color,backgroundColor:hexA(cd.color,0.18),fill:true,borderWidth:2,pointRadius:3,pointBackgroundColor:cd.color}))},
+      data:{labels:['Técnica','Táctica','Físico','Mental'],datasets:catData.map(cd=>({label:cd.label,data:cd.data,borderColor:cd.color,backgroundColor:hexA(cd.color,0.18),fill:true,borderWidth:2,pointRadius:3,pointBackgroundColor:cd.color}))},
       options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:true,position:'bottom',labels:{color:'#ffffff',font:{size:11},boxWidth:10,padding:10,usePointStyle:true}}},
-        scales:{r:{min:0,max:3,ticks:{stepSize:1,backdropColor:'transparent',color:'rgba(255,255,255,0.7)',font:{size:9},callback:v=>['','A trabajar','Funciona','Excelente'][v]||''},grid:{color:'rgba(255,255,255,0.22)'},angleLines:{color:'rgba(255,255,255,0.22)'},pointLabels:{color:'#ffffff',font:{size:12,weight:'700'}}}}
+        plugins:{legend:{display:true,position:'bottom',labels:{color:'#20223a',font:{size:11},boxWidth:10,padding:10,usePointStyle:true}}},
+        scales:{r:{min:0,max:3,ticks:{stepSize:1,backdropColor:'transparent',color:'rgba(32,34,58,0.55)',font:{size:9},callback:v=>['','A trabajar','Funciona','Excelente'][v]||''},grid:{color:'rgba(81,112,255,0.18)'},angleLines:{color:'rgba(81,112,255,0.18)'},pointLabels:{color:'#20223a',font:{size:12,weight:'700'}}}}
       }
     });
   }
@@ -1341,9 +1373,9 @@ function attendanceFor(name, mk){
 function attMonths(name){ return [...new Set(asistRows.filter(r=>(r[ASIST.jugador]||'').trim()===(name||'').trim()).map(r=>ymKey(r[ASIST.fecha])).filter(Boolean))].sort(); }
 function monthLabel(key){
   if(!key) return '';
-  const a=key.split('-'); const d=new Date(Number(a[0]),Number(a[1])-1,1);
-  const l=d.toLocaleDateString('es-AR',{month:'short',year:'numeric'});
-  return l.charAt(0).toUpperCase()+l.slice(1);
+  const MES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const a=key.split('-'); const nm=MES[Number(a[1])-1]||'';
+  return (nm.charAt(0).toUpperCase()+nm.slice(1))+' '+a[0];
 }
 function areaAvgForSessions(list, areaId){
   const v=list.map(s=>avgLvlKeys(s,AREA_KEYS[areaId])).filter(x=>x>0);
@@ -1662,7 +1694,7 @@ function buildHistorial(){
             ${fLvl?`<span class="session-pill pill-fis">Fís: ${lvlLabel(fLvl)}</span>`:''}
             ${mLvl?`<span class="session-pill pill-men">Men: ${lvlLabel(mLvl)}</span>`:''}
           </div>
-          ${s[COL.obs_profe]?`<div class="feedback-block feedback-coach">${s[COL.obs_profe]}</div>`:''}
+          ${s[COL.obs_profe]?`<div class="hist-obs-h">Observación del Profe</div><div class="feedback-block feedback-coach">${s[COL.obs_profe]}</div>`:''}
         </div>
       </div>`;
     }).join('')}
@@ -1798,8 +1830,7 @@ function buildLiga(){
 
   el.innerHTML = monthChipsHTML() + explain + meHTML
     + (podiumHTML?`<div class="card"><div class="card-title">Podio · ${periodLbl}</div>${podiumHTML}</div>`:'')
-    + `<div class="card"><div class="card-title">Tabla de posiciones</div>${rowsHTML||'<div class="empty" style="color:var(--muted);">Sin jugadores en este período.</div>'}</div>`
-    + `<div class="card"><div class="card-title">Mis medallas por área</div><div class="lg-medals">${medalsHTML}</div></div>`;
+    + `<div class="card"><div class="card-title">Tabla de posiciones</div>${rowsHTML||'<div class="empty" style="color:var(--muted);">Sin jugadores en este período.</div>'}</div>`;
   ldEl.style.display='none'; el.style.display='block';
 }
 
