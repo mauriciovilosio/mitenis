@@ -467,8 +467,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 
 /* === v10: avatar clickeable === */
-.header-avatar{cursor:pointer;transition:outline .12s;}
-.header-avatar:hover{outline:2px solid rgba(32,34,58,.3);outline-offset:1px;}
+.header-avatar{transition:outline .12s;}
 
 /* === v12: card de asistencia === */
 .asist-row{display:flex;align-items:center;gap:16px;}
@@ -576,6 +575,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .mc-info:hover .mc-tip,.mc-info.open .mc-tip{opacity:1;pointer-events:auto;transform:translateY(0);}
 .cz-ind-val-sm{font-size:13px;}
 .hist-obs-h{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:8px;margin-bottom:3px;}
+
+/* === v28: filtros acordeón compacto + dot categoría grande === */
+.filter-acc{margin-bottom:10px;}
+.filter-acc .acc-head{padding:10px 14px;}
+.filter-acc .acc-title{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--text);display:inline-flex;align-items:center;gap:4px;}
+.filter-acc .acc-sub{font-size:12px;font-weight:500;color:var(--muted);margin-left:4px;}
+.filter-acc .acc-body-inner{padding:0 14px 12px;}
 </style>
 </head>
 <body>
@@ -605,7 +611,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="header-top">
       <button class="header-back" onclick="goBack()">← Volver</button>
       <div class="header-player">
-        <div class="header-avatar" id="h-avatar" onclick="openAvatarPicker()" title="Cambiar foto de perfil"></div>
+        <div class="header-avatar" id="h-avatar"></div>
         <div>
           <div class="header-name" id="h-name"></div>
           <div class="header-meta" id="h-meta"></div>
@@ -759,7 +765,8 @@ const BALL_COLORS=['#c8d42b','#5170ff','#ff5d5d','#ff9f43','#8e5cff','#17b890','
 const COACH_PIN_FALLBACK='';
 function avatarStore(){ try{ return JSON.parse(localStorage.getItem('mitenis_avatar')||'{}'); }catch(e){ return {}; } }
 function avatarColor(name){
-  const s=avatarStore(); if(s[name]) return s[name];
+  const info=getInfo(name);
+  if(info){ const c=catColor(info[INFO.categoria]||''); if(c) return c; }
   const i=[...new Set(allRows.map(r=>r[COL.alumno]))].sort().indexOf(name);
   return AVATAR_COLORS[(i<0?0:i)%AVATAR_COLORS.length];
 }
@@ -1271,14 +1278,14 @@ function buildCoach(){
   const curMonth=(selectedMonth==='all'||allMonths.indexOf(selectedMonth)<0)?(allMonths[allMonths.length-1]||''):selectedMonth;
   const ci=allMonths.indexOf(curMonth); const prevMonth=ci>0?allMonths[ci-1]:null;
 
-  const monthChips=`<div class="card"><div class="card-title">Filtrar por mes</div><div class="month-filter">
+  const monthChips=`<div class="acc filter-acc"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📅 Filtrar por mes <span class="acc-sub">· ${selectedMonth==='all'?'Todos':mLabelFull(selectedMonth)}</span></span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
     <button class="mf-chip ${selectedMonth==='all'?'active':''}" onclick="setMonthCoach('all')">Todos</button>
     ${allMonths.map(m=>`<button class="mf-chip ${selectedMonth===m?'active':''}" onclick="setMonthCoach('${m}')">${mLabelFull(m)}</button>`).join('')}
-  </div></div>`;
-  const catChips = cats.length?`<div class="card"><div class="card-title">Filtrar por categoría</div><div class="month-filter">
+  </div></div></div></div>`;
+  const catChips = cats.length?`<div class="acc filter-acc"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">🏷️ Filtrar por categoría <span class="acc-sub">· ${coachCat==='all'?'Todas':coachCat}</span></span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
     <button class="mf-chip ${coachCat==='all'?'active':''}" onclick="setCatCoach('all')">Todas</button>
     ${cats.map(ct=>`<button class="mf-chip ${coachCat===ct?'active':''}" onclick="setCatCoach('${ct.replace(/'/g,"\\'")}')">${ct}</button>`).join('')}
-  </div></div>`:'';
+  </div></div></div></div>`:'';
 
   const areas=['tecnica','tactica','fisico','mental'];
   const meta={tecnica:'Técnica',tactica:'Táctica',fisico:'Físico',mental:'Mental'};
@@ -1318,7 +1325,7 @@ function buildCoach(){
       <div class="cz-av" style="background:${avatarColor(d.p)};"></div>
       <div class="cz-name">${d.p}</div>
       <div class="cz-ind">
-        <div class="cz-ind-row"><span class="cz-ind-lbl">Promedio total</span><span class="cz-ind-val">${d.overall>0?d.overall.toFixed(1):'—'}<span>/3</span></span></div>
+        <div class="cz-ind-row"><span class="cz-ind-lbl">Promedio</span><span class="cz-ind-val">${d.overall>0?d.overall.toFixed(1):'—'}<span>/3</span></span></div>
         <div class="cz-ind-row"><span class="cz-ind-lbl">Asistencia</span><span class="cz-ind-val cz-ind-val-sm ${a?(a.met?'ok':'low'):''}">${a?a.pct+'%':'—'}</span></div>
       </div>
     </div>`;
@@ -1327,7 +1334,7 @@ function buildCoach(){
   const withAt=data.filter(d=>d.at); const metN=withAt.filter(d=>d.at.met).length;
   let _sc=0,_so=0; withAt.forEach(d=>{ _sc+=d.at.cumplidas; _so+=d.at.objetivo; }); const genPct=_so>0?Math.round(_sc/_so*100):0;
   const catPalette=['#f3fe76','#ff9f43','#ff5d5d','#5eead4','#a78bfa','#ffffff','#86efac'];
-  const catColorHex=(ct,i)=>{ const t=(ct||'').toLowerCase(); if(t.includes('verde'))return '#22c55e'; if(t.includes('naranja'))return '#ff9f43'; if(t.includes('roj'))return '#ff5d5d'; if(t.includes('amar'))return '#f5ff80'; if(t.includes('azul'))return '#7aa2ff'; return catPalette[i%catPalette.length]; };
+  const catColorHex=(ct,i)=>{ const t=(ct||'').toLowerCase().trim(); if(t==='b'||t.includes('azul'))return '#5170ff'; if(t.includes('verde'))return '#22b16c'; if(t.includes('naranja'))return '#fe972d'; if(t.includes('roj'))return '#f73b3b'; return catPalette[i%catPalette.length]; };
   const hexA=(h,a)=>{const n=(h||'').replace('#','');const r=parseInt(n.slice(0,2),16)||0,g=parseInt(n.slice(2,4),16)||0,b=parseInt(n.slice(4,6),16)||0;return 'rgba('+r+','+g+','+b+','+a+')';};
   const catData=cats.map((ct,i)=>{
     const studs=allPlayersList.filter(p=>catOf(p)===ct);
@@ -1382,12 +1389,12 @@ function areaAvgForSessions(list, areaId){
   return v.length? v.reduce((a,b)=>a+b,0)/v.length : 0;
 }
 function catColor(cat){
-  const t=(cat||'').toLowerCase();
-  if(t.includes('verde')) return 'var(--lv3)';
-  if(t.includes('naranja')||t.includes('amar')) return 'var(--lv2)';
-  if(t.includes('roj')) return 'var(--lv1)';
-  if(t.includes('azul')) return '#1a5fb4';
-  return 'var(--muted)';
+  const t=(cat||'').toLowerCase().trim();
+  if(t==='b'||t.includes('azul')) return '#5170ff';
+  if(t.includes('verde')) return '#22b16c';
+  if(t.includes('naranja')) return '#fe972d';
+  if(t.includes('roj')) return '#f73b3b';
+  return '#6b6f8a';
 }
 function rebuildAll(){
   Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}}); charts={};
@@ -1397,10 +1404,11 @@ function setMonth(m){ selectedMonth=m; rebuildAll(); }
 function filterByMonth(list){ if(selectedMonth==='all') return list; const f=list.filter(s=>monthKey(s)===selectedMonth); return f.length?f:list; }
 function monthChipsHTML(){
   const months=[...new Set(playerSessions.map(monthKey).filter(Boolean))].sort();
-  return `<div class="card"><div class="card-title">Filtrar por mes</div><div class="month-filter">
+  const curLbl=selectedMonth==='all'?'Todos':monthLabel(selectedMonth);
+  return `<div class="acc filter-acc"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📅 Filtrar por mes <span class="acc-sub">· ${curLbl}</span></span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
     <button class="mf-chip ${selectedMonth==='all'?'active':''}" onclick="setMonth('all')">Todos</button>
     ${months.map(m=>`<button class="mf-chip ${selectedMonth===m?'active':''}" onclick="setMonth('${m}')">${monthLabel(m)}</button>`).join('')}
-  </div></div>`;
+  </div></div></div></div>`;
 }
 
 function buildResumen(){
