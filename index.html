@@ -508,6 +508,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .coach-btn{margin-top:16px;width:100%;background:transparent;border:1.5px solid var(--blue);color:var(--blue);border-radius:12px;padding:12px 18px;font-size:14px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s;}
 .coach-btn:hover{background:var(--blue);color:#fff;}
 .cz-h{color:#fff;font-weight:700;font-size:14px;margin:4px 2px 10px;}
+/* Insignia: jugador con más actitud del mes */
+.coach-badge{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#fffbe0,#f3fe76);border:1px solid #e6ef5e;border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;box-shadow:0 8px 22px rgba(243,254,118,.45);}
+.cb-av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:inset 0 3px 6px rgba(255,255,255,.32),inset 0 -4px 8px rgba(0,0,0,.16);}
+.cb-tx{min-width:0;}
+.cb-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#7a6f00;}
+.cb-name{font-size:19px;font-weight:800;color:#20223a;line-height:1.1;margin:2px 0;}
+.cb-sub{font-size:11px;color:#6b6f8a;}
 .cz-row{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--border);}
 .cz-row:last-child{border-bottom:none;}
 .cz-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;box-shadow:inset 0 3px 6px rgba(255,255,255,.32),inset 0 -4px 8px rgba(0,0,0,.16);}
@@ -749,7 +756,7 @@ const ASIST_SHEET = 'asistencia';
 // 17 Agilidad
 // 18 Fuerza
 // 19 Error              (Tolerancia al error)
-// 20 Presión            (Presión en momentos clave)
+// 20 Actitud            (¿Mantiene una actitud positiva?)
 // 21 Comunicación
 // 22 Concentración
 // 23 descripcion
@@ -763,7 +770,7 @@ const COL_DEFAULT = {
   Volea_subida:10, Volea_Ejecucion:11,
   Punto:12, Rival:13, Marcador:14,
   Resistencia:15, Velocidad:16, Agilidad:17, Fuerza:18,
-  Error:19, Presion:20, Comunicacion:21, Concentracion:22,
+  Error:19, Actitud:20, Comunicacion:21, Concentracion:22,
   descripcion:23, obs_profe:24
 };
 let COL = {...COL_DEFAULT};
@@ -821,7 +828,7 @@ const HEADER_ALIASES = {
   Agilidad:['Agilidad'],
   Fuerza:['Fuerza'],
   Error:['Error','Tolerancia al error'],
-  Presion:['Presión','Presion','Presión en momentos clave'],
+  Actitud:['Actitud','Actitud positiva','¿Mantiene una actitud positiva?','Mantiene una actitud positiva','Presión','Presion','Presión en momentos clave'],
   Comunicacion:['Comunicación','Comunicacion'],
   Concentracion:['Concentración','Concentracion'],
   descripcion:['descripcion','descripción','Descripción de la sesión'],
@@ -880,8 +887,8 @@ const RUBRICAS = {
   mental: [
     { key:'Error', nombre:'Tolerancia al error',
       desc:['Se cierra o cambia el juego tras 2 errores seguidos','Se recupera pero tarda 1–2 games en estabilizarse','Resetea entre puntos, sin arrastre emocional visible']},
-    { key:'Presion', nombre:'Presión en momentos clave',
-      desc:['Se apura y acorta el swing en puntos importantes','Juega seguro pero sin arriesgar en break points','Mantiene o sube el nivel en momentos decisivos']}
+    { key:'Actitud', nombre:'Actitud',
+      desc:['Se frustra o se queja con frecuencia y le cuesta sostener una actitud positiva','Mantiene buena actitud cuando las cosas salen bien, pero decae ante la dificultad','Sostiene una actitud positiva y de compromiso durante toda la sesión, incluso en los momentos difíciles']}
   ]
 };
 
@@ -890,7 +897,7 @@ const AREA_KEYS = {
   tecnica:  ['Drive_Preparacion','Drive_control','Drive_Direccion','Reves_Estabilidad','Reves_slice','Saque_Primero','Saque_Segundo','Volea_subida','Volea_Ejecucion'],
   tactica:  ['Punto'],
   fisico:   ['Velocidad','Resistencia'],
-  mental:   ['Error','Presion']
+  mental:   ['Error','Actitud']
 };
 
 // Metadatos de área (para chips y agrupaciones del plan)
@@ -918,7 +925,7 @@ const RESUMEN_GROUPS = {
   ],
   mental:[
     {nombre:'Tolerancia al error', keys:['Error']},
-    {nombre:'Presión', keys:['Presion']}
+    {nombre:'Actitud', keys:['Actitud']}
   ]
 };
 
@@ -1351,7 +1358,7 @@ function buildCoach(){
   const dPts=(cur,prev)=>{ if(!prevMonth||cur<=0||prev<=0) return '<div class="mc-delta flat">—</div>'; const d=cur-prev; if(d>=0.05) return `<div class="mc-delta up">↑ +${d.toFixed(1)} vs ${prevLbl}</div>`; if(d<=-0.05) return `<div class="mc-delta down">↓ ${d.toFixed(1)} vs ${prevLbl}</div>`; return `<div class="mc-delta flat">= vs ${prevLbl}</div>`; };
   const dCount=(cur,prev)=>{ if(!prevMonth) return '<div class="mc-delta flat">—</div>'; const d=cur-prev; if(d>0) return `<div class="mc-delta up">↑ +${d} vs ${prevLbl}</div>`; if(d<0) return `<div class="mc-delta down">↓ ${d} vs ${prevLbl}</div>`; return `<div class="mc-delta flat">= vs ${prevLbl}</div>`; };
 
-  const TIPS={tecnica:'Promedio de los golpes: Drive, Revés, Volea y Saque.',tactica:'Construcción del punto.',fisico:'Resistencia y Velocidad.',mental:'Tolerancia al error y Presión.'};
+  const TIPS={tecnica:'Promedio de los golpes: Drive, Revés, Volea y Saque.',tactica:'Construcción del punto.',fisico:'Resistencia y Velocidad.',mental:'Tolerancia al error y Actitud.'};
   const tipBtn=(t)=>`<span class="mc-info"><button class="mc-info-btn" onclick="toggleTip(this)" aria-label="info">i</button><span class="mc-tip">${t}</span></span>`;
   const obsCard=`<div class="metric-card"><div class="mc-head"><div class="mc-label">👤 Alumnos CDyCA</div>${tipBtn('Cantidad de alumnos registrados en CDyCA (según el filtro de categoría).')}</div><div class="mc-value">${players.length}</div></div>`;
   const areaCards=areas.map(a=>`<div class="metric-card"><div class="mc-head"><div class="mc-label">${AREA_META[a].emoji} ${meta[a]}</div>${tipBtn(TIPS[a])}</div><div class="mc-value">${cAvg[a]>0?cAvg[a].toFixed(1):'—'}<span class="mc-max"> / 3</span></div>${dPts(cAvg[a],pAvg[a]||0)}</div>`).join('');
@@ -1380,10 +1387,28 @@ function buildCoach(){
     const dd=areas.map(a=>{ const vals=studs.map(p=>{const s=lastInMonth(p,curMonth); return s?avgLvlKeys(s,AREA_KEYS[a]):0;}).filter(v=>v>0); return vals.length?vals.reduce((x,y)=>x+y,0)/vals.length:0; });
     return {label:ct, data:dd, color:catColorHex(ct,i)};
   });
+  // ── Insignia: jugador con más actitud del mes ──
+  const iniOf=nm=>nm.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  let actLeader=null, actMax=0;
+  data.forEach(d=>{
+    const cur=lastInMonth(d.p, curMonth);
+    const lv=cur?avgLvlKeys(cur,['Actitud']):0;
+    if(lv>actMax){ actMax=lv; actLeader=d.p; }
+  });
+  const badgeHTML = (actLeader && actMax>0) ? `<div class="coach-badge">
+    <div class="cb-av" style="background:${avatarColor(actLeader)};">${iniOf(actLeader)}</div>
+    <div class="cb-tx">
+      <div class="cb-lbl">🏅 Jugador con más actitud del mes</div>
+      <div class="cb-name">${actLeader}</div>
+      <div class="cb-sub">${curMonth?mLabelFull(curMonth)+' · ':''}Actitud 👍 ${lvlLabel(Math.round(actMax))}</div>
+    </div>
+  </div>` : '';
+
   el.innerHTML = `<button class="lg-info-btn" onclick="openCoachInfo()" style="margin-bottom:14px;">ℹ️ ¿Qué muestra esta sección?</button>`
     + `<div class="cz-filters">${monthChips}${catChips}</div>`
     + `<div class="cz-h">Promedio de la clase${curMonth?' · '+mLabelFull(curMonth):''}</div>`
     + `<div class="metrics-row">${obsCard}${areaCards}${totCard}</div>`
+    + badgeHTML
     + `<div class="card"><div class="card-title">Asistencia del mes</div>${withAt.length?`<div class="cz-asist"><div class="cz-stat"><div class="cz-stat-val">${genPct}%</div><div class="cz-stat-lbl">Asistencia general</div></div><div class="cz-stat"><div class="cz-stat-val">${metN}<span> / ${withAt.length}</span></div><div class="cz-stat-lbl">Cumplieron su objetivo</div></div></div>`:'<div class="nota" style="margin:0;">Sin datos de asistencia para este mes.</div>'}</div>`
     + `<div class="cz-bottom">
         <div class="card cz-radar"><div class="card-title">Comparación por categoría${curMonth?' · '+mLabelFull(curMonth):''}</div><div class="chart-wrap" style="height:320px;margin-top:10px;"><canvas id="ch-coach-radar"></canvas></div></div>
@@ -1485,7 +1510,7 @@ function buildResumen(){
 
   const bench=calcBench(currentPlayer);
   const areas=[{id:'tecnica',nombre:'Técnica'},{id:'tactica',nombre:'Táctica'},{id:'fisico',nombre:'Físico'},{id:'mental',nombre:'Mental'}];
-  const TIPS={tecnica:'Promedio de los golpes: Drive, Revés, Volea y Saque.',tactica:'Construcción del punto.',fisico:'Resistencia y Velocidad.',mental:'Tolerancia al error y Presión.'};
+  const TIPS={tecnica:'Promedio de los golpes: Drive, Revés, Volea y Saque.',tactica:'Construcción del punto.',fisico:'Resistencia y Velocidad.',mental:'Tolerancia al error y Actitud.'};
   const tipBtn=(t)=>`<span class="mc-info"><button class="mc-info-btn" onclick="toggleTip(this)" aria-label="info">i</button><span class="mc-tip">${t}</span></span>`;
   const curAvgs={}, prevAvgs={};
   areas.forEach(a=>{ curAvgs[a.id]=areaAvgForSessions(curSess,a.id); prevAvgs[a.id]=areaAvgForSessions(prevSess,a.id); });
@@ -1564,7 +1589,7 @@ function buildRubrica(){
   const catName=info?info[INFO.categoria]:'';
   const areas=[{id:'tecnica',nombre:'Técnica'},{id:'tactica',nombre:'Táctica'},{id:'fisico',nombre:'Físico'},{id:'mental',nombre:'Mental'}];
   const balls=(lv)=>[1,2,3].map(i=>`<span class="thumb ${i<=lv?'on':'off'}">👍</span>`).join('');
-  const PERF_Q={'Construcción del punto':'¿Construye variando sus golpes?','Lectura del rival':'¿Ajusta su juego?','Gestión del marcador':'¿Sabe cuándo arriesgar?','Resistencia':'¿Se cansa rápido?','Velocidad':'¿Llega con equilibrio y tiempo?','Agilidad':'¿Recupera posición rápido?','Fuerza':'¿Juega profundo bajo cansancio?','Tolerancia al error':'¿Resetea entre puntos?','Presión':'¿Sube nivel en punto clave?','Comunicación':'¿Postura activa y positiva?','Concentración':'¿Se mantiene presente?'};
+  const PERF_Q={'Construcción del punto':'¿Construye variando sus golpes?','Lectura del rival':'¿Ajusta su juego?','Gestión del marcador':'¿Sabe cuándo arriesgar?','Resistencia':'¿Se cansa rápido?','Velocidad':'¿Llega con equilibrio y tiempo?','Agilidad':'¿Recupera posición rápido?','Fuerza':'¿Juega profundo bajo cansancio?','Tolerancia al error':'¿Resetea entre puntos?','Actitud':'¿Mantiene una actitud positiva?','Comunicación':'¿Postura activa y positiva?','Concentración':'¿Se mantiene presente?'};
   const cards=areas.map(a=>{
     const grupos=RESUMEN_GROUPS[a.id];
     const rows=grupos.map(g=>{
