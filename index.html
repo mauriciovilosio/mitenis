@@ -594,6 +594,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .mc-info:hover .mc-tip,.mc-info.open .mc-tip{opacity:1;pointer-events:auto;transform:translateY(0);}
 .cz-ind-val-sm{font-size:13px;}
 .hist-obs-h{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:8px;margin-bottom:3px;}
+/* Insignia de descarga del Reporte de Rendimiento mensual */
+.hist-month{padding-bottom:14px;}
+.report-badge{display:flex;align-items:center;gap:13px;width:100%;margin-top:14px;cursor:pointer;text-align:left;
+  background:linear-gradient(135deg,#5170ff,#6f86ff);color:#fff;border:none;border-radius:14px;padding:14px 16px;
+  box-shadow:0 10px 26px rgba(81,112,255,.34);transition:transform .12s,box-shadow .12s;font-family:'Inter',sans-serif;}
+.report-badge:hover{transform:translateY(-1px);box-shadow:0 14px 32px rgba(81,112,255,.42);}
+.report-badge:active{transform:translateY(0);}
+.rb-ic{font-size:26px;line-height:1;flex-shrink:0;}
+.rb-tx{flex:1;min-width:0;display:flex;flex-direction:column;}
+.rb-title{font-size:14px;font-weight:800;line-height:1.15;}
+.rb-sub{font-size:11px;opacity:.9;text-transform:capitalize;margin-top:1px;}
+.rb-dl{font-size:20px;font-weight:700;flex-shrink:0;opacity:.95;}
 
 /* === v28: filtros acordeón compacto + dot categoría grande === */
 .filter-acc{margin-bottom:10px;}
@@ -641,7 +653,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <nav class="app-tabs">
       <button class="tab-btn active" onclick="switchTab('resumen',this)">Resumen</button>
       <button class="tab-btn" onclick="switchTab('rubrica',this)">Rendimiento</button>
-      <button class="tab-btn" onclick="switchTab('progreso',this)">Progreso</button>
       <button class="tab-btn" onclick="switchTab('plan',this)">Plan de acción</button>
       <button class="tab-btn" onclick="switchTab('liga',this)">🏆 Liga</button>
       <button class="tab-btn" onclick="switchTab('historial',this)">Historial</button>
@@ -659,10 +670,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="tab-view" id="tab-plan">
       <div class="loading-view" id="loading-plan"><div class="spinner"></div><p>Cargando…</p></div>
       <div id="content-plan" style="display:none;"></div>
-    </div>
-    <div class="tab-view" id="tab-progreso">
-      <div class="loading-view" id="loading-progreso"><div class="spinner"></div><p>Cargando…</p></div>
-      <div id="content-progreso" style="display:none;"></div>
     </div>
     <div class="tab-view" id="tab-historial">
       <div class="loading-view" id="loading-historial"><div class="spinner"></div><p>Cargando…</p></div>
@@ -1462,7 +1469,7 @@ function catColor(cat){
 }
 function rebuildAll(){
   Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}}); charts={};
-  [['resumen',buildResumen],['rubrica',buildRubrica],['plan',buildPlan],['progreso',buildProgreso],['historial',buildHistorial],['liga',buildLiga]].forEach(([id,fn])=>{ try{ fn(); }catch(err){ const ld=document.getElementById('loading-'+id), ct=document.getElementById('content-'+id); if(ld) ld.style.display='none'; if(ct){ ct.style.display='block'; ct.innerHTML='<div class="err-box"><strong>No se pudo construir esta vista.</strong>'+(err&&err.message?err.message:err)+'</div>'; } } });
+  [['resumen',buildResumen],['rubrica',buildRubrica],['plan',buildPlan],['historial',buildHistorial],['liga',buildLiga]].forEach(([id,fn])=>{ try{ fn(); }catch(err){ const ld=document.getElementById('loading-'+id), ct=document.getElementById('content-'+id); if(ld) ld.style.display='none'; if(ct){ ct.style.display='block'; ct.innerHTML='<div class="err-box"><strong>No se pudo construir esta vista.</strong>'+(err&&err.message?err.message:err)+'</div>'; } } });
 }
 function setMonth(m){ selectedMonth=m; rebuildAll(); }
 function filterByMonth(list){ if(selectedMonth==='all') return list; const f=list.filter(s=>monthKey(s)===selectedMonth); return f.length?f:list; }
@@ -1619,8 +1626,44 @@ function buildRubrica(){
       <span class="sem-leg" style="background:var(--n2);color:#161616;">👍👍 Funciona</span>
       <span class="sem-leg" style="background:var(--n3);color:#161616;">👍👍👍 Excelente</span>
     </div>`;
-  el.innerHTML = monthChipsHTML() + legend + `<div class="perf-grid">${cards}</div>`;
+  let evoInner;
+  if(playerSessions.length>=2){
+    evoInner=`<div class="nota" style="margin-top:0;">Histórico completo · no depende del mes seleccionado.</div><div class="chart-wrap" style="height:320px;"><canvas id="ch-evolucion"></canvas></div>`;
+  } else {
+    evoInner=`<div class="empty" style="color:var(--muted);">Necesitás al menos 2 sesiones para ver la evolución.</div>`;
+  }
+  const evoHTML=`<div class="card" style="margin-top:14px;"><div class="card-title">📈 Evolución mensual por área</div>${evoInner}</div>`;
+  el.innerHTML = monthChipsHTML() + legend + `<div class="perf-grid">${cards}</div>` + evoHTML;
   ldEl.style.display='none'; el.style.display='block';
+  // Gráfico de evolución — usa TODAS las sesiones, sin filtro de mes
+  if(charts['evolucion']){ try{charts['evolucion'].destroy();}catch(e){} }
+  const allSess=playerSessions;
+  if(allSess.length>=2){
+    const evLabels=allSess.map(s=>fmtDate(s[COL.fecha]));
+    const evAreas=[
+      {id:'tecnica', nombre:'Técnica', color:'#5170ff'},
+      {id:'tactica', nombre:'Táctica', color:'#e0a200'},
+      {id:'fisico',  nombre:'Físico',  color:'#16a34a'},
+      {id:'mental',  nombre:'Mental',  color:'#d6336c'}
+    ];
+    charts['evolucion']=new Chart(document.getElementById('ch-evolucion'),{
+      type:'line',
+      data:{labels:evLabels, datasets:evAreas.map(a=>({
+        label:a.nombre,
+        data:allSess.map(s=>{const v=avgLvlKeys(s,AREA_KEYS[a.id]); return v>0?v:null;}),
+        borderColor:a.color, backgroundColor:a.color,
+        tension:.35, pointRadius:4, pointBackgroundColor:a.color, spanGaps:true, borderWidth:3
+      }))},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:true,position:'bottom',labels:{font:{size:11},boxWidth:14,padding:14,usePointStyle:true}},
+          tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${(c.raw||0).toFixed(1)} 👍`}}},
+        scales:{
+          y:{min:0,max:3,ticks:{stepSize:1,font:{size:11},callback:v=>v>=1&&v<=3?v+' 👍':''},grid:{color:'rgba(81,112,255,0.10)'},title:{display:true,text:'Cantidad de pulgares 👍',font:{size:11,weight:'600'},color:'#6b6f8a'}},
+          x:{ticks:{font:{size:10},maxRotation:40,autoSkip:true,maxTicksLimit:8},grid:{color:'rgba(81,112,255,0.06)'}}
+        }
+      }
+    });
+  }
 }
 
 // ══════════════════════════════════════
@@ -1692,88 +1735,213 @@ function buildPlan(){
 }
 
 // ══════════════════════════════════════
-// PROGRESO — líneas sólidas por área
-// ══════════════════════════════════════
-function buildProgreso(){
-  const el=document.getElementById('content-progreso');
-  const ldEl=document.getElementById('loading-progreso');
-  const sess=filterByMonth(playerSessions);
-  if(sess.length<2){
-    ldEl.style.display='none'; el.style.display='block';
-    el.innerHTML=monthChipsHTML()+'<div class="empty">Necesitás al menos 2 sesiones (en el período elegido) para ver la evolución.</div>'; return;
-  }
-  const labels=sess.map(s=>fmtDate(s[COL.fecha]));
-  el.innerHTML=monthChipsHTML()+`
-    <div class="nota">Evolución del promedio por área · 1 A trabajar · 2 Funciona · 3 Excelente</div>
-    <div class="card"><div class="card-title">Evolución por área</div><div class="chart-wrap" style="height:320px;"><canvas id="ch-areas"></canvas></div></div>
-  `;
-  ldEl.style.display='none'; el.style.display='block';
-  const areas=[
-    {id:'tecnica', nombre:'Técnica', color:'#5170ff'},
-    {id:'tactica', nombre:'Táctica', color:'#e0a200'},
-    {id:'fisico',  nombre:'Físico',  color:'#16a34a'},
-    {id:'mental',  nombre:'Mental',  color:'#d6336c'}
-  ];
-  charts['areas']=new Chart(document.getElementById('ch-areas'),{
-    type:'line',
-    data:{labels, datasets:areas.map(a=>({
-      label:a.nombre,
-      data:sess.map(s=>{const v=avgLvlKeys(s,AREA_KEYS[a.id]); return v>0?v:null;}),
-      borderColor:a.color, backgroundColor:a.color,
-      tension:.35, pointRadius:4, pointBackgroundColor:a.color, spanGaps:true, borderWidth:3
-    }))},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:true,position:'bottom',labels:{font:{size:11},boxWidth:14,padding:14,usePointStyle:true}},
-        tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${(c.raw||0).toFixed(1)} / 3`}}},
-      scales:{
-        y:{min:0,max:3,ticks:{stepSize:1,font:{size:10},callback:v=>['','A trabajar','Funciona','Excelente'][v]||''},grid:{color:'rgba(81,112,255,0.10)'}},
-        x:{ticks:{font:{size:10},maxRotation:40,autoSkip:true,maxTicksLimit:7},grid:{color:'rgba(81,112,255,0.06)'}}
-      }
-    }
-  });
-}
-
-// ══════════════════════════════════════
 // HISTORIAL
 // ══════════════════════════════════════
 function buildHistorial(){
   const el=document.getElementById('content-historial');
   const ldEl=document.getElementById('loading-historial');
-  const sess=[...filterByMonth(playerSessions)].reverse();
+  const sess=filterByMonth(playerSessions);
   if(!sess.length){
     ldEl.style.display='none'; el.style.display='block';
     el.innerHTML=monthChipsHTML()+'<div class="empty">No hay sesiones registradas.</div>'; return;
   }
-  el.innerHTML=monthChipsHTML()+`<div class="card">
-    <div class="card-title">${sess.length} sesión${sess.length!==1?'es':''} registradas</div>
-    ${sess.map(s=>{
-      const tipo=s[COL.tipo]||'';
-      const tLvl=Math.round(avgLvlKeys(s,AREA_KEYS.tecnica));
-      const tacLvl=Math.round(avgLvlKeys(s,AREA_KEYS.tactica));
-      const fLvl=Math.round(avgLvlKeys(s,AREA_KEYS.fisico));
-      const mLvl=Math.round(avgLvlKeys(s,AREA_KEYS.mental));
-      const t=tipo.toLowerCase();
-      const dot=t.includes('torneo')?'var(--lv1)':t.includes('partido')?'var(--lv2)':t.includes('físic')||t.includes('fisic')?'var(--fis)':t.includes('mental')?'var(--men)':'var(--tec)';
-      return `<div class="session-item">
-        <div class="session-dot" style="background:${dot};margin-top:6px;"></div>
-        <div style="flex:1;">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
-            <span class="ctx-badge ${ctxClass(tipo)}">${ctxLabel(tipo)}</span>
-            <span class="session-date">${fmtDate(s[COL.fecha])}</span>
-          </div>
-          ${s[COL.descripcion]?`<div style="font-size:12px;color:var(--muted);margin-bottom:4px;">${s[COL.descripcion]}</div>`:''}
-          <div class="session-pills">
-            ${tLvl?`<span class="session-pill pill-tec">Téc: ${lvlLabel(tLvl)}</span>`:''}
-            ${tacLvl?`<span class="session-pill pill-tac">Tác: ${lvlLabel(tacLvl)}</span>`:''}
-            ${fLvl?`<span class="session-pill pill-fis">Fís: ${lvlLabel(fLvl)}</span>`:''}
-            ${mLvl?`<span class="session-pill pill-men">Men: ${lvlLabel(mLvl)}</span>`:''}
-          </div>
-          ${s[COL.obs_profe]?`<div class="hist-obs-h">Observación del Profe</div><div class="feedback-block feedback-coach">${s[COL.obs_profe]}</div>`:''}
+  const renderSession=(s)=>{
+    const tipo=s[COL.tipo]||'';
+    const tLvl=Math.round(avgLvlKeys(s,AREA_KEYS.tecnica));
+    const tacLvl=Math.round(avgLvlKeys(s,AREA_KEYS.tactica));
+    const fLvl=Math.round(avgLvlKeys(s,AREA_KEYS.fisico));
+    const mLvl=Math.round(avgLvlKeys(s,AREA_KEYS.mental));
+    const t=tipo.toLowerCase();
+    const dot=t.includes('torneo')?'var(--lv1)':t.includes('partido')?'var(--lv2)':t.includes('físic')||t.includes('fisic')?'var(--fis)':t.includes('mental')?'var(--men)':'var(--tec)';
+    return `<div class="session-item">
+      <div class="session-dot" style="background:${dot};margin-top:6px;"></div>
+      <div style="flex:1;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+          <span class="ctx-badge ${ctxClass(tipo)}">${ctxLabel(tipo)}</span>
+          <span class="session-date">${fmtDate(s[COL.fecha])}</span>
         </div>
-      </div>`;
-    }).join('')}
-  </div>`;
+        ${s[COL.descripcion]?`<div style="font-size:12px;color:var(--muted);margin-bottom:4px;">${s[COL.descripcion]}</div>`:''}
+        <div class="session-pills">
+          ${tLvl?`<span class="session-pill pill-tec">Téc: ${lvlLabel(tLvl)}</span>`:''}
+          ${tacLvl?`<span class="session-pill pill-tac">Tác: ${lvlLabel(tacLvl)}</span>`:''}
+          ${fLvl?`<span class="session-pill pill-fis">Fís: ${lvlLabel(fLvl)}</span>`:''}
+          ${mLvl?`<span class="session-pill pill-men">Men: ${lvlLabel(mLvl)}</span>`:''}
+        </div>
+        ${s[COL.obs_profe]?`<div class="hist-obs-h">Observación del Profe</div><div class="feedback-block feedback-coach">${s[COL.obs_profe]}</div>`:''}
+      </div>
+    </div>`;
+  };
+  // Agrupar por mes (más reciente primero)
+  const byMonth={};
+  sess.forEach(s=>{ const mk=monthKey(s); if(!mk) return; (byMonth[mk]=byMonth[mk]||[]).push(s); });
+  const months=Object.keys(byMonth).sort().reverse();
+  const pl=currentPlayer.replace(/'/g,"\\'");
+  const monthsHTML=months.map(mk=>{
+    const ms=[...byMonth[mk]].reverse(); // dentro del mes, más reciente arriba
+    const n=ms.length;
+    const rows=ms.map(renderSession).join('');
+    const badge=`<button class="report-badge" onclick="downloadMonthReport('${pl}','${mk}')">
+      <span class="rb-ic">📄</span>
+      <span class="rb-tx"><span class="rb-title">Descargar Reporte de Rendimiento</span><span class="rb-sub">${monthLabel(mk)} · resumen completo del mes</span></span>
+      <span class="rb-dl">⬇</span>
+    </button>`;
+    return `<div class="card hist-month">
+      <div class="card-title">${monthLabel(mk)} · ${n} sesión${n!==1?'es':''}</div>
+      ${rows}
+      ${badge}
+    </div>`;
+  }).join('');
+  el.innerHTML=monthChipsHTML()+monthsHTML;
   ldEl.style.display='none'; el.style.display='block';
+}
+
+// ── Reporte de Rendimiento mensual (descarga HTML autónomo) ──
+function downloadMonthReport(name, mk){
+  try{
+    const html=buildMonthReportHTML(name, mk);
+    const blob=new Blob([html], {type:'text/html;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const safe=(name||'jugador').replace(/[^a-z0-9]+/gi,'_').replace(/^_|_$/g,'');
+    a.href=url; a.download=`Reporte_${safe}_${mk}.html`;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ try{document.body.removeChild(a);}catch(e){} URL.revokeObjectURL(url); }, 120);
+  }catch(e){ alert('No se pudo generar el reporte: '+(e&&e.message?e.message:e)); }
+}
+function buildMonthReportHTML(name, mk){
+  const esc=(s)=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const info=getInfo(name);
+  const cat=info?(info[INFO.categoria]||'').trim():'';
+  const ms=sessionsOf(name).filter(s=>monthKey(s)===mk); // ascendente
+  const monthName=monthLabel(mk);
+  const ini=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const color=avatarColor(name);
+  const areas=[['tecnica','Técnica','🎾','#5170ff'],['tactica','Táctica','♟️','#e0a200'],['fisico','Físico','⚡','#16a34a'],['mental','Mental','🧠','#d6336c']];
+  const areaAvg={}; areas.forEach(([id])=>{ areaAvg[id]=areaAvgScope(name,mk,id); });
+  const ovVals=areas.map(([id])=>areaAvg[id]).filter(v=>v>0);
+  const overall=ovVals.length?ovVals.reduce((a,b)=>a+b,0)/ovVals.length:0;
+  const allMk=[...new Set(sessionsOf(name).map(monthKey).filter(Boolean))].sort();
+  const prevMk=allMk.indexOf(mk)>0?allMk[allMk.indexOf(mk)-1]:null;
+  const at=attendanceFor(name,mk);
+  const REPORT_Q={'Drive':'¿Golpe sólido y dirigido?','Revés':'¿Estable y confiable?','Saque':'¿Constante y con intención?','Volea':'¿Define en la red?','Construcción del punto':'¿Construye variando sus golpes?','Velocidad':'¿Llega con equilibrio y tiempo?','Resistencia':'¿Mantiene el nivel hasta el final?','Tolerancia al error':'¿Resetea entre puntos?','Actitud':'¿Mantiene una actitud positiva?'};
+  const TH=(lv)=>{lv=Math.round(lv)||0; return '<span class="th-wrap">'+[1,2,3].map(i=>'<span class="th'+(i<=lv?' on':' off')+'">👍</span>').join('')+'</span>';};
+  const gAvg=(keys)=>{const vals=ms.map(s=>avgLvlKeys(s,keys)).filter(v=>v>0);return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;};
+
+  // Tarjetas de área (scorecard) con delta vs mes anterior
+  const areaCards=areas.map(([id,nombre,emoji,col])=>{
+    const v=areaAvg[id];
+    const pv=prevMk?areaAvgScope(name,prevMk,id):0;
+    let delta='';
+    if(v>0 && pv>0){ const d=v-pv; if(d>=0.05) delta='<span class="dl up">▲ +'+d.toFixed(1)+'</span>'; else if(d<=-0.05) delta='<span class="dl down">▼ '+d.toFixed(1)+'</span>'; else delta='<span class="dl flat">= igual</span>'; }
+    return '<div class="ac" style="--ac:'+col+'">'
+      +'<div class="ac-top"><span class="ac-emoji">'+emoji+'</span><span class="ac-name">'+nombre+'</span></div>'
+      +'<div class="ac-val">'+(v>0?v.toFixed(1):'—')+'<small>/3</small></div>'
+      +'<div class="ac-th">'+TH(v)+'</div>'
+      +'<div class="ac-lab">'+(v>0?esc(lvlLabel(Math.round(v))):'Sin datos')+'</div>'
+      + (delta?'<div class="ac-delta">'+delta+(prevMk?' <span class="ac-prevm">vs '+esc(monthLabel(prevMk))+'</span>':'')+'</div>':'')
+      +'</div>';
+  }).join('');
+
+  // Detalle por habilidad (RESUMEN_GROUPS)
+  const detalle=areas.map(([id,nombre,emoji,col])=>{
+    const grupos=RESUMEN_GROUPS[id]||[];
+    const rows=grupos.map(g=>{
+      const v=gAvg(g.keys); if(v<=0) return '';
+      const q=REPORT_Q[g.nombre]||'';
+      return '<div class="sk"><div class="sk-l"><span class="sk-name">'+esc(g.nombre)+'</span>'+(q?'<span class="sk-q">'+esc(q)+'</span>':'')+'</div><div class="sk-r">'+TH(v)+'<span class="sk-lab">'+esc(lvlLabel(Math.round(v)))+'</span></div></div>';
+    }).filter(Boolean).join('');
+    if(!rows) return '';
+    return '<div class="det-area"><div class="det-h" style="--ac:'+col+'">'+emoji+' '+nombre+'</div>'+rows+'</div>';
+  }).filter(Boolean).join('');
+
+  // Observaciones del profe
+  const obs=ms.filter(s=>(s[COL.obs_profe]||'').trim()).map(s=>'<div class="ob"><div class="ob-d">'+esc(fmtDate(s[COL.fecha]))+'</div><div class="ob-t">'+esc(s[COL.obs_profe].trim())+'</div></div>').join('');
+
+  // Línea de tiempo de sesiones
+  const sesiones=[...ms].reverse().map(s=>{
+    const tipo=s[COL.tipo]||'';
+    const pills=areas.map(([id,nombre,emoji,col])=>{const lv=Math.round(avgLvlKeys(s,AREA_KEYS[id])); return lv>0?'<span class="pill" style="--ac:'+col+'">'+emoji+' '+esc(lvlLabel(lv))+'</span>':'';}).filter(Boolean).join('');
+    return '<div class="ses"><div class="ses-top"><span class="ses-type">'+esc(ctxLabel(tipo))+'</span><span class="ses-date">'+esc(fmtDate(s[COL.fecha]))+'</span></div>'+(pills?'<div class="ses-pills">'+pills+'</div>':'')+'</div>';
+  }).join('');
+
+  const atHTML = at ? '<div class="att"><div class="att-cell"><div class="att-v">'+at.pct+'%</div><div class="att-l">Asistencia</div></div><div class="att-cell"><div class="att-v">'+at.cumplidas+'<small>/'+at.objetivo+'</small></div><div class="att-l">Sesiones cumplidas</div></div><div class="att-cell"><div class="att-badge '+(at.met?'ok':'no')+'">'+(at.met?'✓ Objetivo cumplido':'Objetivo no alcanzado')+'</div></div></div>' : '';
+
+  const hoy=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'});
+  const titleTxt='Reporte de Rendimiento — '+name+' — '+monthName;
+
+  return '<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
++'<title>'+esc(titleTxt)+'</title>'
++'<style>'
++'*{box-sizing:border-box;margin:0;padding:0;}'
++'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#eef1f8;color:#20223a;padding:18px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
++'.page{max-width:760px;margin:0 auto;}'
++'.hero{background:linear-gradient(135deg,#5170ff,#2d3aa8);color:#fff;border-radius:20px;padding:28px 26px;position:relative;overflow:hidden;box-shadow:0 14px 40px rgba(81,112,255,.35);}'
++'.hero:after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;background:rgba(255,255,255,.08);border-radius:50%;}'
++'.brand{font-weight:800;font-size:14px;letter-spacing:.04em;opacity:.92;}'
++'.hero-title{font-size:30px;font-weight:800;margin-top:10px;line-height:1.05;}'
++'.hero-sub{font-size:16px;font-weight:600;opacity:.9;margin-top:2px;text-transform:capitalize;}'
++'.player{display:flex;align-items:center;gap:14px;margin-top:20px;position:relative;z-index:1;}'
++'.pav{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;box-shadow:inset 0 3px 6px rgba(255,255,255,.3),inset 0 -5px 9px rgba(0,0,0,.2);}'
++'.pname{font-size:20px;font-weight:800;}'
++'.pmeta{font-size:13px;opacity:.9;text-transform:capitalize;}'
++'.overall{background:#fff;border-radius:18px;padding:22px;text-align:center;margin-top:16px;box-shadow:0 8px 24px rgba(32,34,58,.08);}'
++'.ov-lbl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6b6f8a;}'
++'.ov-val{font-size:52px;font-weight:800;line-height:1;margin:6px 0;color:#20223a;}'
++'.ov-val small{font-size:20px;color:#9aa0bd;font-weight:700;}'
++'.ov-lab{font-size:15px;font-weight:700;color:#5170ff;margin-top:4px;}'
++'.th-wrap{white-space:nowrap;}'
++'.th{font-size:20px;filter:grayscale(1);opacity:.25;}'
++'.th.on{filter:none;opacity:1;}'
++'.grid4{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}'
++'.ac{background:#fff;border-radius:16px;padding:16px;box-shadow:0 6px 18px rgba(32,34,58,.07);border-top:4px solid var(--ac);}'
++'.ac-top{display:flex;align-items:center;gap:8px;}'
++'.ac-emoji{font-size:18px;}'
++'.ac-name{font-weight:700;font-size:14px;}'
++'.ac-val{font-size:30px;font-weight:800;margin:6px 0 2px;}'
++'.ac-val small{font-size:14px;color:#9aa0bd;}'
++'.ac-th .th{font-size:16px;}'
++'.ac-lab{font-size:12px;font-weight:700;color:var(--ac);margin-top:4px;}'
++'.ac-delta{font-size:11px;margin-top:6px;}'
++'.dl.up{color:#16a34a;font-weight:700;}.dl.down{color:#dc2626;font-weight:700;}.dl.flat{color:#9aa0bd;font-weight:600;}'
++'.ac-prevm{color:#9aa0bd;font-weight:500;}'
++'.section-title{font-size:16px;font-weight:800;margin:24px 4px 10px;}'
++'.att{background:#fff;border-radius:16px;padding:16px;margin-top:14px;display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:10px;align-items:center;box-shadow:0 6px 18px rgba(32,34,58,.07);}'
++'.att-cell{text-align:center;}'
++'.att-v{font-size:26px;font-weight:800;}.att-v small{font-size:14px;color:#9aa0bd;}'
++'.att-l{font-size:11px;color:#6b6f8a;font-weight:600;}'
++'.att-badge{display:inline-block;padding:8px 12px;border-radius:99px;font-size:12px;font-weight:700;}'
++'.att-badge.ok{background:#dcfce7;color:#15803d;}.att-badge.no{background:#fee2e2;color:#b91c1c;}'
++'.det-area{background:#fff;border-radius:16px;padding:6px 16px 10px;margin-bottom:12px;box-shadow:0 6px 18px rgba(32,34,58,.07);}'
++'.det-h{font-weight:800;font-size:14px;color:var(--ac);padding:12px 0 8px;border-bottom:1px solid #eef0f7;}'
++'.sk{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f2f3f9;}'
++'.sk:last-child{border-bottom:none;}'
++'.sk-name{font-weight:700;font-size:13px;display:block;}'
++'.sk-q{font-size:11px;color:#9aa0bd;font-style:italic;}'
++'.sk-r{display:flex;align-items:center;gap:8px;white-space:nowrap;}'
++'.sk-lab{font-size:11px;font-weight:700;color:#6b6f8a;}'
++'.ob{background:#fff7e6;border-left:4px solid #e0a200;border-radius:10px;padding:12px 14px;margin-bottom:10px;}'
++'.ob-d{font-size:11px;font-weight:700;color:#b5860b;margin-bottom:3px;}'
++'.ob-t{font-size:13px;color:#4a4d63;line-height:1.45;}'
++'.ses{background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:9px;box-shadow:0 4px 12px rgba(32,34,58,.05);}'
++'.ses-top{display:flex;justify-content:space-between;align-items:center;}'
++'.ses-type{font-weight:700;font-size:13px;}'
++'.ses-date{font-size:12px;color:#9aa0bd;}'
++'.ses-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}'
++'.pill{font-size:11px;font-weight:700;color:#fff;background:var(--ac);border-radius:99px;padding:3px 9px;opacity:.92;}'
++'.footer{text-align:center;font-size:11px;color:#9aa0bd;margin:26px 0 8px;}'
++'.printbtn{display:block;width:100%;max-width:760px;margin:0 auto 30px;background:#5170ff;color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;}'
++'@media print{body{background:#fff;padding:0;}.printbtn{display:none;}.hero{box-shadow:none;}.ac,.overall,.att,.det-area,.ses{box-shadow:none;border:1px solid #eef0f7;}}'
++'</style></head><body><div class="page">'
++'<div class="hero"><div class="brand">👍 mi tenis</div><div class="hero-title">Reporte de Rendimiento</div><div class="hero-sub">'+esc(monthName)+'</div>'
++'<div class="player"><div class="pav" style="background:'+color+'">'+esc(ini)+'</div><div><div class="pname">'+esc(name)+'</div><div class="pmeta">'+(cat?esc(cat)+' · ':'')+ms.length+' sesión'+(ms.length!==1?'es':'')+'</div></div></div></div>'
++'<div class="overall"><div class="ov-lbl">Promedio general del mes</div><div class="ov-val">'+(overall>0?overall.toFixed(1):'—')+'<small> / 3</small></div><div class="ac-th">'+TH(overall)+'</div><div class="ov-lab">'+(overall>0?esc(lvlLabel(Math.round(overall))):'Sin datos')+'</div></div>'
++'<div class="grid4">'+areaCards+'</div>'
++ atHTML
++ (detalle?'<div class="section-title">Detalle por habilidad</div>'+detalle:'')
++ (obs?'<div class="section-title">Observaciones del Profe</div>'+obs:'')
++ (sesiones?'<div class="section-title">Sesiones del mes</div>'+sesiones:'')
++'<div class="footer">Generado el '+esc(hoy)+' · mi tenis · sistema de rendimiento para jugadores de tenis</div>'
++'</div><button class="printbtn" onclick="window.print()">🖨️ Imprimir o guardar como PDF</button></body></html>';
 }
 
 // ══════════════════════════════════════
