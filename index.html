@@ -612,9 +612,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .filter-acc{margin-bottom:8px;background:transparent;border:none;border-radius:0;overflow:visible;}
 .filter-acc .acc-head{padding:8px 2px;}
 .filter-acc .acc-head:hover{background:transparent;}
-.filter-acc .acc-title{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--text);display:inline-flex;align-items:center;gap:4px;}
-.filter-acc .acc-sub{font-size:12px;font-weight:500;color:var(--muted);margin-left:4px;}
+.filter-acc .acc-title{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#fff;display:inline-flex;align-items:center;gap:4px;}
+.filter-acc .acc-sub{font-size:12px;font-weight:500;color:rgba(255,255,255,.82);margin-left:4px;}
+.filter-acc .acc-chevron{color:#fff;}
 .filter-acc .acc-body-inner{padding:0 2px 10px;}
+/* chips: fuente blanca; el seleccionado queda con fondo blanco */
+.filter-acc .mf-chip{background:transparent;border-color:rgba(255,255,255,.55);color:#fff;}
+.filter-acc .mf-chip:hover{background:rgba(255,255,255,.14);border-color:#fff;color:#fff;}
+.filter-acc .mf-chip.active{background:#fff;border-color:#fff;color:var(--blue);font-weight:700;}
 
 /* === Historial: calendario de sesiones === */
 .cal-card{padding:16px;}
@@ -632,6 +637,8 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(81,1
 .cal-cell.cal-dl{background:var(--ball);color:#5b5400;border-color:#d9e84a;}
 .cal-cell.cal-dl .cal-dlico{font-size:11px;line-height:1;margin-top:1px;}
 .cal-cell.cal-dl.has{box-shadow:inset 0 0 0 2px var(--blue);}
+.cal-cell.cal-dl-lock{background:var(--surf2);color:var(--hint);border:1px dashed var(--border);cursor:default;}
+.cal-cell.cal-dl-lock .cal-dlico{opacity:.7;}
 .cal-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:var(--muted);}
 .cal-legend span{display:inline-flex;align-items:center;gap:6px;}
 .cal-legend .lg-swatch{width:13px;height:13px;border-radius:4px;flex-shrink:0;}
@@ -1807,11 +1814,17 @@ function openHistDay(pl, mk, day){
 function closeHistDay(){ const ov=document.getElementById('hist-day-overlay'); if(ov) ov.classList.remove('show'); }
 
 // Calendario de un mes: marca días con sesión y resalta el último día (descarga)
+function monthEnded(mk){
+  const now=new Date();
+  const todayMk=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  return mk < todayMk; // el mes terminó una vez que estamos en un mes posterior
+}
 function buildMonthCalendar(mk, monthSessions, pl){
   const parts=mk.split('-'); const y=Number(parts[0]); const m=Number(parts[1]);
   const lastDay=new Date(y, m, 0).getDate();
   let startDow=new Date(y, m-1, 1).getDay();   // 0=Dom..6=Sáb
   startDow=(startDow+6)%7;                       // semana arranca en Lunes
+  const ended=monthEnded(mk);                    // reporte disponible solo si terminó el mes
   const dayCount={};
   monthSessions.forEach(s=>{ const d=parseDate(s[COL.fecha]); if(!d) return; const dd=Number(d.slice(8,10)); dayCount[dd]=(dayCount[dd]||0)+1; });
   const dows=['Lu','Ma','Mi','Ju','Vi','Sá','Do'];
@@ -1820,7 +1833,8 @@ function buildMonthCalendar(mk, monthSessions, pl){
   for(let day=1; day<=lastDay; day++){
     const has=dayCount[day]>0;
     const isLast=day===lastDay;
-    if(isLast){
+    if(isLast && ended){
+      // El mes terminó: el último día permite descargar el reporte
       cells+=`<button class="cal-cell cal-dl${has?' has':''}" onclick="downloadMonthReport('${pl}','${mk}')" title="Descargar el reporte completo de ${monthLabel(mk)}">
         <span class="cal-num">${day}</span><span class="cal-dlico">📄</span>
         ${dayCount[day]>1?`<span class="cal-badge">${dayCount[day]}</span>`:''}
@@ -1830,25 +1844,36 @@ function buildMonthCalendar(mk, monthSessions, pl){
         <span class="cal-num">${day}</span><span class="cal-dot"></span>
         ${dayCount[day]>1?`<span class="cal-badge">${dayCount[day]}</span>`:''}
       </button>`;
+    } else if(isLast){
+      // Mes en curso, sin sesión ese día: descarga bloqueada hasta que termine el mes
+      cells+=`<div class="cal-cell cal-dl-lock" title="El reporte estará disponible cuando termine el mes">
+        <span class="cal-num">${day}</span><span class="cal-dlico">🔒</span>
+      </div>`;
     } else {
       cells+=`<div class="cal-cell"><span class="cal-num">${day}</span></div>`;
     }
   }
   const n=monthSessions.length;
+  const dlSwatch = ended
+    ? `<span><span class="lg-swatch" style="background:var(--ball);"></span> Descargar reporte del mes</span>`
+    : `<span><span class="lg-swatch" style="background:var(--surf2);border:1px dashed var(--border);"></span> Reporte 🔒 (al terminar el mes)</span>`;
+  const footer = ended
+    ? `<button class="report-badge report-badge-out" onclick="downloadMonthReport('${pl}','${mk}')">
+        <span class="rb-ic">📄</span>
+        <span class="rb-tx"><span class="rb-title">Descargar Reporte de Rendimiento</span><span class="rb-sub">${monthLabel(mk)} · resumen completo del mes</span></span>
+        <span class="rb-dl">⬇</span>
+      </button>`
+    : `<div class="nota" style="margin:10px 0 20px;">🔒 El Reporte de Rendimiento de <strong>${monthLabel(mk)}</strong> estará disponible para descargar cuando termine el mes.</div>`;
   return `<div class="card cal-card">
       <div class="card-title">${monthLabel(mk)} · ${n} sesión${n!==1?'es':''}</div>
       <div class="cal-dows">${dows.map(d=>`<div class="cal-dow">${d}</div>`).join('')}</div>
       <div class="cal-grid">${cells}</div>
       <div class="cal-legend">
         <span><span class="lg-swatch" style="background:var(--blue);"></span> Día con sesión</span>
-        <span><span class="lg-swatch" style="background:var(--ball);"></span> Descargar reporte del mes</span>
+        ${dlSwatch}
       </div>
     </div>
-    <button class="report-badge report-badge-out" onclick="downloadMonthReport('${pl}','${mk}')">
-      <span class="rb-ic">📄</span>
-      <span class="rb-tx"><span class="rb-title">Descargar Reporte de Rendimiento</span><span class="rb-sub">${monthLabel(mk)} · resumen completo del mes</span></span>
-      <span class="rb-dl">⬇</span>
-    </button>`;
+    ${footer}`;
 }
 
 function buildHistorial(){
@@ -1864,7 +1889,7 @@ function buildHistorial(){
   sess.forEach(s=>{ const mk=monthKey(s); if(!mk) return; (byMonth[mk]=byMonth[mk]||[]).push(s); });
   const months=Object.keys(byMonth).sort().reverse();
   const pl=currentPlayer.replace(/'/g,"\\'");
-  const desc=`<div class="nota">📅 Tu calendario de entrenamiento. Los días en <strong>azul</strong> tienen una sesión registrada — tocalos para ver el detalle. El <strong>último día del mes</strong> (en amarillo 📄) te deja descargar tu registro completo del mes.</div>`;
+  const desc=`<div class="nota">📅 Tu calendario de entrenamiento. Los días en <strong>azul</strong> tienen una sesión registrada — tocalos para ver el detalle. El registro completo del mes se puede descargar <strong>una vez que el mes haya terminado</strong> (último día en amarillo 📄).</div>`;
   const calsHTML=months.map(mk=>buildMonthCalendar(mk, byMonth[mk], pl)).join('');
   el.innerHTML=monthChipsHTML()+desc+calsHTML;
   ldEl.style.display='none'; el.style.display='block';
