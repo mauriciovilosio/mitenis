@@ -591,6 +591,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .cz-intro-d{font-size:13px;color:var(--text);line-height:1.55;}
 .cz-filters{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:6px;}
 .cz-filters .card{margin:0;}
+/* Botón de descarga del resumen de planificación (Modo Profe) */
+.coach-dl-wrap{display:flex;margin:2px 0 14px;}
+.coach-dl{display:inline-flex;align-items:center;gap:9px;background:linear-gradient(135deg,#5170ff,#6f86ff);color:#fff;border:none;border-radius:12px;padding:11px 16px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;box-shadow:0 8px 22px rgba(81,112,255,.34);transition:transform .12s,box-shadow .12s;text-align:left;line-height:1.25;}
+.coach-dl:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(81,112,255,.42);}
+.coach-dl:active{transform:translateY(0);}
+.coach-dl-lock{display:inline-flex;align-items:center;gap:8px;background:var(--surf2);color:var(--muted);border:1px dashed var(--border);border-radius:12px;padding:11px 16px;font-size:12px;font-weight:600;line-height:1.3;}
 .cz-asist{display:flex;gap:14px;}
 .cz-stat{flex:1;background:var(--surf2);border-radius:var(--radius-sm);padding:12px;text-align:center;}
 .cz-stat-val{font-size:26px;font-weight:800;color:var(--text);line-height:1;}
@@ -1496,6 +1502,22 @@ function buildCoach(){
   </div>` : '';
 
   el.innerHTML = `<div class="cz-filters">${monthChips}${catChips}</div>`
+    + (()=>{
+        const planMonth = (selectedMonth!=='all' && allMonths.indexOf(selectedMonth)>=0)
+          ? selectedMonth
+          : (allMonths.filter(m=>monthEnded(m)).pop() || '');
+        const planReady = planMonth && monthEnded(planMonth);
+        const catArg = (coachCat||'all').replace(/'/g,"\\'");
+        let inner;
+        if(planReady){
+          inner=`<button class="coach-dl" onclick="downloadCoachPlan('${planMonth}','${catArg}')" title="Descargar el resumen para planificar ${mLabelFull(planMonth)}">📄 Descargar resumen para planificar · ${mLabelFull(planMonth)}</button>`;
+        } else if(planMonth){
+          inner=`<div class="coach-dl-lock">🔒 El resumen para planificar estará disponible al cerrar ${mLabelFull(planMonth)}</div>`;
+        } else {
+          inner=`<div class="coach-dl-lock">🔒 El resumen para planificar estará disponible al cerrar el primer mes</div>`;
+        }
+        return `<div class="coach-dl-wrap">${inner}</div>`;
+      })()
     + `<div class="cz-h">Promedio de la clase${curMonth?' · '+mLabelFull(curMonth):''}</div>`
     + `<div class="metrics-row">${obsCard}${areaCards}${totCard}</div>`
     + badgeHTML
@@ -2082,6 +2104,93 @@ function buildMonthReportHTML(name, mk){
 + (obs?'<div class="section-title">Observaciones del Profe</div>'+obs:'')
 + (sesiones?'<div class="section-title">Sesiones del mes</div>'+sesiones:'')
 +'<div class="footer">Generado el '+esc(hoy)+' · mi tenis · sistema de rendimiento para jugadores de tenis</div>'
++'</div><button class="printbtn" onclick="window.print()">🖨️ Imprimir o guardar como PDF</button></body></html>';
+}
+
+// ══════════════════════════════════════
+// RESUMEN MENSUAL PARA PLANIFICAR (Modo Profe)
+// Lista, por área, cada rúbrica con los jugadores que la tienen en «A trabajar»
+// ══════════════════════════════════════
+function coachPlayersFor(cat){
+  let players=[...new Set(allRows.map(r=>r[COL.alumno]))].filter(Boolean).sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base'}));
+  const catOf=p=>{ const i=getInfo(p); return i?(i[INFO.categoria]||'').trim():''; };
+  if(cat && cat!=='all') players=players.filter(p=>catOf(p)===cat);
+  return players;
+}
+// Nivel más reciente de una rúbrica dentro de un mes (0 si no fue evaluada)
+function rubricLevelInMonth(player, key, mk){
+  const ms=allRows.filter(r=>r[COL.alumno]===player && monthKey(r)===mk)
+    .sort((a,b)=>new Date(parseDate(a[COL.fecha]))-new Date(parseDate(b[COL.fecha])));
+  for(let i=ms.length-1;i>=0;i--){ const lv=toLvl(ms[i][COL[key]]); if(lv>0) return lv; }
+  return 0;
+}
+function downloadCoachPlan(mk, cat){
+  try{
+    const html=buildCoachPlanHTML(mk, cat);
+    const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const safeCat=((cat&&cat!=='all')?cat:'todas').replace(/[^a-z0-9]+/gi,'_').replace(/^_|_$/g,'');
+    a.href=url; a.download=`Plan_${mk}_${safeCat}.html`;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ try{document.body.removeChild(a);}catch(e){} URL.revokeObjectURL(url); },120);
+  }catch(e){ alert('No se pudo generar el resumen: '+(e&&e.message?e.message:e)); }
+}
+function buildCoachPlanHTML(mk, cat){
+  const esc=(s)=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const monthName=monthLabel(mk);
+  const players=coachPlayersFor(cat);
+  const catLbl = (cat&&cat!=='all') ? cat : 'Todas las categorías';
+  const areasMeta=[['tecnica','Técnica','🎾','#5170ff'],['tactica','Táctica','♟️','#e0a200'],['fisico','Físico','⚡','#16a34a'],['mental','Mental','🧠','#d6336c']];
+  let totalFlags=0;
+  const sections=areasMeta.map(([id,nombre,emoji,col])=>{
+    const rubs=RUBRICAS[id]||[];
+    const rows=rubs.map(rb=>{
+      const names=players.filter(p=>rubricLevelInMonth(p, rb.key, mk)===1);
+      totalFlags+=names.length;
+      const chips = names.length
+        ? '<div class="chips">'+names.map(nm=>'<span class="chip">'+esc(nm)+'</span>').join('')+'</div>'
+        : '<div class="none">✓ Nadie en «A trabajar»</div>';
+      return '<div class="rub"><div class="rub-h"><span class="rub-name">'+esc(rb.nombre)+'</span><span class="rub-count'+(names.length?'':' zero')+'">'+names.length+'</span></div>'+chips+'</div>';
+    }).join('');
+    return '<div class="area"><div class="area-h" style="--ac:'+col+'">'+emoji+' '+esc(nombre)+'</div>'+rows+'</div>';
+  }).join('');
+  const hoy=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'});
+  const titleTxt='Resumen para planificar — '+monthName+' — '+catLbl;
+  return '<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
++'<title>'+esc(titleTxt)+'</title>'
++'<style>'
++'*{box-sizing:border-box;margin:0;padding:0;}'
++'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#eef1f8;color:#20223a;padding:18px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
++'.page{max-width:760px;margin:0 auto;}'
++'.hero{background:linear-gradient(135deg,#5170ff,#2d3aa8);color:#fff;border-radius:20px;padding:26px 26px;position:relative;overflow:hidden;box-shadow:0 14px 40px rgba(81,112,255,.35);}'
++'.hero:after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;background:rgba(255,255,255,.08);border-radius:50%;}'
++'.brand{font-weight:800;font-size:14px;letter-spacing:.04em;opacity:.92;}'
++'.hero-title{font-size:28px;font-weight:800;margin-top:10px;line-height:1.05;}'
++'.hero-sub{font-size:15px;font-weight:600;opacity:.92;margin-top:4px;text-transform:capitalize;}'
++'.hero-meta{font-size:13px;opacity:.85;margin-top:8px;}'
++'.intro{background:#fff;border-radius:16px;padding:16px 18px;margin-top:16px;box-shadow:0 6px 18px rgba(32,34,58,.07);font-size:13px;line-height:1.55;color:#4a4d63;}'
++'.intro b{color:#20223a;}'
++'.legend{display:inline-block;background:#fde8e8;color:#b91c1c;font-weight:700;font-size:12px;padding:2px 9px;border-radius:99px;}'
++'.area{background:#fff;border-radius:16px;padding:6px 18px 12px;margin-top:14px;box-shadow:0 6px 18px rgba(32,34,58,.07);}'
++'.area-h{font-weight:800;font-size:16px;color:var(--ac);padding:14px 0 10px;border-bottom:2px solid var(--ac);margin-bottom:4px;}'
++'.rub{padding:11px 0;border-bottom:1px solid #f2f3f9;}'
++'.rub:last-child{border-bottom:none;}'
++'.rub-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px;}'
++'.rub-name{font-weight:700;font-size:13px;}'
++'.rub-count{font-size:12px;font-weight:800;color:#fff;background:#dc2626;border-radius:99px;min-width:22px;text-align:center;padding:1px 8px;}'
++'.rub-count.zero{background:#d6f5e3;color:#15803d;}'
++'.chips{display:flex;flex-wrap:wrap;gap:6px;}'
++'.chip{font-size:12px;font-weight:600;background:#fde8e8;color:#b91c1c;border:1px solid #f6caca;border-radius:8px;padding:4px 10px;}'
++'.none{font-size:12px;color:#15803d;font-weight:600;}'
++'.footer{text-align:center;font-size:11px;color:#9aa0bd;margin:26px 0 8px;}'
++'.printbtn{display:block;width:100%;max-width:760px;margin:18px auto 30px;background:#5170ff;color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;}'
++'@media print{body{background:#fff;padding:0;}.printbtn{display:none;}.hero{box-shadow:none;}.area,.intro{box-shadow:none;border:1px solid #eef0f7;}}'
++'</style></head><body><div class="page">'
++'<div class="hero"><div class="brand">🧢 mi tenis · Modo Profe</div><div class="hero-title">Resumen para planificar</div><div class="hero-sub">'+esc(monthName)+'</div><div class="hero-meta">'+esc(catLbl)+' · '+players.length+' jugador'+(players.length!==1?'es':'')+'</div></div>'
++'<div class="intro">Cada rúbrica muestra los jugadores que la tienen en <span class="legend">A trabajar</span> durante '+esc(monthName)+'. Usalo como guía para armar el foco de las clases del próximo mes. En total hay <b>'+totalFlags+'</b> punto'+(totalFlags!==1?'s':'')+' a reforzar.</div>'
++ sections
++'<div class="footer">Generado el '+esc(hoy)+' · mi tenis · sistema de seguimiento y desarrollo para jugadores de tenis</div>'
 +'</div><button class="printbtn" onclick="window.print()">🖨️ Imprimir o guardar como PDF</button></body></html>';
 }
 
