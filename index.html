@@ -560,6 +560,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .ball-label.mejora-trigger:active{transform:scale(.97);}
 #mejora-title{text-align:left;}
 .mejora-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--lv1);background:var(--lv1-bg);border-radius:999px;padding:3px 11px;margin-bottom:10px;}
+.mejora-tag.tag1{color:var(--lv1);background:var(--lv1-bg);}
+.mejora-tag.tag2{color:#8a6d00;background:#fdf3cf;}
 .mejora-intro{font-size:13px;color:var(--text);line-height:1.55;margin:0 0 10px;}
 .mejora-list{margin:0;padding-left:18px;}
 .mejora-list li{font-size:13px;color:var(--text);line-height:1.5;margin-bottom:8px;}
@@ -1421,31 +1423,61 @@ function closeLigaInfo(){ const ov=document.getElementById('liga-info-overlay');
 // (Reemplazable: editá los textos de cada rúbrica)
 // ══════════════════════════════════════
 const MEJORAS = {
-  'Drive':{ emoji:'🎾', objetivo:'Punto de impacto estable.', ejercicio:'40 drives en media cancha con canasto, con foco solo en el contacto adelante del cuerpo.', medir:'% de bolas que pasan la red y caen dentro (apuntá 30 de 40).' },
-  'Revés':{ emoji:'🎾', objetivo:'Estabilidad del golpe.', ejercicio:'30 reveses controlados con canasto, buscando siempre el mismo punto de impacto.', medir:'Bolas consecutivas sin error (apuntá 8 seguidas).' },
-  'Saque':{ emoji:'🎾', objetivo:'Lanzamiento consistente.', ejercicio:'50 lanzamientos sin golpear, haciendo caer la pelota en una zona marcada con la raqueta.', medir:'Aciertos en zona (apuntá 40 de 50).' },
-  'Volea':{ emoji:'🎾', objetivo:'Bloqueo firme.', ejercicio:'Voleas cortas contra la pared, manteniendo la muñeca firme.', medir:'Repeticiones seguidas sin que caiga la bola.' },
-  'Construcción del punto':{ emoji:'♟️', objetivo:'Tener un plan de 3 golpes.', ejercicio:'Jugá puntos declarando en voz alta tu patrón antes de sacar.', medir:'Puntos en los que cumpliste el patrón.' },
-  'Velocidad':{ emoji:'⚡', objetivo:'Primer paso explosivo.', ejercicio:'10 arrancadas de 5 metros desde la posición de espera.', medir:'Tiempo o sensación de explosividad.', nota:'Para un plan serio, derivá con un preparador físico.' },
-  'Resistencia':{ emoji:'⚡', objetivo:'Base aeróbica.', ejercicio:'20 min de trote suave continuo, 3 veces por semana.', medir:'Poder hablar mientras corrés.', nota:'Para un plan serio, derivá con un preparador físico.' },
-  'Tolerancia al error':{ emoji:'🧠', objetivo:'Rutina de reseteo.', ejercicio:'Ritual de 3 segundos mirando las cuerdas + respiración antes de cada saque.', medir:'Autoevaluación del 1 al 5 de cumplimiento.', nota:'Es autogestión, no reemplaza a un psicólogo deportivo. Si la frustración es persistente, conviene consultarlo.' },
-  'Actitud':{ emoji:'🧠', objetivo:'Postura activa.', ejercicio:'Entre puntos, caminar erguido y con la raqueta en la mano no dominante.', medir:'Sostenerlo durante un set completo.', nota:'Es autogestión, no reemplaza a un psicólogo deportivo. El coach lo observa y lo marca.' }
+  'Drive':{ emoji:'🎾', niveles:{
+    1:{ objetivo:'Estabilidad del golpe.', ejercicio:'30 drives con canasto, con foco en el contacto adelante del cuerpo.' },
+    2:{ objetivo:'Dar dirección.', ejercicio:'Alternar paralelo y cruzado apuntando a conos.' }
+  }},
+  'Revés':{ emoji:'🎾', niveles:{
+    1:{ objetivo:'Estabilidad del golpe.', ejercicio:'30 reveses con canasto, buscando siempre el mismo punto de impacto.' },
+    2:{ objetivo:'Slice de cambio de ritmo.', ejercicio:'Pegar 1 slice cada 2 bolas durante el peloteo.' }
+  }},
+  'Saque':{ emoji:'🎾', niveles:{
+    1:{ objetivo:'Lanzamiento consistente.', ejercicio:'50 lanzamientos sin golpear, haciendo caer la pelota en una zona marcada.' },
+    2:{ objetivo:'Dirigir el primer saque.', ejercicio:'30 saques a un cono en cada esquina del cuadro.' }
+  }},
+  'Volea':{ emoji:'🎾', niveles:{
+    1:{ objetivo:'Bloqueo firme.', ejercicio:'Voleas cortas contra la pared, manteniendo la muñeca firme.' },
+    2:{ objetivo:'Dirigir la volea.', ejercicio:'20 voleas a una zona, alternando derecha y revés.' }
+  }},
+  'Construcción del punto':{ emoji:'♟️', niveles:{
+    1:{ objetivo:'Tener un plan de 3 golpes.', ejercicio:'Declarar en voz alta dónde vas a jugar antes de sacar y cómo vas a terminar el punto.' },
+    2:{ objetivo:'Variar el ritmo.', ejercicio:'Jugar un punto donde tengas que cambiar de profundidad al menos 1 vez.' }
+  }},
+  'Velocidad':{ emoji:'⚡', niveles:{
+    1:{ objetivo:'Primer paso rápido.', ejercicio:'Juego de reacción: el profe señala un lado, el alumno arranca y toca el cono.' },
+    2:{ objetivo:'Velocidad con control.', ejercicio:'Escalera de agilidad + tocar conos de colores que el profe nombra.' }
+  }, nota:'Para un plan serio, derivá con un preparador físico.' },
+  'Resistencia':{ emoji:'⚡', niveles:{
+    1:{ objetivo:'Disfrutar el movimiento continuo.', ejercicio:'Juegos de persecución: "la mancha", 10-15 min.' },
+    2:{ objetivo:'Sostener la intensidad.', ejercicio:'Desafío: sostener un peloteo de 20 bolas seguidas.' }
+  }, nota:'Para un plan serio, derivá con un preparador físico.' },
+  'Tolerancia al error':{ emoji:'🧠', niveles:{
+    1:{ objetivo:'Borrón y cuenta nueva.', ejercicio:'Ritual: acomodar las cuerdas de la raqueta + respiración (4-4-4) antes de sacar.' },
+    2:{ objetivo:'Bajar la autocrítica.', ejercicio:'Desafío: jugar puntos "sin enojos".' }
+  }, nota:'Es autogestión, no reemplaza a un psicólogo deportivo.' },
+  'Actitud':{ emoji:'🧠', niveles:{
+    1:{ objetivo:'Postura activa.', ejercicio:'Ritual: caminar con la cabeza levantada y volver a la posición de juego.' },
+    2:{ objetivo:'Lenguaje de "campeón".', ejercicio:'Ser buen compañero y sonreír al finalizar la clase.' }
+  }, nota:'Es autogestión, no reemplaza a un psicólogo deportivo.' }
 };
-function openMejora(name){
+function openMejora(name, lv){
+  lv = Number(lv)||1;
   const m=MEJORAS[name];
   const tEl=document.getElementById('mejora-title');
   const bEl=document.getElementById('mejora-body');
   if(!tEl||!bEl) return;
-  tEl.innerHTML=`${m&&m.emoji?m.emoji+' ':''}Cómo mejorar tu ${name}`;
-  if(m){
+  const verbo = lv>=2 ? 'potenciar' : 'mejorar';
+  tEl.innerHTML=`${m&&m.emoji?m.emoji+' ':''}Cómo ${verbo} tu ${name}`;
+  const data = m && m.niveles ? m.niveles[lv] : null;
+  if(data){
+    const nivelLbl = lv>=2 ? 'Funciona' : 'A trabajar';
     const block=(ico,lbl,txt)=>`<div class="mejora-block"><div class="mejora-block-lbl">${ico} ${lbl}</div><div class="mejora-block-txt">${txt}</div></div>`;
-    bEl.innerHTML=`<div class="mejora-tag">Nivel actual: A trabajar</div>`
-      +block('🎯','Objetivo',m.objetivo)
-      +block('🏋️','Ejercicio',m.ejercicio)
-      +block('📊','Cómo medirlo',m.medir)
+    bEl.innerHTML=`<div class="mejora-tag tag${lv}">Nivel actual: ${nivelLbl}</div>`
+      +block('🎯','Objetivo',data.objetivo)
+      +block('🏋️','Ejercicio',data.ejercicio)
       +(m.nota?`<div class="mejora-nota">ℹ️ ${m.nota}</div>`:'');
   } else {
-    bEl.innerHTML=`<p class="mejora-intro">Pronto vas a tener consejos específicos para mejorar esta habilidad. ¡Seguí practicando con tu profe!</p>`;
+    bEl.innerHTML=`<p class="mejora-intro">Pronto vas a tener consejos específicos para esta habilidad. ¡Seguí practicando con tu profe!</p>`;
   }
   const ov=document.getElementById('mejora-overlay'); if(ov) ov.classList.add('show');
 }
@@ -1821,8 +1853,8 @@ function buildRubrica(){
         <div class="ball-row">
           <span class="ball-name">${g.nombre}</span>
           <span class="balls">${balls(lv)}</span>
-          ${lv===1
-            ? `<span class="ball-label lb1 mejora-trigger" onclick="openMejora('${g.nombre}')" onmouseenter="openMejora('${g.nombre}')" title="Cómo mejorar">${lvlLabel(lv)} 💡</span>`
+          ${(lv===1||lv===2)
+            ? `<span class="ball-label lb${lv} mejora-trigger" onclick="openMejora('${g.nombre}',${lv})" title="Cómo mejorar">${lvlLabel(lv)} 💡</span>`
             : `<span class="ball-label lb${lv}">${lvlLabel(lv)}</span>`}
         </div>
         ${q?`<div class="ball-q">${q}</div>`:''}
@@ -1832,7 +1864,7 @@ function buildRubrica(){
     if(!rows) return '';
     return `<div class="perf-card"><div class="perf-card-title">${AREA_META[a.id].emoji} ${a.nombre}</div>${rows}</div>`;
   }).join('');
-  const legend=`<div class="nota">El rendimiento se mide en <strong>3 niveles</strong> — sumá pulgares 👍 a medida que mejorás. Tocá una rúbrica en <strong>A trabajar</strong> 💡 para ver cómo mejorarla.</div>
+  const legend=`<div class="nota">El rendimiento se mide en <strong>3 niveles</strong> — sumá pulgares 👍 a medida que mejorás. Hacé click en una rúbrica en <strong>A trabajar</strong> o <strong>Funciona</strong> 💡 para ver cómo seguir mejorando.</div>
     <div class="sem-legend" style="margin-bottom:14px;">
       <span class="sem-leg" style="background:var(--n1);color:#161616;">👍 A trabajar</span>
       <span class="sem-leg" style="background:var(--n2);color:#161616;">👍👍 Funciona</span>
