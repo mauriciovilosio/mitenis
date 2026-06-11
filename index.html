@@ -66,7 +66,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .player-acc:last-child{margin-bottom:0;}
 .player-acc .acc-head{padding:12px 14px;}
 .player-acc .acc-title{font-size:14px;font-weight:700;color:var(--text);}
-.player-acc .acc-body-inner{padding:0 12px 12px;}
+.player-acc .acc-body-inner{padding:10px 12px 12px;}
 .acc-right{display:flex;align-items:center;gap:9px;}
 .player-cat-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.10);}
 .player-cat-count{font-size:11px;font-weight:700;color:var(--muted);background:var(--surf2);border-radius:99px;padding:2px 9px;min-width:24px;text-align:center;}
@@ -107,6 +107,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .ficha-grid{display:flex;flex-wrap:wrap;gap:14px 24px;}
 .ficha-item label{font-size:10px;color:var(--hint);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px;}
 .ficha-item span{font-size:14px;font-weight:500;color:var(--text);}
+.ficha-sep{align-self:stretch;width:1px;background:var(--border);margin:2px 0;}
 
 /* ÁREA CARDS — 4 áreas con colores distintos */
 .area-card{border-radius:var(--radius);padding:16px;margin-bottom:14px;border:1px solid transparent;}
@@ -294,6 +295,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 /* SEMÁFORO (Plan) */
 .sem-legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
 .sem-leg{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:5px 10px;border-radius:7px;}
+.sem-leg-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-right:2px;}
 .sem-group{margin-bottom:16px;}
 .sem-group-h{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px;}
 .sem-group-h .dot{width:12px;height:12px;border-radius:50%;display:inline-block;}
@@ -506,6 +508,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .asist-fill{height:100%;border-radius:999px;background:var(--lv3);transition:width .6s cubic-bezier(.34,1.2,.64,1);}
 .asist-fill.low{background:var(--lv2);}
 .asist-txt{font-size:12px;color:var(--muted);}
+.asist-kpi{flex-shrink:0;}
+.asist-frac{font-size:32px;font-weight:800;line-height:1;}
+.asist-frac span{font-size:18px;font-weight:700;color:var(--hint);}
+.asist-frac.ok{color:var(--lv3);}
+.asist-frac.low{color:var(--lv2);}
+.asist-pctsm{font-size:11px;color:var(--muted);margin-top:5px;}
+.asist-dots{display:flex;flex-wrap:wrap;gap:8px;align-items:center;align-content:center;flex:1;}
+.asist-dot{width:18px;height:18px;border-radius:50%;background:var(--surf2);border:1.5px solid var(--border);box-sizing:border-box;}
+.asist-dot.done{background:var(--lv2);border-color:var(--lv2);}
+.asist-dot.done.met{background:var(--lv3);border-color:var(--lv3);}
 
 /* === v13: sufijo "/ 3" en el score === */
 .mc-max{font-size:0.56em;font-weight:600;color:var(--hint);letter-spacing:0;}
@@ -603,7 +615,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* === v17: logo emoji + indicador de suba === */
 .logo-emoji{font-size:104px;line-height:1;}
-.rise-tag{display:inline-block;font-size:11px;font-weight:700;color:#136c34;background:#dcfce7;padding:3px 10px;border-radius:999px;margin-top:7px;}
+.rise-tag{display:inline-block;font-size:11px;font-weight:700;color:var(--blue);background:rgba(81,112,255,.12);padding:3px 10px;border-radius:999px;margin-top:7px;}
 
 /* === v18: Modo Profe (highlight + ranking compacto) === */
 .mc-hl{background:#f5ff80;border-color:#e6ef5e;}
@@ -742,7 +754,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(81,1
     <div class="landing-title"><span>mi</span> tenis</div>
     <div class="landing-sub">sistema de seguimiento y desarrollo para jugadores de tenis <button class="info-i" onclick="openAppInfo()" aria-label="Más información">i</button></div>
     <div class="select-card">
-      <div class="select-label">Seleccioná un jugador</div>
+      <div class="select-label">Seleccioná un jugador por categoría</div>
       <div class="player-list" id="player-grid">
         <div class="loading-state">Cargando jugadores…</div>
       </div>
@@ -847,6 +859,27 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(81,1
       </ul>
     </div>
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeAppInfo()">Entendido</button></div>
+  </div>
+</div>
+
+<div class="pin-overlay" id="rendimiento-info-overlay" onclick="if(event.target===this)closeRendInfo()">
+  <div class="pin-modal" style="max-width:380px;">
+    <div class="pin-title">Cómo se mide Mi Rendimiento</div>
+    <div style="font-size:14px;color:var(--text);line-height:1.7;text-align:left;margin-top:4px;">
+      <p style="margin:0 0 12px;">Tu rendimiento se mide en <strong>3 niveles</strong>, sumá 👍 a medida que mejorás.</p>
+      <p style="margin:0;"><strong>Extra:</strong> Si hacés click en una habilidad <strong>A trabajar</strong> podés ver cómo seguir mejorando.</p>
+    </div>
+    <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeRendInfo()">Entendido</button></div>
+  </div>
+</div>
+
+<div class="pin-overlay" id="registro-info-overlay" onclick="if(event.target===this)closeRegistroInfo()">
+  <div class="pin-modal" style="max-width:380px;">
+    <div class="pin-title">Cómo funciona Mi Registro</div>
+    <div style="font-size:14px;color:var(--text);line-height:1.7;text-align:left;margin-top:4px;">
+      <p style="margin:0;">Los días en <span class="hl-azul">azul</span> tienen una sesión registrada — tocalos para ver el detalle. Al finalizar el mes, podés descargar tu registro completo.</p>
+    </div>
+    <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeRegistroInfo()">Entendido</button></div>
   </div>
 </div>
 
@@ -1325,7 +1358,7 @@ function renderPlayers(){
   grid.innerHTML=cats.map((c,idx)=>{
     const list=groups[c].slice().sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base',numeric:true}));
     const dotColor = c===SIN ? 'var(--hint)' : catColor(c);
-    const open = idx===0 ? ' open' : ''; // primera categoría abierta por defecto
+    const open = ''; // todos los acordeones cerrados al abrir
     return `<div class="acc player-acc${open}">
       <div class="acc-head" onclick="toggleAcc(this)">
         <span class="acc-title"><span class="player-cat-dot" style="background:${dotColor};"></span>${c}</span>
@@ -1453,6 +1486,10 @@ function openCoachInfo(){
 function closeCoachInfo(){ const ov=document.getElementById('coach-info-overlay'); if(ov) ov.classList.remove('show'); }
 function openAppInfo(){ const ov=document.getElementById('app-info-overlay'); if(ov) ov.classList.add('show'); }
 function closeAppInfo(){ const ov=document.getElementById('app-info-overlay'); if(ov) ov.classList.remove('show'); }
+function openRendInfo(){ const ov=document.getElementById('rendimiento-info-overlay'); if(ov) ov.classList.add('show'); }
+function closeRendInfo(){ const ov=document.getElementById('rendimiento-info-overlay'); if(ov) ov.classList.remove('show'); }
+function openRegistroInfo(){ const ov=document.getElementById('registro-info-overlay'); if(ov) ov.classList.add('show'); }
+function closeRegistroInfo(){ const ov=document.getElementById('registro-info-overlay'); if(ov) ov.classList.remove('show'); }
 function openAvatarPicker(){
   if(!currentPlayer) return;
   const cur=avatarColor(currentPlayer);
@@ -1866,12 +1903,14 @@ function buildResumen(){
   const catName=info?info[INFO.categoria]:'';
   const catDot=catName?`<span class="cat-dot" style="background:${catColor(catName)};"></span>`:'';
   const fichaHTML=info?`<div class="card">
+    <div class="card-title">Información del alumno</div>
     <div class="ficha-grid">
       ${info[INFO.brazo]?`<div class="ficha-item"><label>Brazo hábil</label><span>${info[INFO.brazo]}</span></div>`:''}
       ${info[INFO.altura]?`<div class="ficha-item"><label>Altura</label><span>${info[INFO.altura]}</span></div>`:''}
       ${info[INFO.edad]?`<div class="ficha-item"><label>Edad</label><span>${info[INFO.edad]} años</span></div>`:''}
       ${catName?`<div class="ficha-item"><label>Categoría</label><span>${catDot}${catName}</span></div>`:''}
-      ${info[INFO.objetivo]?`<div class="ficha-item" style="flex-basis:100%;"><label>Objetivo</label><span style="font-size:13px;font-weight:400;">${info[INFO.objetivo]}</span></div>`:''}
+      ${(catName && info[INFO.objetivo])?`<span class="ficha-sep"></span>`:''}
+      ${info[INFO.objetivo]?`<div class="ficha-item"><label>Objetivo</label><span>${info[INFO.objetivo]}</span></div>`:''}
     </div>
   </div>`:'';
 
@@ -1927,7 +1966,21 @@ function buildResumen(){
   </div>`;
 
   const at=attendanceFor(currentPlayer, curMonth);
-  const asistHTML = at ? `<div class="card"><div class="card-title">Asistencia · ${monthLabel(curMonth)}</div><div class="asist-row"><div class="asist-pct ${at.met?'ok':'low'}">${at.pct}%</div><div class="asist-meta"><div class="asist-bar"><div class="asist-fill ${at.met?'ok':'low'}" style="width:${Math.min(100,at.pct)}%;"></div></div><div class="asist-txt">${at.cumplidas} de ${at.objetivo} sesiones del mes${at.met?' · objetivo cumplido 🎾':''}</div></div></div></div>` : '';
+  let asistHTML='';
+  if(at){
+    const obj=Math.max(0, at.objetivo|0);
+    const done=Math.max(0, Math.min(obj, at.cumplidas|0));
+    const dots=Array.from({length:obj},(_,i)=>`<span class="asist-dot${i<done?(at.met?' done met':' done'):''}"></span>`).join('');
+    asistHTML=`<div class="card"><div class="card-title">Asistencia · ${monthLabel(curMonth)}</div>
+      <div class="asist-row">
+        <div class="asist-kpi">
+          <div class="asist-frac ${at.met?'ok':'low'}">${done}<span>/${obj}</span></div>
+          <div class="asist-pctsm">${at.pct}%${at.met?' · objetivo cumplido 🎾':''}</div>
+        </div>
+        <div class="asist-dots">${dots||'<span class="asist-txt">Sin objetivo definido este mes</span>'}</div>
+      </div>
+    </div>`;
+  }
   el.innerHTML = chips + fichaHTML + `<div class="metrics-row">${cards}${totalCard}</div>` + asistHTML + radarHTML;
   ldEl.style.display='none'; el.style.display='block';
 
@@ -1991,14 +2044,14 @@ function buildRubrica(){
             : `<span class="ball-label lb${lv}">${lvlLabel(lv)}</span>`}
         </div>
         ${q?`<div class="ball-q">${q}</div>`:''}
-        ${rise?`<div class="rise-tag">🔥 ¡Subiste de nivel!</div>`:''}
+        ${rise?`<div class="rise-tag">¡Subiste de nivel!</div>`:''}
       </div>`;
     }).filter(Boolean).join('');
     if(!rows) return '';
     return `<div class="perf-card"><div class="perf-card-title">${AREA_META[a.id].emoji} ${a.nombre}</div>${rows}</div>`;
   }).join('');
-  const legend=`<div class="nota">El rendimiento se mide en <strong>3 niveles</strong> — sumá pulgares 👍 a medida que mejorás. Hacé click en una rúbrica en <strong>A trabajar</strong> o <strong>Funciona</strong> 💡 para ver cómo seguir mejorando.</div>
-    <div class="sem-legend" style="margin-bottom:14px;">
+  const legend=`<div class="sem-legend" style="margin-bottom:14px;align-items:center;">
+      <span class="sem-leg-label">Niveles</span>
       <span class="sem-leg" style="background:var(--n1);color:#161616;">👍 A trabajar</span>
       <span class="sem-leg" style="background:var(--n2);color:#161616;">👍👍 Funciona</span>
       <span class="sem-leg" style="background:var(--n3);color:#161616;">👍👍👍 Excelente</span>
@@ -2010,7 +2063,7 @@ function buildRubrica(){
     evoInner=`<div class="empty" style="color:var(--muted);">Necesitás al menos 2 sesiones para ver la evolución.</div>`;
   }
   const evoHTML=`<div class="card" style="margin-top:14px;"><div class="card-title">📈 Evolución mensual por área</div>${evoInner}</div>`;
-  el.innerHTML = monthChipsHTML() + legend + `<div class="perf-grid">${cards}</div>` + evoHTML;
+  el.innerHTML = `<button class="lg-info-btn" onclick="openRendInfo()">¿Cómo se mide mi rendimiento?</button>` + monthChipsHTML() + legend + `<div class="perf-grid">${cards}</div>` + evoHTML;
   ldEl.style.display='none'; el.style.display='block';
   // Gráfico de evolución — usa TODAS las sesiones, sin filtro de mes
   if(charts['evolucion']){ try{charts['evolucion'].destroy();}catch(e){} }
@@ -2220,13 +2273,13 @@ function buildHistorial(){
   sess.forEach(s=>{ const mk=monthKey(s); if(!mk) return; (byMonth[mk]=byMonth[mk]||[]).push(s); });
   const months=Object.keys(byMonth).sort();
   const pl=currentPlayer.replace(/'/g,"\\'");
-  const desc=`<div class="nota">Los días en <span class="hl-azul">azul</span> tienen una sesión registrada — tocalos para ver el detalle. Al finalizar el mes, puedo descargar Mi Registro completo.</div>`;
+  const infoBtn=`<button class="lg-info-btn" onclick="openRegistroInfo()">¿Cómo funciona Mi Registro?</button>`;
   const legend=`<div class="cal-legend" style="margin:-2px 0 12px;">
     <span><span class="lg-swatch" style="background:var(--ball);"></span> Descargar reporte (mes cerrado)</span>
     <span><span class="lg-swatch" style="background:var(--surf2);border:1px dashed var(--border);"></span> Reporte 🔒</span>
   </div>`;
   const calsHTML=months.map(mk=>buildMonthCalendar(mk, byMonth[mk], pl)).join('');
-  el.innerHTML=monthChipsHTML()+desc+legend+`<div class="cal-months">${calsHTML}</div>`;
+  el.innerHTML=infoBtn+monthChipsHTML()+legend+`<div class="cal-months">${calsHTML}</div>`;
   ldEl.style.display='none'; el.style.display='block';
 }
 
