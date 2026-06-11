@@ -503,7 +503,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .header-avatar{transition:outline .12s;}
 
 /* === v12: card de asistencia === */
-.asist-row{display:flex;flex-direction:column;align-items:stretch;gap:14px;}
+.asist-row{display:flex;flex-direction:row;align-items:center;gap:14px;}
 .asist-pct{font-size:34px;font-weight:800;line-height:1;}
 .asist-pct.ok{color:var(--lv3);}
 .asist-pct.low{color:var(--lv2);}
@@ -516,13 +516,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .asist-frac{font-size:32px;font-weight:800;line-height:1;}
 .asist-frac span{font-size:18px;font-weight:700;color:var(--hint);}
 .asist-frac.ok{color:#22b16c;}
-.asist-frac.low{color:#626262;}
-.asist-pctsm{font-size:11px;color:var(--muted);margin-top:5px;}
+.asist-frac.low{color:#5170ff;}
+.asist-pctsm{font-size:11px;margin-top:5px;color:var(--muted);}
 .asist-pctsm.ok{color:#22b16c;}
-.asist-dots{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center;align-content:center;width:100%;}
-.asist-dot{width:18px;height:18px;border-radius:50%;background:#e8eaef;box-sizing:border-box;}
-.asist-dot.done{background:#626262;}
-.asist-dot.done.met{background:#22b16c;}
+.asist-pctsm.low{color:#5170ff;}
+.asist-sep{align-self:stretch;border-left:2px dotted #c7cbd5;margin:3px 0;flex-shrink:0;}
+.asist-dots{display:flex;flex-wrap:wrap;gap:8px 9px;align-items:center;align-content:center;flex:1;min-width:0;}
+.asist-ball{display:inline-flex;color:#c7cbd5;line-height:0;}
+.asist-ball.done{color:#5170ff;}
+.asist-ball.done.met{color:#22b16c;}
+.asist-ball-svg{width:21px;height:21px;display:block;}
 
 /* === v13: sufijo "/ 3" en el score === */
 .mc-max{font-size:0.56em;font-weight:600;color:var(--hint);letter-spacing:0;}
@@ -1977,13 +1980,15 @@ function buildResumen(){
   if(at){
     const obj=Math.max(0, at.objetivo|0);
     const done=Math.max(0, Math.min(obj, at.cumplidas|0));
-    const dots=Array.from({length:obj},(_,i)=>`<span class="asist-dot${i<done?(at.met?' done met':' done'):''}"></span>`).join('');
+    const ball='<svg class="asist-ball-svg" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="currentColor"/><path d="M5.5 5.5 C 12 11, 12 21, 5.5 26.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity="0.92"/><path d="M26.5 5.5 C 20 11, 20 21, 26.5 26.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity="0.92"/></svg>';
+    const dots=Array.from({length:obj},(_,i)=>`<span class="asist-ball${i<done?(at.met?' done met':' done'):''}">${ball}</span>`).join('');
     asistHTML=`<div class="card"><div class="card-title">Asistencia · ${monthLabel(curMonth)}</div>
       <div class="asist-row">
         <div class="asist-kpi">
           <div class="asist-frac ${at.met?'ok':'low'}">${done}<span>/${obj}</span></div>
-          <div class="asist-pctsm ${at.met?'ok':''}">${at.pct}%${at.met?' · objetivo cumplido 🎾':''}</div>
+          <div class="asist-pctsm ${at.met?'ok':'low'}">${at.pct}%</div>
         </div>
+        ${obj>0?'<div class="asist-sep"></div>':''}
         <div class="asist-dots">${dots||'<span class="asist-txt">Sin objetivo definido este mes</span>'}</div>
       </div>
     </div>`;
