@@ -352,6 +352,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* === mi tenis: ajustes de marca === */
 .radar-wrap{background:transparent;border:none;margin-bottom:16px;padding:2px 0 8px;}
+.top-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;margin-bottom:14px;}
+.top-row > .card{margin:0;height:100%;}
+@media(max-width:720px){.top-row{grid-template-columns:1fr;}}
+.radar-sub{text-align:center;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;}
 .mc-delta.down{color:var(--muted);}
 .perf-delta.neg{color:var(--muted);}
 .perf-tick{background:var(--blue-d);opacity:.75;}
@@ -1970,9 +1974,15 @@ function buildResumen(){
     <div class="mc-cat">${monthLabel(curMonth)} · ${curSess.length} ses.</div>
   </div>`;
 
-  const radarHTML=`<div class="radar-wrap">
-    <div class="card-title" style="text-align:center;margin-bottom:6px;color:#fff;">Perfil — ${monthLabel(curMonth)}${prevMonth?` vs ${prevLbl}`:''}</div>
-    <div class="chart-wrap" style="height:380px;"><canvas id="ch-radar"></canvas></div>
+  const radarHTML=`<div class="acc evo-acc">
+    <div class="acc-head" onclick="toggleAcc(this)">
+      <span class="acc-title">📊 Evaluación de mi Perfil</span>
+      <span class="acc-chevron">▾</span>
+    </div>
+    <div class="acc-body"><div class="acc-body-inner">
+      <div class="radar-sub">Perfil — ${monthLabel(curMonth)}${prevMonth?` vs ${prevLbl}`:''}</div>
+      <div class="chart-wrap" style="height:380px;"><canvas id="ch-radar"></canvas></div>
+    </div></div>
   </div>`;
 
   const at=attendanceFor(currentPlayer, curMonth);
@@ -1993,7 +2003,10 @@ function buildResumen(){
       </div>
     </div>`;
   }
-  el.innerHTML = chips + fichaHTML + asistHTML + `<div class="metrics-row">${cards}${totalCard}</div>` + radarHTML;
+  let topRow='';
+  if(fichaHTML && asistHTML) topRow=`<div class="top-row">${fichaHTML}${asistHTML}</div>`;
+  else topRow=fichaHTML+asistHTML;
+  el.innerHTML = chips + topRow + `<div class="metrics-row">${cards}${totalCard}</div>` + radarHTML;
   ldEl.style.display='none'; el.style.display='block';
 
   if(document.getElementById('ch-radar')){
@@ -2002,13 +2015,13 @@ function buildResumen(){
     charts['radar']=new Chart(document.getElementById('ch-radar'),{
       type:'radar',
       data:{labels:['Técnica','Táctica','Físico','Mental'],datasets:[
-        ...(prevMonth?[{label:prevLbl,data:prv,borderColor:'rgba(255,255,255,0.7)',backgroundColor:'rgba(255,255,255,0.06)',borderDash:[5,4],borderWidth:1.5,pointRadius:3,pointBackgroundColor:'rgba(255,255,255,0.7)'}]:[]),
-        {label:monthLabel(curMonth),data:cur,borderColor:'#f3fe76',backgroundColor:'rgba(243,254,118,0.28)',borderWidth:2,pointRadius:5,pointBackgroundColor:'#f3fe76',pointBorderColor:'#f3fe76'}
+        ...(prevMonth?[{label:prevLbl,data:prv,borderColor:'rgba(107,111,138,0.55)',backgroundColor:'rgba(107,111,138,0.05)',borderDash:[5,4],borderWidth:1.5,pointRadius:3,pointBackgroundColor:'rgba(107,111,138,0.6)'}]:[]),
+        {label:monthLabel(curMonth),data:cur,borderColor:'#5170ff',backgroundColor:'rgba(81,112,255,0.16)',borderWidth:2,pointRadius:5,pointBackgroundColor:'#5170ff',pointBorderColor:'#5170ff'}
       ]},
       options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:true,position:'bottom',labels:{color:'#ffffff',font:{size:12},boxWidth:10,padding:14}},
+        plugins:{legend:{display:true,position:'bottom',labels:{color:'#20223a',font:{size:12},boxWidth:10,padding:14}},
           tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${(c.raw||0).toFixed(1)} / 3`}}},
-        scales:{r:{min:0,max:3,ticks:{stepSize:1,backdropColor:'transparent',color:'rgba(255,255,255,0.75)',font:{size:10},callback:v=>['','A trabajar','Funciona','Excelente'][v]||''},grid:{color:'rgba(255,255,255,0.22)'},angleLines:{color:'rgba(255,255,255,0.22)'},pointLabels:{color:'#ffffff',font:{size:13,weight:'700'}}}}
+        scales:{r:{min:0,max:3,ticks:{stepSize:1,backdropColor:'transparent',color:'#6b6f8a',font:{size:10},callback:v=>['','A trabajar','Funciona','Excelente'][v]||''},grid:{color:'rgba(81,112,255,0.14)'},angleLines:{color:'rgba(81,112,255,0.14)'},pointLabels:{color:'#20223a',font:{size:13,weight:'700'}}}}
       }
     });
   }
