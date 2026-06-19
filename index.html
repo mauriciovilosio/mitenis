@@ -832,6 +832,16 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
 .plan-extra{display:flex;flex-direction:column;gap:5px;border-top:1px solid var(--border);padding-top:10px;margin-top:2px;}
 .plan-extra-row{font-size:12.5px;color:var(--muted);}
 .plan-extra-row b{color:var(--text);font-weight:700;}
+@media (max-width:600px){
+  .plan-list{grid-template-columns:1fr 1fr;gap:9px;}
+  .plan-card{padding:11px;gap:7px;border-radius:13px;}
+  .plan-card-tags{gap:4px;}
+  .plan-tag{font-size:9px;padding:2px 6px;}
+  .plan-act{font-size:13px;line-height:1.2;}
+  .plan-desc{font-size:11.5px;line-height:1.4;}
+  .plan-extra{gap:3px;padding-top:7px;}
+  .plan-extra-row{font-size:10.5px;}
+}
 </style>
 </head>
 <body>
@@ -1331,7 +1341,7 @@ const RESUMEN_GROUPS = {
 let allRows=[], infoRows=[], asistRows=[], videoRows=[], currentPlayer=null, playerSessions=[], charts={}, selectedMonth='all', coachCat='all';
 let appMode='escuela'; // 'escuela' | 'torneos'
 let adultRows=[], matchRows=[], eventRows=[], circuitoCat='all';
-let planRows=[], planHeader=[], planFilters={golpe:'all', actividad:'all', categoria:'all', q:''};
+let planRows=[], planHeader=[], planFilters={golpe:'all', categoria:'all', nivel:'all', q:''};
 
 // ══════════════════════════════════════
 // FETCH CSV DESDE GOOGLE SHEETS
@@ -1966,7 +1976,7 @@ function openCoach(){
 }
 function openCoachView(){
   selectedMonth='all'; coachCat='all';
-  planFilters={golpe:'all', actividad:'all', categoria:'all', q:''};
+  planFilters={golpe:'all', categoria:'all', nivel:'all', q:''};
   // Reset a la subpestaña "Mi Resumen"
   document.querySelectorAll('#tabs-coach .tab-btn').forEach((b,i)=>b.classList.toggle('active', i===0));
   document.querySelectorAll('.coach-view').forEach(v=>v.classList.remove('active'));
@@ -2002,8 +2012,8 @@ function planFiltered(){
   const q=(planFilters.q||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   return planRows.filter(r=>{
     if(planFilters.golpe!=='all' && planVal(r,'golpe')!==planFilters.golpe) return false;
-    if(planFilters.actividad!=='all' && planVal(r,'actividad')!==planFilters.actividad) return false;
     if(planFilters.categoria!=='all' && planVal(r,'categoria')!==planFilters.categoria) return false;
+    if(planFilters.nivel!=='all' && planVal(r,'nivel')!==planFilters.nivel) return false;
     if(q){
       const hay=['golpe','actividad','categoria','descripcion','objetivo','material','nivel']
         .map(k=>planVal(r,k)).join(' ').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
@@ -2032,7 +2042,7 @@ function renderPlanList(){
     const golpe=planVal(r,'golpe'), act=planVal(r,'actividad'), cat=planVal(r,'categoria'), desc=planVal(r,'descripcion');
     const obj=planVal(r,'objetivo'), mat=planVal(r,'material'), dur=planVal(r,'duracion'), niv=planVal(r,'nivel');
     const tags=[golpe?`<span class="plan-tag golpe">${esc(golpe)}</span>`:'', cat?`<span class="plan-tag cat">${esc(cat)}</span>`:''].filter(Boolean).join('');
-    const extra=[obj?`<div class="plan-extra-row"><b>🎯 Objetivo:</b> ${esc(obj)}</div>`:'', mat?`<div class="plan-extra-row"><b>🎒 Material:</b> ${esc(mat)}</div>`:'', dur?`<div class="plan-extra-row"><b>⏱️ Duración:</b> ${esc(dur)}</div>`:'', niv?`<div class="plan-extra-row"><b>📶 Nivel:</b> ${esc(niv)}</div>`:''].filter(Boolean).join('');
+    const extra=[obj?`<div class="plan-extra-row"><b>🎯 Objetivo:</b> ${esc(obj)}</div>`:'', mat?`<div class="plan-extra-row"><b>🎒 Material:</b> ${esc(mat)}</div>`:'', dur?`<div class="plan-extra-row"><b>⏱️ Duración:</b> ${esc(dur)}</div>`:''].filter(Boolean).join('');
     return `<div class="plan-card">
       ${tags?`<div class="plan-card-tags">${tags}</div>`:''}
       ${act?`<div class="plan-act">${esc(act)}</div>`:''}
@@ -2052,8 +2062,8 @@ function buildCoachPlanificacion(){
   const filters=`<div class="plan-filters">
       <input class="plan-search" type="search" placeholder="🔎 Buscar actividad…" value="${(planFilters.q||'').replace(/"/g,'&quot;')}" oninput="setPlanSearch(this.value)">
       ${planFilterAcc('golpe','Golpe','🎾')}
-      ${planFilterAcc('actividad','Actividad','📝')}
       ${planFilterAcc('categoria','Categoría','🏷️')}
+      ${planFilterAcc('nivel','Nivel','📶')}
     </div>`;
   el.innerHTML=`<div class="cz-h">📋 Actividades para planificar clases</div>${filters}<div class="plan-count" id="plan-count"></div><div id="plan-list-wrap"></div>`;
   renderPlanList();
