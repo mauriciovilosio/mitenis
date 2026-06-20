@@ -52,7 +52,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .logo-ball svg{width:60px;height:104px;}
 .landing-title{font-family:'Inter',sans-serif;font-size:clamp(36px,9vw,60px);font-weight:400;color:var(--blue);line-height:1.0;letter-spacing:-.03em;margin-bottom:8px;}
 .landing-title span{font-weight:800;}
-.landing-sub{font-size:14px;color:rgba(10,81,58,.8);margin-bottom:2.5rem;letter-spacing:.01em;}
+.landing-sub{font-size:14px;font-weight:700;color:rgba(10,81,58,.92);margin-bottom:2.5rem;letter-spacing:.01em;}
 .select-card{background:var(--surf);border:1px solid var(--border);border-radius:20px;padding:1.5rem;width:100%;box-shadow:0 10px 34px rgba(10,81,58,0.14);}
 .select-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;text-align:left;}
 .player-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
@@ -1540,6 +1540,57 @@ function calcBench(playerName){
 // INIT
 // ══════════════════════════════════════
 const CACHE_KEY='mitenis_cache_v1';
+// ── Persistencia de navegación (al refrescar, vuelve a la sección donde estaba) ──
+// Usamos sessionStorage: al ACTUALIZAR la página se mantiene la sección,
+// pero al CERRAR y reabrir vuelve al Inicio (así se respetan los PIN).
+const NAV_KEY='mitenis_nav_v1';
+let __navRestored=false, __restoringNav=false;
+function navState(){
+  const coachVisible=document.getElementById('coach')?.classList.contains('visible');
+  const circuitoVisible=document.getElementById('circuito')?.classList.contains('visible');
+  const appVisible=document.getElementById('app')?.classList.contains('visible');
+  let v='landing', tab=null, player=null;
+  if(coachVisible){ v='coach'; const cv=document.querySelector('.coach-view.active'); tab=cv?cv.id.replace('coach-view-',''):'resumen'; }
+  else if(circuitoVisible){ v='circuito'; }
+  else if(appVisible){ v='player'; player=currentPlayer; const tv=document.querySelector('.tab-view.active'); tab=tv?tv.id.replace('tab-',''):null; }
+  return {v, mode:appMode, player, tab, month:selectedMonth, coachCat};
+}
+function saveNav(){ if(__restoringNav) return; try{ sessionStorage.setItem(NAV_KEY, JSON.stringify(navState())); }catch(e){} }
+function activateTab(id){ if(!id) return; const btn=[...document.querySelectorAll('.app-tabs .tab-btn')].find(b=>(b.getAttribute('onclick')||'').includes("switchTab('"+id+"'")); if(btn) switchTab(id, btn); }
+function activateCoachTab(id){ if(!id) return; const btn=[...document.querySelectorAll('#tabs-coach .tab-btn')].find(b=>(b.getAttribute('onclick')||'').includes("switchCoachTab('"+id+"'")); if(btn) switchCoachTab(id, btn); }
+function restoreNav(){
+  if(__navRestored) return;
+  let s; try{ s=JSON.parse(sessionStorage.getItem(NAV_KEY)||'null'); }catch(e){ s=null; }
+  if(!s || !s.v) return;
+  __restoringNav=true;
+  try{
+    if(s.mode && s.mode!==appMode) setMode(s.mode);
+    if(s.v==='landing'){ __navRestored=true; }
+    else if(s.v==='coach'){
+      if(!allRows.length) { __restoringNav=false; return; } // aún sin datos: reintentar tras la red
+      openCoachView();
+      if(s.coachCat && s.coachCat!=='all'){ coachCat=s.coachCat; }
+      if(s.month && s.month!=='all'){ selectedMonth=s.month; }
+      if((s.coachCat&&s.coachCat!=='all')||(s.month&&s.month!=='all')) buildCoach();
+      if(s.tab && s.tab!=='resumen') activateCoachTab(s.tab);
+      __navRestored=true;
+    } else if(s.v==='circuito'){
+      if(!adultRows.length && !matchRows.length){ __restoringNav=false; return; } // datos aún no disponibles
+      openCircuito();
+      __navRestored=true;
+    } else if(s.v==='player' && s.player){
+      const exists = appMode==='torneos'
+        ? adultRows.some(r=>(r[ADULT.alumno]||'').trim()===s.player.trim())
+        : allRows.some(r=>(r[COL.alumno]||'').trim()===s.player.trim());
+      if(!exists){ __restoringNav=false; return; } // datos aún no disponibles: reintentar
+      openPlayer(s.player);
+      if(s.month && s.month!=='all'){ selectedMonth=s.month; rebuildAll(); }
+      if(s.tab) activateTab(s.tab);
+      __navRestored=true;
+    }
+  }catch(e){}
+  __restoringNav=false;
+}
 function fmtUpdated(ts){ const d=new Date(ts); return isNaN(d)?'':d.toLocaleString('es-AR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }
 function setUpdated(ts){ const e=document.getElementById('last-update'); if(e) e.textContent = ts ? ('Última actualización: '+fmtUpdated(ts)) : ''; }
 function applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix){
@@ -1584,7 +1635,7 @@ function renderPlayers(){
     const catOf=p=>{ const i=getAdultInfo(p); return i?(i[ADULT.categoria]||'').trim():''; };
     const groups={};
     players.forEach(p=>{ const c=catOf(p)||SIN; (groups[c]=groups[c]||[]).push(p); });
-    const cats=Object.keys(groups).sort((a,b)=>{ if(a===SIN)return 1; if(b===SIN)return -1; return a.localeCompare(b,'es',{sensitivity:'base',numeric:true}); });
+    const cats=Object.keys(groups).sort((a,b)=>{ if(a===SIN)return 1; if(b===SIN)return -1; const ra=catRank(a),rb=catRank(b); if(ra!==rb) return ra-rb; return a.localeCompare(b,'es',{sensitivity:'base',numeric:true}); });
     const btn=name=>{
       const ini=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
       const color=avatarColor(name);
@@ -1598,7 +1649,7 @@ function renderPlayers(){
       const list=groups[c].slice().sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base',numeric:true}));
       const dotColor=c===SIN?'var(--hint)':catColor(c);
       return `<div class="acc player-acc">
-        <div class="acc-head" onclick="toggleAcc(this)">
+        <div class="acc-head" onclick="togglePlayerAcc(this)">
           <span class="acc-title"><span class="player-cat-dot" style="background:${dotColor};"></span>${c}</span>
           <span class="acc-right"><span class="player-cat-count">${list.length}</span><span class="acc-chevron">▾</span></span>
         </div>
@@ -1616,6 +1667,7 @@ function renderPlayers(){
   // Categorías en orden alfabético; "Sin categoría" siempre al final
   const cats=Object.keys(groups).sort((a,b)=>{
     if(a===SIN) return 1; if(b===SIN) return -1;
+    const ra=catRank(a), rb=catRank(b); if(ra!==rb) return ra-rb;
     return a.localeCompare(b,'es',{sensitivity:'base',numeric:true});
   });
   const btn=name=>{
@@ -1632,7 +1684,7 @@ function renderPlayers(){
     const dotColor = c===SIN ? 'var(--hint)' : catColor(c);
     const open = ''; // todos los acordeones cerrados al abrir
     return `<div class="acc player-acc${open}">
-      <div class="acc-head" onclick="toggleAcc(this)">
+      <div class="acc-head" onclick="togglePlayerAcc(this)">
         <span class="acc-title"><span class="player-cat-dot" style="background:${dotColor};"></span>${c}</span>
         <span class="acc-right"><span class="player-cat-count">${list.length}</span><span class="acc-chevron">▾</span></span>
       </div>
@@ -1649,6 +1701,7 @@ async function init(){
     const raw=localStorage.getItem(CACHE_KEY);
     if(raw){ const cc=JSON.parse(raw); if(cc && cc.data){ applyData(cc.data, cc.info||[], cc.asist||[], cc.videos||[], cc.adults||[], cc.matches||[], cc.events||[], cc.plan||[]); renderPlayers(); setUpdated(cc.ts); } }
   }catch(e){}
+  try{ restoreNav(); }catch(e){}
   // 2) Refresco en vivo desde el Sheet
   try{
     const [dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix] = await Promise.all([
@@ -1663,6 +1716,7 @@ async function init(){
     ]);
     applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix);
     renderPlayers();
+    try{ restoreNav(); }catch(e){}
     const ts=Date.now(); setUpdated(ts);
     try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ts, data:dataMatrix, info:infoMatrix, asist:asistMatrix, videos:videosMatrix, adults:adultsMatrix, matches:matchesMatrix, events:eventsMatrix, plan:planMatrix})); }catch(e){}
   }catch(e){
@@ -1745,20 +1799,33 @@ function openPlayer(name){
   document.getElementById('app').classList.add('visible');
   setupTabsForMode();
   rebuildAll();
+  saveNav();
 }
 function goBack(){
   document.getElementById('landing').style.display='';
   document.getElementById('app').classList.remove('visible');
+  saveNav();
 }
 function switchTab(id,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.tab-view').forEach(v=>v.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('tab-'+id).classList.add('active');
+  saveNav();
 }
 function toggleAcc(head){
   const acc=head.closest('.acc');
   if(acc) acc.classList.toggle('open');
+}
+// Acordeón "desplazante" del menú de jugadores: al abrir una categoría se cierran las demás.
+function togglePlayerAcc(head){
+  const acc=head.closest('.acc');
+  if(!acc) return;
+  const willOpen=!acc.classList.contains('open');
+  const grid=acc.closest('#player-grid')||document;
+  grid.querySelectorAll('.player-acc.open').forEach(a=>{ if(a!==acc) a.classList.remove('open'); });
+  acc.classList.toggle('open', willOpen);
+  if(willOpen){ try{ acc.scrollIntoView({behavior:'smooth', block:'nearest'}); }catch(e){} }
 }
 function toggleTip(btn){
   const w=btn.parentElement; if(!w) return;
@@ -1967,6 +2034,7 @@ function setMode(m){
     if(btn) btn.innerHTML='🧢 Modo Profe';
   }
   renderPlayers();
+  saveNav();
 }
 function openEntry(){ if(appMode==='torneos') openCircuito(); else openCoach(); }
 function openCoach(){
@@ -1985,10 +2053,11 @@ function openCoachView(){
   document.getElementById('app').classList.remove('visible');
   document.getElementById('coach').classList.add('visible');
   try{ buildCoach(); }catch(e){ const el=document.getElementById('coach-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir Modo Profe.</strong>'+(e&&e.message?e.message:e)+'</div>'; }
+  saveNav();
 }
-function closeCoach(){ document.getElementById('coach').classList.remove('visible'); document.getElementById('landing').style.display=''; }
-function setMonthCoach(m){ selectedMonth=m; buildCoach(); }
-function setCatCoach(c){ coachCat=c; buildCoach(); }
+function closeCoach(){ document.getElementById('coach').classList.remove('visible'); document.getElementById('landing').style.display=''; saveNav(); }
+function setMonthCoach(m){ selectedMonth=m; buildCoach(); saveNav(); }
+function setCatCoach(c){ coachCat=c; buildCoach(); saveNav(); }
 
 // ── Modo Profe: subpestañas (Mi Resumen / Mi Planificación) ──
 function switchCoachTab(id, btn){
@@ -1997,6 +2066,7 @@ function switchCoachTab(id, btn){
   if(btn) btn.classList.add('active');
   const v=document.getElementById('coach-view-'+id); if(v) v.classList.add('active');
   if(id==='planificacion'){ try{ buildCoachPlanificacion(); }catch(e){ const el=document.getElementById('coach-plan-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir la planificación.</strong>'+(e&&e.message?e.message:e)+'</div>'; } }
+  saveNav();
 }
 
 // ── Modo Profe: repositorio de actividades de planificación ──
@@ -2169,8 +2239,9 @@ function openCircuito(){
   document.getElementById('app').classList.remove('visible');
   document.getElementById('circuito').classList.add('visible');
   try{ buildCircuito(); }catch(e){ const el=document.getElementById('circuito-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir Circuito interno.</strong>'+(e&&e.message?e.message:e)+'</div>'; }
+  saveNav();
 }
-function closeCircuito(){ document.getElementById('circuito').classList.remove('visible'); document.getElementById('landing').style.display=''; }
+function closeCircuito(){ document.getElementById('circuito').classList.remove('visible'); document.getElementById('landing').style.display=''; saveNav(); }
 function setCatCircuito(c){ circuitoCat=c; buildCircuito(); }
 function buildCircuito(){
   const el=document.getElementById('circuito-content');
@@ -2447,14 +2518,22 @@ function idealText(hex){
 }
 function catColor(cat){
   const t=(cat||'').toLowerCase().trim();
-  if(t.includes('roj')) return '#f73b3b';        // Cat. Roja
-  if(t.includes('naranja')) return '#fe972d';    // Cat. Naranja
-  if(t.includes('mujer')) return '#6e10cc';      // Cat. Mujer
-  if(t.includes('10')) return '#22b16c';         // Sub 10
-  if(t.includes('12')) return '#2b2b2b';         // Sub 12
-  if(t==='a'||t.includes('cat. a')||t.includes('cat a')||t.includes('verde')) return '#ffe220'; // Cat. A
-  if(t==='b'||t.includes('cat. b')||t.includes('cat b')||t.includes('azul')) return '#e39e36';  // Cat. B
+  if(t.includes('roj')) return '#ff5757';        // Roja
+  if(t.includes('naranja')) return '#fe972d';    // Naranja
+  if(t.includes('mujer')) return '#e2a9f1';      // Cat. Mujer
+  if(t.includes('10')) return '#7ed957';         // Sub 10
+  if(t.includes('12')) return '#0a513a';         // Sub 12
+  if(t.includes('14')) return '#ffde59';         // Sub 14
+  if(t==='a'||t.includes('cat. a')||t.includes('cat a')||t.includes('verde')) return '#ffde59'; // Cat. A
+  if(t==='b'||t.includes('cat. b')||t.includes('cat b')||t.includes('azul')) return '#e9d541';  // Cat. B
   return '#6b6f8a';
+}
+// Orden lógico de categorías (como en la paleta): escuela y torneos. Desconocidas -> al final (alfabético).
+function catRank(cat){
+  const t=(cat||'').toLowerCase().trim();
+  const order=['roj','naranja','10','12','14','cat. a','cat. b','mujer'];
+  for(let i=0;i<order.length;i++){ if(t.includes(order[i])) return i; }
+  return 90;
 }
 function rebuildAll(){
   Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}}); charts={};
@@ -2463,7 +2542,7 @@ function rebuildAll(){
     : [['resumen',buildResumen],['rubrica',buildRubrica],['historial',buildHistorial],['liga',buildLiga]];
   tabs.forEach(([id,fn])=>{ try{ fn(); }catch(err){ const ld=document.getElementById('loading-'+id), ct=document.getElementById('content-'+id); if(ld) ld.style.display='none'; if(ct){ ct.style.display='block'; ct.innerHTML='<div class="err-box"><strong>No se pudo construir esta vista.</strong>'+(err&&err.message?err.message:err)+'</div>'; } } });
 }
-function setMonth(m){ selectedMonth=m; rebuildAll(); }
+function setMonth(m){ selectedMonth=m; rebuildAll(); saveNav(); }
 function filterByMonth(list){ if(selectedMonth==='all') return list; const f=list.filter(s=>monthKey(s)===selectedMonth); return f.length?f:list; }
 function monthChipsHTML(){
   const months=[...new Set(playerSessions.map(monthKey).filter(Boolean))].sort();
