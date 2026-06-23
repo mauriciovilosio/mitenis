@@ -1142,7 +1142,8 @@ const COL_DEFAULT = {
   Punto:12, Rival:13, Marcador:14,
   Resistencia:15, Velocidad:16, Agilidad:17, Fuerza:18,
   Error:19, Actitud:20, Comunicacion:21, Concentracion:22,
-  descripcion:23, obs_profe:24
+  descripcion:23, obs_profe:24,
+  fortalezas:25, aspecto:26
 };
 let COL = {...COL_DEFAULT};
 
@@ -1228,7 +1229,9 @@ const HEADER_ALIASES = {
   Comunicacion:['Comunicación','Comunicacion'],
   Concentracion:['Concentración','Concentracion'],
   descripcion:['descripcion','descripción','Descripción de la sesión'],
-  obs_profe:['obs_profe','Observación del profe','Observación del coach','Observaciones']
+  obs_profe:['obs_profe','Observación del profe','Observación del coach','Observaciones'],
+  fortalezas:['Fortalezas','Fortalezas del mes','Fortaleza'],
+  aspecto:['Aspecto principal a trabajar','Aspecto a trabajar','Aspecto principal','Aspectos a trabajar']
 };
 const INFO_ALIASES = {
   alumno:['alumno','Jugador','Nombre'],
@@ -3090,6 +3093,12 @@ function buildMonthReportHTML(name, mk){
   // ASPECTO PRINCIPAL A TRABAJAR (grupo más bajo)
   const foco=[...allGroups].sort((x,y)=> (x.curLv-y.curLv) || (x.cur-y.cur))[0]||null;
   const focoNext=foco?Math.min(3,foco.curLv+1):0;
+  // Fortalezas / Aspecto a trabajar — desde columnas de la hoja 'Registro-rubrica'
+  const splitItems=(t)=> String(t||'').split(/\r?\n|·|•|;|\u2022/).map(x=>x.replace(/^[\s\-–*]+/,'').trim()).filter(Boolean);
+  const fortCol=ms.filter(s=>(s[COL.fortalezas]||'').trim()!=='');
+  const fortItems=fortCol.length?splitItems(fortCol[fortCol.length-1][COL.fortalezas]):[];
+  const aspCol=ms.filter(s=>(s[COL.aspecto]||'').trim()!=='');
+  const aspText=aspCol.length?(aspCol[aspCol.length-1][COL.aspecto]||'').trim():'';
 
   // OBSERVACIÓN DEL PROFE (más reciente con texto)
   const obsList=ms.filter(s=>(s[COL.obs_profe]||'').trim()!=='');
@@ -3269,7 +3278,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
       <div class="pl-av" style="background:${color};">${esc(ini)}</div>
       <div>
         <div class="pl-name">${esc(name)}</div>
-        ${cat?`<span class="pl-cat" style="background:${catCol};">${esc(cat)}</span>`:''}
+        ${cat?`<span class="pl-cat" style="background:${catCol};color:${idealText(catCol)};">${esc(cat)}</span>`:''}
         <div class="pl-meta">
           <div>📋 <b>${ms.length}</b> ${ms.length===1?'sesión registrada':'sesiones registradas'}</div>
           <div>📈 Asistencia: <b>${at?at.pct+'%':'—'}</b></div>
@@ -3323,18 +3332,22 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
       <div class="panel">
         <div class="ph"><span class="ph-ic">⭐</span><span class="ph-tx">Fortalezas del mes</span></div>
         <div class="pb">
-        ${fortalezas.length?fortalezas.map(g=>`<div class="str">
+        ${fortItems.length
+          ? fortItems.map(t=>`<div class="str"><div class="str-ic">⭐</div><div><div class="str-t">${esc(t)}</div></div></div>`).join('')
+          : (fortalezas.length?fortalezas.map(g=>`<div class="str">
           <div class="str-ic">${g.area.emoji}</div>
           <div><div class="str-t">${esc(g.nombre)} · ${lvlLabel(g.curLv)}</div>
           <div class="str-s">${esc(g.desc||lvlSub(g.curLv))}</div></div>
-        </div>`).join(''):'<div class="str-s">Aún sin datos suficientes este mes.</div>'}
+        </div>`).join(''):'<div class="str-s">Aún sin datos suficientes este mes.</div>')}
         </div>
       </div>
       <div class="panel">
         <div class="ph"><span class="ph-ic">🎯</span><span class="ph-tx">Aspecto principal a trabajar</span></div>
         <div class="pb">
-        ${foco?`<div class="foco-t">${esc(foco.nombre)} <span style="font-size:11px;font-weight:700;color:${foco.area.col};">· ${esc(foco.area.nombre)}</span></div>
-          <div class="foco-d">${esc(foco.desc||'Foco de trabajo para el próximo período.')}</div>`:'<div class="foco-d">Aún sin datos suficientes este mes.</div>'}
+        ${aspText
+          ? `<div class="foco-d">${esc(aspText)}</div>`
+          : (foco?`<div class="foco-t">${esc(foco.nombre)} <span style="font-size:11px;font-weight:700;color:${foco.area.col};">· ${esc(foco.area.nombre)}</span></div>
+          <div class="foco-d">${esc(foco.desc||'Foco de trabajo para el próximo período.')}</div>`:'<div class="foco-d">Aún sin datos suficientes este mes.</div>')}
         </div>
       </div>
     </div>
