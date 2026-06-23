@@ -9,11 +9,11 @@
 :root {
   --blue:       #0a513a;
   --blue-d:     #178a54;
-  --yellow:     #f3fe76;
+  --yellow:     #ffde59;
   --court:      #0a513a;
   --court-mid:  #178a54;
   --court-l:    #52c98c;
-  --ball:       #f3fe76;
+  --ball:       #ffde59;
   --bg:         #0a513a;
   --surf:       #ffffff;
   --surf2:      #e8f7ef;
@@ -31,10 +31,10 @@
   --lv2:        #e0a200; --lv2-bg:#fef3c7;
   --lv3:        #16a34a; --lv3-bg:#dcfce7;
   /* Rendimiento — foco (amarillo) -> fortaleza (azul) */
-  --pf1:        #f3fe76; --pf1-bg:#fbffcf;
+  --pf1:        #ffde59; --pf1-bg:#fff4d2;
   --pf2:        #9fe0bf; --pf2-bg:#dcf3e7;
   --pf3:        #0a513a; --pf3-bg:#d6f1e2;
-  --n1:#ff8585; --n2:#f5ff80; --n3:#22b16c;
+  --n1:#ff8585; --n2:#ffde59; --n3:#22b16c;
   --radius:     16px;
   --radius-sm:  10px;
 }
@@ -56,7 +56,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 /* === Logo lockup nuevo (Inicio) — fondo transparente === */
 .logo-lockup{display:flex;align-items:center;justify-content:center;gap:18px;margin:0 auto 2.4rem;flex-wrap:wrap;}
 .logo-mark{width:88px;height:88px;border-radius:20px;background:#0d5230;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 10px 26px rgba(10,81,58,.22);}
-.logo-mark span{font-family:'Inter',sans-serif;font-weight:800;font-size:60px;line-height:1;color:#f3d23e;}
+.logo-mark span{font-family:'Inter',sans-serif;font-weight:800;font-size:60px;line-height:1;color:#ffde59;}
 .logo-words{text-align:left;}
 .logo-name{font-family:'Inter',sans-serif;font-size:clamp(34px,8vw,52px);font-weight:800;color:var(--blue);line-height:1;letter-spacing:-.02em;}
 .logo-tag{font-size:clamp(13px,3.4vw,16px);font-weight:600;color:var(--blue);line-height:1.35;margin-top:7px;}
@@ -396,7 +396,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .be{background:#eef0f7;}
 .bf1{background:#9aa0b4;border-color:#9aa0b4;}
 .bf2{background:#0a513a;border-color:#0a513a;}
-.bf3{background:#f3fe76;border-color:#d9e84a;}
+.bf3{background:#ffde59;border-color:#e8c23e;}
 .ball-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.05);}
 .ball-name{font-size:13px;font-weight:500;color:var(--text);}
 .ball-right{display:flex;align-items:center;gap:10px;}
@@ -568,7 +568,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .mc-mini{display:inline-block;margin-top:9px;font-size:11px;font-weight:700;color:var(--blue);background:var(--surf2);border:1px solid var(--border);border-radius:999px;padding:3px 10px;}
 .cz-h{color:#fff;font-weight:700;font-size:14px;margin:4px 2px 10px;}
 /* Insignia: jugador con más actitud del mes */
-.coach-badge{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#fffbe0,#f3fe76);border:1px solid #e6ef5e;border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;box-shadow:0 8px 22px rgba(243,254,118,.45);}
+.coach-badge{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#fffbe0,#ffde59);border:1px solid #e8c23e;border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;box-shadow:0 8px 22px rgba(243,254,118,.45);}
 .cb-av{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:inset 0 3px 6px rgba(255,255,255,.32),inset 0 -4px 8px rgba(0,0,0,.16);}
 .cb-tx{min-width:0;}
 .cb-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#7a6f00;}
@@ -646,7 +646,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .rise-tag{display:inline-block;font-size:11px;font-weight:700;color:var(--blue);background:rgba(10,81,58,.12);padding:3px 10px;border-radius:999px;margin-top:7px;}
 
 /* === v18: Modo Profe (highlight + ranking compacto) === */
-.mc-hl{background:#f5ff80;border-color:#e6ef5e;}
+.mc-hl{background:#ffde59;border-color:#e8c23e;}
 .cz-row{display:flex;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid var(--border);}
 .cz-name{font-size:14px;font-weight:600;color:var(--text);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .cz-score{font-size:23px;font-weight:800;color:var(--text);line-height:1;}
@@ -807,12 +807,12 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
 .cal-cell.cal-has{background:var(--blue);color:#fff;border-color:var(--blue-d);}
 .cal-cell.cal-has .cal-dot{width:4px;height:4px;border-radius:50%;background:#fff;margin-top:2px;}
 .cal-badge{position:absolute;top:1px;right:1px;font-size:8px;font-weight:800;background:var(--ball);color:#5b5400;border-radius:99px;padding:0 3px;line-height:11px;min-width:11px;text-align:center;}
-.cal-cell.cal-dl{background:var(--ball);color:#5b5400;border-color:#d9e84a;}
+.cal-cell.cal-dl{background:var(--ball);color:#5b5400;border-color:#e8c23e;}
 .cal-cell.cal-dl .cal-dlico{font-size:8px;line-height:1;margin-top:1px;}
 .cal-cell.cal-dl.has{box-shadow:inset 0 0 0 2px var(--blue);}
 .cal-cell.cal-dl-lock{background:var(--surf2);color:var(--hint);border:1px dashed var(--border);cursor:default;}
 .cal-cell.cal-dl-lock .cal-dlico{font-size:8px;opacity:.7;}
-.cal-dl-btn{margin-top:8px;width:100%;min-height:36px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--ball);color:#5b5400;border:1px solid #d9e84a;border-radius:10px;padding:6px 8px;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:transform .12s;line-height:1.2;}
+.cal-dl-btn{margin-top:8px;width:100%;min-height:36px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--ball);color:#5b5400;border:1px solid #e8c23e;border-radius:10px;padding:6px 8px;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:transform .12s;line-height:1.2;}
 .cal-dl-btn:hover{transform:translateY(-1px);}
 .cal-dl-note{margin-top:8px;width:100%;min-height:36px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);background:var(--surf2);border:1px dashed var(--border);border-radius:10px;padding:6px 8px;text-align:center;line-height:1.3;}
 .hl-azul{background:#0a513a;color:#fff;padding:1px 7px;border-radius:5px;font-weight:600;}
@@ -2430,7 +2430,7 @@ function buildCoach(){
 
   const withAt=data.filter(d=>d.at); const metN=withAt.filter(d=>d.at.met).length;
   let _sc=0,_so=0; withAt.forEach(d=>{ _sc+=d.at.cumplidas; _so+=d.at.objetivo; }); const genPct=_so>0?Math.round(_sc/_so*100):0;
-  const catPalette=['#f3fe76','#ff9f43','#ff5d5d','#5eead4','#a78bfa','#ffffff','#86efac'];
+  const catPalette=['#ffde59','#ff9f43','#ff5d5d','#5eead4','#a78bfa','#ffffff','#86efac'];
   const catColorHex=(ct,i)=>{ const c=catColor(ct); return (c&&c!=='#6b6f8a')?c:catPalette[i%catPalette.length]; };
   const hexA=(h,a)=>{const n=(h||'').replace('#','');const r=parseInt(n.slice(0,2),16)||0,g=parseInt(n.slice(2,4),16)||0,b=parseInt(n.slice(4,6),16)||0;return 'rgba('+r+','+g+','+b+','+a+')';};
   const catData=cats.map((ct,i)=>{
@@ -3097,12 +3097,12 @@ function buildMonthReportHTML(name, mk){
 
   // ÚLTIMA SESIÓN
   const last=ms.length?ms[ms.length-1]:null;
-  let lastFecha='', lastDesc='', lastEnfoque=[];
+  let lastFecha='', lastDesc='', lastTipo='';
   if(last){
     const d=new Date(parseDate(last[COL.fecha])+'T12:00:00');
     lastFecha=isNaN(d)?fmtDate(last[COL.fecha]):d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
     lastDesc=(last[COL.descripcion]||'').trim();
-    lastEnfoque=areas.filter(a=>avgLvlKeys(last,AREA_KEYS[a.id])>0).map(a=>a.nombre);
+    lastTipo=(last[COL.tipo]||'').trim();
   }
 
   // ÍNDICE GENERAL — gauge
@@ -3112,13 +3112,13 @@ function buildMonthReportHTML(name, mk){
   // DESEMPEÑO GENERAL — pulgares
   let thumbs, perfLbl, perfMsg, perfCol;
   if(overall>=2.3){ thumbs=3; perfLbl='EXCELENTE'; perfMsg='Gran mes de trabajo. ¡A sostenerlo!'; perfCol='#22b16c'; }
-  else if(overall>=1.5){ thumbs=2; perfLbl='FUNCIONA'; perfMsg='Buen mes de trabajo. Vamos por más.'; perfCol='#f3d23e'; }
-  else { thumbs=1; perfLbl='EN CAMINO'; perfMsg='Seguimos sumando, paso a paso.'; perfCol='#7ed957'; }
+  else if(overall>=1.5){ thumbs=2; perfLbl='MUY BIEN'; perfMsg='Buen mes de trabajo. Vamos por más.'; perfCol='#ffde59'; }
+  else { thumbs=1; perfLbl='BIEN'; perfMsg='Seguimos sumando, paso a paso.'; perfCol='#7ed957'; }
   // COMPROMISO
   const compromiso = (actitudExcelente(name,mk) || (at&&at.met)) ? 'ALTO' : ((at&&at.pct>=60)?'MEDIO':'EN CRECIMIENTO');
 
   const overallDelta=(prevOverall>0 && overall>0)?(overall-prevOverall):null;
-  const thumbSVG=(filled)=>`<svg viewBox="0 0 24 24" width="26" height="26" fill="${filled?'#f3d23e':'none'}" stroke="${filled?'#f3d23e':'rgba(243,210,62,.45)'}" stroke-width="1.6"><path d="M7 10v10H4V10h3zm3 10c-.55 0-1-.45-1-1V9.5c0-.3.13-.57.34-.76l5.4-5.18.86.86c.22.22.36.52.36.86v.28L15.6 9h4.9c.83 0 1.5.67 1.5 1.5l-2 7.5c-.17.86-.93 1.5-1.83 1.5H10z"/></svg>`;
+  const thumbSVG=(filled)=>`<svg viewBox="0 0 24 24" width="26" height="26" fill="${filled?'#ffde59':'none'}" stroke="${filled?'#ffde59':'rgba(243,210,62,.45)'}" stroke-width="1.6"><path d="M7 10v10H4V10h3zm3 10c-.55 0-1-.45-1-1V9.5c0-.3.13-.57.34-.76l5.4-5.18.86.86c.22.22.36.52.36.86v.28L15.6 9h4.9c.83 0 1.5.67 1.5 1.5l-2 7.5c-.17.86-.93 1.5-1.83 1.5H10z"/></svg>`;
 
   return `<!DOCTYPE html><html lang="es"><head>
 <meta charset="utf-8">
@@ -3141,15 +3141,15 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
 .hd{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:22px 26px 18px;}
 .hd-brand{display:flex;align-items:center;gap:13px;}
 .hd-mark{width:46px;height:46px;border-radius:11px;background:#0a3d2a;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.hd-mark span{font-weight:800;font-size:30px;color:#f3d23e;line-height:1;}
+.hd-mark span{font-weight:800;font-size:30px;color:#ffde59;line-height:1;}
 .hd-bn{font-size:21px;font-weight:800;color:#fff;line-height:1;}
 .hd-bt{font-size:9.5px;font-weight:600;color:rgba(255,255,255,.62);margin-top:4px;line-height:1.3;}
 .hd-rep{text-align:right;}
-.hd-rep-m{font-size:15px;font-weight:800;color:#f3d23e;text-transform:uppercase;letter-spacing:.02em;}
+.hd-rep-m{font-size:15px;font-weight:800;color:#ffde59;text-transform:uppercase;letter-spacing:.02em;}
 .hd-rep-s{font-size:9.5px;color:rgba(255,255,255,.6);margin-top:2px;}
 
 /* PLAYER / INDEX / PERF ROW */
-.top{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:14px;padding:0 26px 22px;align-items:center;}
+.top{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:14px;padding:0 26px 22px;align-items:stretch;}
 .pl{display:flex;align-items:center;gap:14px;}
 .pl-av{width:62px;height:62px;border-radius:14px;display:flex;align-items:center;justify-content:center;
        font-size:22px;font-weight:900;color:#fff;flex-shrink:0;border:2.5px solid rgba(255,255,255,.25);}
@@ -3157,8 +3157,9 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
 .pl-cat{display:inline-block;margin-top:5px;padding:2px 11px;border-radius:99px;font-size:10px;font-weight:800;color:#13261a;}
 .pl-meta{margin-top:9px;display:flex;flex-direction:column;gap:3px;}
 .pl-meta div{font-size:10.5px;color:rgba(255,255,255,.8);}
-.pl-meta b{color:#f3d23e;font-weight:800;}
+.pl-meta b{color:#ffde59;font-weight:800;}
 .ix{text-align:center;border-left:1px solid rgba(255,255,255,.12);border-right:1px solid rgba(255,255,255,.12);}
+.ix{display:flex;flex-direction:column;}.ix-body,.pf-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;}.pf{display:flex;flex-direction:column;}
 .ix-lbl{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:6px;}
 .ix-g{position:relative;width:128px;height:128px;margin:0 auto;}
 .ix-g svg{transform:rotate(-90deg);}
@@ -3168,7 +3169,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
 .pf{text-align:center;}
 .pf-lbl{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:8px;}
 .pf-th{display:flex;gap:5px;justify-content:center;margin-bottom:8px;}
-.pf-st{font-size:20px;font-weight:900;color:#f3d23e;line-height:1;}
+.pf-st{font-size:20px;font-weight:900;color:#ffde59;line-height:1;}
 .pf-msg{font-size:10px;color:rgba(255,255,255,.72);margin-top:5px;line-height:1.35;}
 
 /* BODY (cream) */
@@ -3194,8 +3195,8 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
 .panel{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(10,61,42,.06);}
 .ph{background:#0d4b34;padding:9px 15px;display:flex;align-items:center;gap:8px;}
-.ph-ic{color:#f3d23e;font-size:14px;}
-.ph-tx{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#f3d23e;}
+.ph-ic{color:#ffde59;font-size:14px;}
+.ph-tx{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#ffde59;}
 .pb{padding:13px 15px;}
 .str{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid #f0f4ec;}
 .str:last-child{border-bottom:none;}
@@ -3213,10 +3214,10 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
 .coach-q{font-size:12px;color:#33493b;line-height:1.55;font-style:italic;}
 .coach-q:before{content:'“';color:#bcd3c2;font-size:26px;font-weight:900;line-height:0;vertical-align:-8px;margin-right:2px;}
 .coach-sig{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:11px;border-top:1px solid #f0f4ec;}
-.coach-av{width:34px;height:34px;border-radius:50%;background:#0d4b34;color:#f3d23e;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0;}
+.coach-av{width:34px;height:34px;border-radius:50%;background:#0d4b34;color:#ffde59;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0;}
 .coach-nm{font-size:12px;font-weight:800;color:#163024;line-height:1.1;}
 .coach-rl{font-size:10px;color:#6b8a76;}
-.coach-name-sig{margin-left:auto;font-family:'Caveat',cursive;font-size:24px;color:#0d5230;line-height:1;}
+
 .ls-row{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:800;color:#163024;text-transform:capitalize;margin-bottom:10px;}
 .ls-row .ls-cal{font-size:15px;}
 .ls-sec{margin-bottom:9px;}
@@ -3238,9 +3239,9 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
 /* FOOTER */
 .ft{background:#0d4b34;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 22px;}
 .ft-l{font-size:11px;color:rgba(255,255,255,.8);font-style:italic;}
-.ft-r{font-size:11px;font-weight:800;color:#f3d23e;display:flex;align-items:center;gap:10px;}
+.ft-r{font-size:11px;font-weight:800;color:#ffde59;display:flex;align-items:center;gap:10px;}
 .ft-m{width:26px;height:26px;border-radius:7px;background:#0a3d2a;display:flex;align-items:center;justify-content:center;}
-.ft-m span{color:#f3d23e;font-weight:800;font-size:16px;}
+.ft-m span{color:#ffde59;font-weight:800;font-size:16px;}
 @media(max-width:680px){
   .top{grid-template-columns:1fr;gap:18px;} .ix{border:none;}
   .cards3{grid-template-columns:1fr 1fr;} .cols{grid-template-columns:1fr;}
@@ -3278,20 +3279,22 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
     </div>
     <div class="ix">
       <div class="ix-lbl">Índice general del mes</div>
-      <div class="ix-g">
+      <div class="ix-body"><div class="ix-g">
         <svg width="128" height="128" viewBox="0 0 128 128">
           <circle cx="64" cy="64" r="${R}" fill="none" stroke="rgba(255,255,255,.13)" stroke-width="12"/>
-          <circle cx="64" cy="64" r="${R}" fill="none" stroke="#f3d23e" stroke-width="12" stroke-linecap="round"
+          <circle cx="64" cy="64" r="${R}" fill="none" stroke="#ffde59" stroke-width="12" stroke-linecap="round"
                   stroke-dasharray="${dash} ${C.toFixed(1)}"/>
         </svg>
         <div class="ix-c"><div class="ix-n">${overall>0?overall.toFixed(1):'—'}</div><div class="ix-d">/ 3</div></div>
-      </div>
+      </div></div>
     </div>
     <div class="pf">
       <div class="pf-lbl">Desempeño general</div>
-      <div class="pf-th">${[1,2,3].map(i=>thumbSVG(i<=thumbs)).join('')}</div>
-      <div class="pf-st" style="color:${perfCol};">${perfLbl}</div>
-      <div class="pf-msg">${perfMsg}</div>
+      <div class="pf-body">
+        <div class="pf-th">${[1,2,3].map(i=>thumbSVG(i<=thumbs)).join('')}</div>
+        <div class="pf-st" style="color:${perfCol};">${perfLbl}</div>
+        <div class="pf-msg">${perfMsg}</div>
+      </div>
     </div>
   </div>
 
@@ -3309,8 +3312,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
         <div class="ac-h"><div class="ac-ic" style="background:${a.col};">${a.emoji}</div><div class="ac-nm">${esc(a.nombre)}</div></div>
         <div class="ac-val" style="color:${v>0?a.col:'#9aaa9a'};">${v>0?v.toFixed(1):'—'}<span> / 3</span></div>
         <div class="ac-bar"><i style="width:${w}%;background:${a.col};"></i></div>
-        <div class="ac-st ${st.cls}">${st.ar} ${st.lbl}</div>
-        ${st.val!==''?`<div class="ac-dl">${st.val}${prevShort?' vs '+prevShort:''}</div>`:''}
+        ${d===null?'':`<div class="ac-st ${st.cls}">${st.ar} ${st.lbl}</div>${st.val!==''?`<div class="ac-dl">${st.val}${prevShort?' vs '+prevShort:''}</div>`:''}`}
         ${bullets.length?`<div class="ac-ul">${bullets.map(b=>`<div class="ac-li">${thumbSVG(true).replace('width="26" height="26"','width="13" height="13"')}<div><b>${esc(b.t)}</b> · ${esc(b.s)}</div></div>`).join('')}</div>`:''}
       </div>`;
     }).join('')}
@@ -3332,11 +3334,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
         <div class="ph"><span class="ph-ic">🎯</span><span class="ph-tx">Aspecto principal a trabajar</span></div>
         <div class="pb">
         ${foco?`<div class="foco-t">${esc(foco.nombre)} <span style="font-size:11px;font-weight:700;color:${foco.area.col};">· ${esc(foco.area.nombre)}</span></div>
-          <div class="foco-d">${esc(foco.desc||'Foco de trabajo para el próximo período.')}</div>
-          <div class="foco-o"><span class="foco-o-ic">🏆</span><div>
-            <div class="foco-o-l">Objetivo del próximo mes</div>
-            <div class="foco-o-t">Alcanzar nivel ${lvlLabel(focoNext)} en ${esc(foco.nombre)}${obj?'. '+esc(obj):'.'}</div>
-          </div></div>`:'<div class="foco-d">Aún sin datos suficientes este mes.</div>'}
+          <div class="foco-d">${esc(foco.desc||'Foco de trabajo para el próximo período.')}</div>`:'<div class="foco-d">Aún sin datos suficientes este mes.</div>'}
         </div>
       </div>
     </div>
@@ -3344,13 +3342,12 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
     <!-- COACH + ÚLTIMA SESIÓN -->
     <div class="cols">
       <div class="panel">
-        <div class="ph"><span class="ph-ic">💬</span><span class="ph-tx">Comentario del Coach</span></div>
+        <div class="ph"><span class="ph-ic">💬</span><span class="ph-tx">Comentario del Profe</span></div>
         <div class="pb">
           <div class="coach-q">${coachQuote?esc(coachQuote):'Buen mes de trabajo. Seguimos construyendo el proceso de '+esc(name.split(' ')[0])+' con foco y constancia.'}</div>
           <div class="coach-sig">
-            <div class="coach-av">MV</div>
-            <div><div class="coach-nm">Mauricio Vilosio</div><div class="coach-rl">Coach</div></div>
-            <div class="coach-name-sig">Mauri</div>
+            <div class="coach-av">PM</div>
+            <div class="coach-nm">Profe Mauri</div>
           </div>
         </div>
       </div>
@@ -3358,27 +3355,10 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
         <div class="ph"><span class="ph-ic">📅</span><span class="ph-tx">Última sesión registrada</span></div>
         <div class="pb">
         ${last?`<div class="ls-row"><span class="ls-cal">📌</span>${esc(lastFecha)}</div>
-          ${lastEnfoque.length?`<div class="ls-sec"><div class="ls-l">Enfoque principal</div><div class="ls-chips">${lastEnfoque.map(e=>`<span class="ls-chip">${esc(e)}</span>`).join('')}</div></div>`:''}
-          ${lastDesc?`<div class="ls-sec"><div class="ls-l">Notas de la sesión</div><div class="ls-desc">${esc(lastDesc)}</div></div>`:''}`
+          ${lastTipo?`<div class="ls-sec"><div class="ls-l">Tipo de sesión</div><div class="ls-chips"><span class="ls-chip">${esc(lastTipo)}</span></div></div>`:''}
+          ${lastDesc?`<div class="ls-sec"><div class="ls-l">Descripción de la sesión</div><div class="ls-desc">${esc(lastDesc)}</div></div>`:''}`
           :'<div class="ls-desc">Sin sesiones registradas este mes.</div>'}
         </div>
-      </div>
-    </div>
-
-    <!-- RESUMEN DE EVOLUCIÓN -->
-    <div class="evo">
-      <div class="ph"><span class="ph-ic">📊</span><span class="ph-tx">Resumen de evolución</span></div>
-      <div class="evo-grid">
-      ${areas.map(a=>{
-        const c=areaAvg[a.id], p=prevAvg[a.id]; const d=deltaOf(a.id);
-        const dl = d===null ? '—' : (Math.abs(d)<0.05?'0.0':(d>0?'+'+d.toFixed(1):d.toFixed(1)));
-        const dc = d===null ? '#9aaa9a' : (Math.abs(d)<0.05?'#6b8a76':(d>0?'#16a34a':'#c2185b'));
-        return `<div class="evo-c">
-          <div class="evo-a">${esc(a.nombre)}</div>
-          <div class="evo-v">${p>0?p.toFixed(1):'—'}<span class="ar">→</span>${c>0?c.toFixed(1):'—'}</div>
-          <div class="evo-d" style="color:${dc};">${dl}</div>
-        </div>`;
-      }).join('')}
       </div>
     </div>
 
