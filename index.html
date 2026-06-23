@@ -3094,7 +3094,7 @@ function buildMonthReportHTML(name, mk){
   const foco=[...allGroups].sort((x,y)=> (x.curLv-y.curLv) || (x.cur-y.cur))[0]||null;
   const focoNext=foco?Math.min(3,foco.curLv+1):0;
   // Fortalezas / Aspecto a trabajar — desde columnas de la hoja 'Registro-rubrica'
-  const splitItems=(t)=> String(t||'').split(/\r?\n|·|•|;|\u2022/).map(x=>x.replace(/^[\s\-–*]+/,'').trim()).filter(Boolean);
+  const splitItems=(t)=> String(t||'').split(/\r?\n|·|•|;|,|\u2022/).map(x=>x.replace(/^[\s\-–*0-9.\)]+/,'').trim()).filter(Boolean);
   const fortCol=ms.filter(s=>(s[COL.fortalezas]||'').trim()!=='');
   const fortItems=fortCol.length?splitItems(fortCol[fortCol.length-1][COL.fortalezas]):[];
   const aspCol=ms.filter(s=>(s[COL.aspecto]||'').trim()!=='');
@@ -3210,6 +3210,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
 .str{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid #f0f4ec;}
 .str:last-child{border-bottom:none;}
 .str-ic{width:26px;height:26px;border-radius:8px;background:#eaf6ee;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.str-ic.str-num{background:#0d4b34;color:#ffde59;font-weight:900;font-size:13px;}
 .str-t{font-size:12px;font-weight:800;color:#163024;line-height:1.2;}
 .str-s{font-size:10.5px;color:#5d7466;margin-top:2px;line-height:1.35;}
 .foco-t{font-size:15px;font-weight:900;color:#163024;line-height:1.2;margin-bottom:6px;}
@@ -3333,7 +3334,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
         <div class="ph"><span class="ph-ic">⭐</span><span class="ph-tx">Fortalezas del mes</span></div>
         <div class="pb">
         ${fortItems.length
-          ? fortItems.map(t=>`<div class="str"><div class="str-ic">⭐</div><div><div class="str-t">${esc(t)}</div></div></div>`).join('')
+          ? fortItems.map((t,i)=>`<div class="str"><div class="str-ic str-num">${i+1}</div><div><div class="str-t">${esc(t)}</div></div></div>`).join('')
           : (fortalezas.length?fortalezas.map(g=>`<div class="str">
           <div class="str-ic">${g.area.emoji}</div>
           <div><div class="str-t">${esc(g.nombre)} · ${lvlLabel(g.curLv)}</div>
@@ -3345,7 +3346,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
         <div class="ph"><span class="ph-ic">🎯</span><span class="ph-tx">Aspecto principal a trabajar</span></div>
         <div class="pb">
         ${aspText
-          ? `<div class="foco-d">${esc(aspText)}</div>`
+          ? `<div class="foco-d"><strong>${esc(aspText)}</strong></div>`
           : (foco?`<div class="foco-t">${esc(foco.nombre)} <span style="font-size:11px;font-weight:700;color:${foco.area.col};">· ${esc(foco.area.nombre)}</span></div>
           <div class="foco-d">${esc(foco.desc||'Foco de trabajo para el próximo período.')}</div>`:'<div class="foco-d">Aún sin datos suficientes este mes.</div>')}
         </div>
