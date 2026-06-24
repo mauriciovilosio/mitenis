@@ -771,7 +771,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .mc-info{position:relative;display:inline-block;}
 #coach .metric-card:hover{z-index:30;}
 .cz-pair{display:grid;grid-template-columns:1.5fr 1fr;gap:12px;align-items:stretch;margin-bottom:14px;}
-.cz-act-body{display:flex;align-items:center;gap:12px;}
+.cz-name-cell{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.cz-act-tag{font-size:10px;font-weight:700;color:#a07800;display:flex;align-items:center;gap:3px;line-height:1.2;}
 .cz-pair .coach-badge,.cz-pair>.card{margin-bottom:0;}
 @media(max-width:600px){.cz-pair{grid-template-columns:1fr;}}
 .mc-info-btn{width:18px;height:18px;border-radius:50%;border:1px solid var(--border);background:var(--surf2);color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;padding:0;line-height:16px;font-family:'Inter',sans-serif;}
@@ -2549,12 +2550,25 @@ function buildCoach(){
   const areaCards=areas.map(a=>`<div class="metric-card"><div class="mc-head"><div class="mc-label">${AREA_META[a].emoji} ${meta[a]}</div>${tipBtn(TIPS[a])}</div><div class="mc-value">${cAvg[a]>0?cAvg[a].toFixed(1):'—'}<span class="mc-max"> / 3</span></div>${dPts(cAvg[a],pAvg[a]||0)}</div>`).join('');
   const totCard=`<div class="metric-card mc-hl"><div class="mc-head"><div class="mc-label">Promedio Total</div>${tipBtn('Promedio general de las 4 áreas (Técnica, Táctica, Físico y Mental).')}</div><div class="mc-value">${cTot>0?cTot.toFixed(1):'—'}<span class="mc-max"> / 3</span></div>${dPts(cTot,pTot)}</div>`;
 
+  // Jugador con más actitud del mes — uno por categoría (mes en curso)
+  const actByCat={};
+  data.forEach(d=>{
+    const cur=lastInMonth(d.p, curMonth);
+    const lv=cur?avgLvlKeys(cur,['Actitud']):0;
+    if(lv<=0) return;
+    const ct=catOf(d.p)||'—';
+    if(!actByCat[ct] || lv>actByCat[ct].lv){ actByCat[ct]={name:d.p, lv}; }
+  });
+  const actLeaderSet=new Set(Object.values(actByCat).map(x=>x.name));
   const studRows=data.slice().sort((a,b)=>b.overall-a.overall).map((d,i)=>{
     const a=d.at;
     return `<div class="cz-row">
       <div class="cz-rank">${i+1}</div>
       <div class="cz-av" style="background:${avatarColor(d.p)};"></div>
-      <div class="cz-name">${d.p}</div>
+      <div class="cz-name-cell">
+        <div class="cz-name">${d.p}</div>
+        ${actLeaderSet.has(d.p)?'<div class="cz-act-tag">🏅 Jugador con más actitud del mes</div>':''}
+      </div>
       <div class="cz-ind">
         <div class="cz-ind-row"><span class="cz-ind-lbl">Promedio</span><span class="cz-ind-val">${d.overall>0?d.overall.toFixed(1):'—'}<span>/3</span></span></div>
         <div class="cz-ind-row"><span class="cz-ind-lbl">Asistencia</span><span class="cz-ind-val cz-ind-val-sm ${a?(a.met?'ok':'low'):''}">${a?a.pct+'%':'—'}</span></div>
@@ -2572,25 +2586,6 @@ function buildCoach(){
     const dd=areas.map(a=>{ const vals=studs.map(p=>{const s=lastInMonth(p,curMonth); return s?avgLvlKeys(s,AREA_KEYS[a]):0;}).filter(v=>v>0); return vals.length?vals.reduce((x,y)=>x+y,0)/vals.length:0; });
     return {label:ct, data:dd, color:catColorHex(ct,i)};
   });
-  // ── Insignia: jugador con más actitud del mes ──
-  const iniOf=nm=>nm.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  let actLeader=null, actMax=0;
-  data.forEach(d=>{
-    const cur=lastInMonth(d.p, curMonth);
-    const lv=cur?avgLvlKeys(cur,['Actitud']):0;
-    if(lv>actMax){ actMax=lv; actLeader=d.p; }
-  });
-  const badgeHTML = (actLeader && actMax>0) ? `<div class="card cz-act-card">
-    <div class="card-title">🏅 Jugador con más actitud del mes</div>
-    <div class="cz-act-body">
-      <div class="cb-av" style="background:${avatarColor(actLeader)};color:${idealText(avatarColor(actLeader))};">${iniOf(actLeader)}</div>
-      <div class="cb-tx">
-        <div class="cb-name">${actLeader}</div>
-        <div class="cb-sub">${curMonth?mLabelFull(curMonth):''}</div>
-      </div>
-    </div>
-  </div>` : '';
-
   const planBtnHTML = (()=>{
         const planMonth = (selectedMonth!=='all' && allMonths.indexOf(selectedMonth)>=0)
           ? selectedMonth
@@ -2609,11 +2604,10 @@ function buildCoach(){
       })();
 
   const asistCard = `<div class="card"><div class="card-title">Asistencia del mes</div>${withAt.length?`<div class="cz-asist"><div class="cz-stat"><div class="cz-stat-val">${genPct}%</div><div class="cz-stat-lbl">Asistencia general</div></div><div class="cz-stat"><div class="cz-stat-val">${metN}<span> / ${withAt.length}</span></div><div class="cz-stat-lbl">Cumplieron su objetivo</div></div></div>`:'<div class="nota" style="margin:0;">Sin datos de asistencia para este mes.</div>'}</div>`;
-  const pairHTML = badgeHTML ? `<div class="cz-pair">${asistCard}${badgeHTML}</div>` : asistCard;
   el.innerHTML = `<div class="cz-filters">${monthChips}${catChips}</div>`
     + `<div class="cz-h">Promedio total${curMonth?' · '+mLabelFull(curMonth):''}</div>`
     + `<div class="metrics-row">${obsCard}${areaCards}${totCard}</div>`
-    + pairHTML
+    + asistCard
     + `<div class="cz-bottom">
         <div class="card cz-radar"><div class="card-title">Comparación por categoría${curMonth?' · '+mLabelFull(curMonth):''}</div><div class="chart-wrap" style="height:320px;margin-top:10px;"><canvas id="ch-coach-radar"></canvas></div></div>
         <div class="card cz-rank-card"><div class="card-title">Ranking de alumnos · ${players.length}</div><div class="cz-rank-scroll">${studRows||'<div class="empty" style="color:var(--muted);">Sin alumnos en este filtro.</div>'}</div></div>
