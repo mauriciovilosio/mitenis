@@ -63,6 +63,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 @media(max-width:520px){.logo-lockup{gap:14px;}.logo-mark{width:70px;height:70px;border-radius:16px;}.logo-mark span{font-size:46px;}}
 
 .select-card{background:var(--surf);border:1px solid var(--border);border-radius:20px;padding:1.5rem;width:100%;box-shadow:0 10px 34px rgba(10,81,58,0.14);}
+/* === Inicio v2: 3 botones encolumnados === */
+.start-menu{display:flex;flex-direction:column;gap:12px;width:100%;max-width:420px;margin:0 auto;}
+.start-btn{display:flex;align-items:center;gap:13px;width:100%;background:var(--surf);border:1.5px solid var(--border);border-radius:16px;padding:15px 16px;cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;color:var(--blue);font-size:16px;font-weight:700;text-align:left;box-shadow:0 6px 20px rgba(10,81,58,.08);}
+.start-btn:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 12px 28px rgba(10,81,58,.16);}
+.start-ico{flex-shrink:0;width:44px;height:44px;border-radius:12px;background:var(--surf2);display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;}
+.start-txt{flex:1;color:var(--blue);}
+.start-info{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:rgba(10,81,58,.10);color:var(--blue);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;font-style:italic;font-family:Georgia,serif;cursor:pointer;transition:transform .15s,background .15s;}
+.start-info:hover{transform:scale(1.15);background:rgba(10,81,58,.20);}
+.start-info:focus-visible{outline:2px solid var(--blue);outline-offset:1px;}
+.select-back{background:none;border:none;color:var(--blue);font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;padding:0 0 12px;display:block;}
+.select-back:hover{text-decoration:underline;}
+
 .select-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;text-align:left;}
 .player-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .player-btn{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;text-align:left;}
@@ -724,6 +736,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .ev-meta{font-size:11px;color:var(--muted);}
 .cz-cats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
 .cz-filter{margin-bottom:16px;}
+/* === Circuito interno: pestañas + selector de jugador === */
+.cz-select{width:100%;margin-top:4px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--surf);color:var(--blue);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;cursor:pointer;}
+.cz-select:focus{outline:none;border-color:var(--blue);}
+
 .cz-filter-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:9px;letter-spacing:.01em;}
 .cz-filter .cz-cats{margin-bottom:0;}
 .cz-kpis{margin-bottom:16px;}
@@ -873,18 +889,31 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
         <div class="logo-tag">Observamos. Acompañamos. Potenciamos.</div>
       </div>
     </div>
-    <div class="mode-toggle">
-      <button class="mode-btn active" id="mode-escuela" onclick="setMode('escuela')">Escuela de Tenis<span class="mode-info" role="button" tabindex="0" aria-label="Qué incluye Escuela de Tenis" onclick="event.stopPropagation();openAppInfo()">🎾</span></button>
-      <button class="mode-btn" id="mode-torneos" onclick="setMode('torneos')">Torneos internos<span class="mode-info" role="button" tabindex="0" aria-label="Qué incluye Torneos internos" onclick="event.stopPropagation();openTorneosInfo()">🏆</span></button>
+    <div class="start-menu" id="start-menu">
+      <button class="start-btn" id="start-escuela" onclick="chooseMode('escuela')">
+        <span class="start-ico">🎾</span>
+        <span class="start-txt">Escuela de Tenis</span>
+        <span class="start-info" role="button" tabindex="0" aria-label="Qué incluye Escuela de Tenis" onclick="event.stopPropagation();openAppInfo()">i</span>
+      </button>
+      <button class="start-btn" id="start-torneos" onclick="openCircuito()">
+        <span class="start-ico">🏆</span>
+        <span class="start-txt">Circuito interno</span>
+        <span class="start-info" role="button" tabindex="0" aria-label="Qué incluye Circuito interno" onclick="event.stopPropagation();openTorneosInfo()">i</span>
+      </button>
+      <button class="start-btn" id="start-profe" onclick="openProfe()">
+        <span class="start-ico">🧢</span>
+        <span class="start-txt">Modo Profe</span>
+        <span class="start-info" role="button" tabindex="0" aria-label="Qué es Modo Profe" onclick="event.stopPropagation();openCoachInfo()">i</span>
+      </button>
     </div>
-    <div class="select-card">
+    <div class="select-card" id="select-card" style="display:none;">
+      <button class="select-back" onclick="closeSelect()">← Volver</button>
       <div class="select-label" id="select-label">Seleccioná un jugador por categoría</div>
       <div class="player-list" id="player-grid">
         <div class="loading-state">Cargando jugadores…</div>
       </div>
       <div class="last-update" id="last-update"></div>
     </div>
-    <button class="coach-btn" id="entry-btn" onclick="openEntry()">🧢 Modo Profe</button>
   </div>
 </div>
 
@@ -971,6 +1000,10 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
       <div class="header-player"><div class="header-name">🎾 Circuito interno</div></div>
       <div style="width:60px;"></div>
     </div>
+    <nav class="app-tabs" id="tabs-circuito">
+      <button class="tab-btn active" onclick="setCircuitoTab('torneos')">Torneos</button>
+      <button class="tab-btn" onclick="setCircuitoTab('jugadores')">Jugadores</button>
+    </nav>
   </header>
   <main class="app-content"><div id="circuito-content"></div></main>
 </div>
@@ -1365,6 +1398,8 @@ let allRows=[], infoRows=[], asistRows=[], videoRows=[], currentPlayer=null, pla
 let appMode='escuela'; // 'escuela' | 'torneos'
 let ligaView='mensual'; // 'mensual' | 'anual' (Mi Ranking)
 let adultRows=[], matchRows=[], eventRows=[], circuitoCat='all';
+let circuitoTab='torneos', circuitoPlayer=null;
+let __pendingCircuito=null, __circuitoUnlocked=new Set();
 let planRows=[], planHeader=[], planFilters={golpe:'all', categoria:'all', nivel:'all', q:''};
 
 // ══════════════════════════════════════
@@ -1770,11 +1805,19 @@ function selectPlayer(name){
   }
   openPlayer(name);
 }
-function closePin(){ document.getElementById('pin-overlay').classList.remove('show'); __pendingPlayer=null; }
+function closePin(){ document.getElementById('pin-overlay').classList.remove('show'); __pendingPlayer=null;
+  if(__pendingCircuito){ __pendingCircuito=null; circuitoPlayer=null; if(circuitoTab==='jugadores') buildCircuitoJugadores(); } }
 function submitPin(){
   const val=(document.getElementById('pin-input').value||'').trim();
   if(__pinMode==='coach'){
     if(val===coachPin()){ document.getElementById('pin-overlay').classList.remove('show'); openCoachView(); }
+    else { document.getElementById('pin-err').textContent='PIN incorrecto. Probá de nuevo.'; }
+    return;
+  }
+  if(__pinMode==='circuito'){
+    const nm=__pendingCircuito; const ai=getAdultInfo(nm);
+    const apin=(ai && ai[ADULT.pin]!=null) ? String(ai[ADULT.pin]).trim() : '';
+    if(val===apin){ document.getElementById('pin-overlay').classList.remove('show'); __circuitoUnlocked.add(nm); __pendingCircuito=null; circuitoPlayer=nm; buildCircuitoJugadores(); }
     else { document.getElementById('pin-err').textContent='PIN incorrecto. Probá de nuevo.'; }
     return;
   }
@@ -1827,6 +1870,7 @@ function openPlayer(name){
 }
 function goBack(){
   document.getElementById('landing').style.display='';
+  resetLanding();
   document.getElementById('app').classList.remove('visible');
   saveNav();
 }
@@ -2046,19 +2090,27 @@ function coachPin(){
 }
 function setMode(m){
   appMode=m;
-  document.getElementById('mode-escuela').classList.toggle('active', m==='escuela');
-  document.getElementById('mode-torneos').classList.toggle('active', m==='torneos');
-  const lbl=document.getElementById('select-label');
-  const btn=document.getElementById('entry-btn');
-  if(m==='torneos'){
-    if(lbl) lbl.textContent='Seleccioná un jugador por categoría';
-    if(btn) btn.innerHTML='🎾 Circuito interno';
-  } else {
-    if(lbl) lbl.textContent='Seleccioná un jugador por categoría';
-    if(btn) btn.innerHTML='🧢 Modo Profe';
-  }
+  const me=document.getElementById('mode-escuela'); if(me) me.classList.toggle('active', m==='escuela');
+  const mt=document.getElementById('mode-torneos'); if(mt) mt.classList.toggle('active', m==='torneos');
   renderPlayers();
   saveNav();
+}
+// Inicio v2: elegir modo abre el selector de jugador; Modo Profe abre la sección
+function chooseMode(m){
+  setMode(m);
+  const sm=document.getElementById('start-menu'); if(sm) sm.style.display='none';
+  const sc=document.getElementById('select-card'); if(sc) sc.style.display='block';
+  const lbl=document.getElementById('select-label');
+  if(lbl) lbl.textContent = (m==='torneos'?'Torneos internos · seleccioná un jugador':'Escuela de Tenis · seleccioná un jugador');
+}
+function closeSelect(){
+  const sc=document.getElementById('select-card'); if(sc) sc.style.display='none';
+  const sm=document.getElementById('start-menu'); if(sm) sm.style.display='flex';
+}
+function openProfe(){ openCoach(); }
+function resetLanding(){
+  const sm=document.getElementById('start-menu'); if(sm) sm.style.display='flex';
+  const sc=document.getElementById('select-card'); if(sc) sc.style.display='none';
 }
 function openEntry(){ if(appMode==='torneos') openCircuito(); else openCoach(); }
 function openCoach(){
@@ -2079,7 +2131,7 @@ function openCoachView(){
   try{ buildCoach(); }catch(e){ const el=document.getElementById('coach-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir Modo Profe.</strong>'+(e&&e.message?e.message:e)+'</div>'; }
   saveNav();
 }
-function closeCoach(){ document.getElementById('coach').classList.remove('visible'); document.getElementById('landing').style.display=''; saveNav(); }
+function closeCoach(){ document.getElementById('coach').classList.remove('visible'); document.getElementById('landing').style.display=''; resetLanding(); saveNav(); }
 function setMonthCoach(m){ selectedMonth=m; buildCoach(); saveNav(); }
 function setCatCoach(c){ coachCat=c; buildCoach(); saveNav(); }
 
@@ -2258,16 +2310,38 @@ function buildCalendario(){
   el.innerHTML=html; ld.style.display='none'; el.style.display='block';
 }
 function openCircuito(){
-  circuitoCat='all';
+  circuitoCat='all'; circuitoTab='torneos'; circuitoPlayer=null;
   document.getElementById('landing').style.display='none';
   document.getElementById('app').classList.remove('visible');
   document.getElementById('circuito').classList.add('visible');
   try{ buildCircuito(); }catch(e){ const el=document.getElementById('circuito-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir Circuito interno.</strong>'+(e&&e.message?e.message:e)+'</div>'; }
   saveNav();
 }
-function closeCircuito(){ document.getElementById('circuito').classList.remove('visible'); document.getElementById('landing').style.display=''; saveNav(); }
+function closeCircuito(){ document.getElementById('circuito').classList.remove('visible'); document.getElementById('landing').style.display=''; resetLanding(); saveNav(); }
 function setCatCircuito(c){ circuitoCat=c; buildCircuito(); }
 function buildCircuito(){
+  const order=['torneos','jugadores'];
+  document.querySelectorAll('#tabs-circuito .tab-btn').forEach((b,i)=>b.classList.toggle('active', order[i]===circuitoTab));
+  if(circuitoTab==='jugadores') buildCircuitoJugadores(); else buildCircuitoTorneos();
+}
+function setCircuitoTab(t){ circuitoTab=t; buildCircuito(); saveNav(); }
+function setCircuitoPlayer(name){
+  name=name||null;
+  if(!name){ circuitoPlayer=null; buildCircuitoJugadores(); return; }
+  const info=getAdultInfo(name);
+  const pin=(info && info[ADULT.pin]!=null) ? String(info[ADULT.pin]).trim() : '';
+  if(pin && !__circuitoUnlocked.has(name)){
+    __pendingCircuito=name; __pinMode='circuito';
+    document.getElementById('pin-sub').textContent='Ingresá el PIN de '+name;
+    const inp=document.getElementById('pin-input'); if(inp) inp.value='';
+    document.getElementById('pin-err').textContent='';
+    document.getElementById('pin-overlay').classList.add('show');
+    setTimeout(()=>{try{inp.focus();}catch(e){}},60);
+    return;
+  }
+  circuitoPlayer=name; buildCircuitoJugadores();
+}
+function buildCircuitoTorneos(){
   const el=document.getElementById('circuito-content');
   const cats=[...new Set([...adultRows.map(r=>(r[ADULT.categoria]||'').trim()), ...matchRows.map(m=>(m[MATCH.categoria]||'').trim())].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
   if(!cats.length){ el.innerHTML='<div class="empty">No hay categorías de torneos cargadas todavía.</div>'; return; }
@@ -2331,6 +2405,58 @@ function buildCircuito(){
   </div>`;
 
   el.innerHTML = chips + cards + rankAcc;
+}
+function buildCircuitoJugadores(){
+  const el=document.getElementById('circuito-content');
+  const names=new Set();
+  adultRows.forEach(r=>{ const n=(r[ADULT.alumno]||'').trim(); if(n) names.add(n); });
+  matchRows.forEach(m=>{ [m[MATCH.jugadorA],m[MATCH.jugadorB]].forEach(x=>{ const n=(x||'').trim(); if(n) names.add(n); }); });
+  const list=[...names].filter(Boolean).sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base'}));
+  if(!list.length){ el.innerHTML='<div class="empty">No hay jugadores de torneos cargados todavía.</div>'; return; }
+  if(circuitoPlayer && !list.includes(circuitoPlayer)) circuitoPlayer=null;
+  const esc=v=>String(v||'').replace(/"/g,'&quot;');
+  const filter=`<div class="cz-filter">
+    <div class="cz-filter-title">Seleccioná un jugador</div>
+    <select class="cz-select" onchange="setCircuitoPlayer(this.value)">
+      <option value="" ${!circuitoPlayer?'selected':''}>— Elegí un jugador —</option>
+      ${list.map(n=>`<option value="${esc(n)}" ${circuitoPlayer===n?'selected':''}>${n}</option>`).join('')}
+    </select>
+  </div>`;
+  let body='';
+  if(!circuitoPlayer){
+    body='<div class="empty">Elegí un jugador para ver su resumen en torneos.</div>';
+  } else {
+    const name=circuitoPlayer;
+    const rec=playerRecord(name);
+    const winPct=rec.dec?Math.round(rec.w/rec.dec*100):0;
+    const info=getAdultInfo(name); const cat=(info?info[ADULT.categoria]:'')||'';
+    let posTxt='—';
+    if(cat){ const arr=rankingForCat(cat); const idx=arr.findIndex(p=>sameName(p.name,name)); if(idx>=0) posTxt=(idx+1)+'º de '+arr.length; }
+    const summary=`<div class="card"><div class="card-title">Mi resumen en torneos</div>
+      <div class="rec-row">
+        <div class="rec-item"><div class="rec-val">${rec.w}-${rec.l}</div><div class="rec-lbl">Récord G-P</div></div>
+        <div class="rec-item"><div class="rec-val">${rec.p}</div><div class="rec-lbl">Partidos</div></div>
+        <div class="rec-item"><div class="rec-val">${winPct}%</div><div class="rec-lbl">Victorias</div></div>
+        <div class="rec-item"><div class="rec-val">${rec.pts}</div><div class="rec-lbl">Puntos</div></div>
+      </div></div>`;
+    const posCard = cat?`<div class="card"><div class="card-title">Posición en el ranking · ${catLabel(cat)}</div>
+      <div class="rec-row"><div class="rec-item"><div class="rec-val">${posTxt}</div><div class="rec-lbl">Posición</div></div></div></div>`:'';
+    const ms=playerMatches(name).slice().sort((a,b)=>(parseDate(b[MATCH.fecha])||'').localeCompare(parseDate(a[MATCH.fecha])||''));
+    const rows=ms.map(m=>{
+      const opp=sameName(m[MATCH.jugadorA],name)?(m[MATCH.jugadorB]||''):(m[MATCH.jugadorA]||'');
+      const win=matchWinner(m); const decided=!!win; const won=decided&&sameName(win,name);
+      const cls=!decided?'tie':(won?'win':'loss'); const badge=!decided?'·':(won?'G':'P');
+      const res=(m[MATCH.resultado]||'').trim();
+      const meta=[(m[MATCH.torneo]||'').trim(), m[MATCH.fecha]?fmtDate(m[MATCH.fecha]):''].filter(Boolean).join(' · ');
+      return `<div class="match-row ${cls}"><div class="match-badge">${badge}</div>
+        <div class="match-mid"><div class="match-opp">vs ${opp||'—'}</div><div class="match-meta">${meta}</div></div>
+        <div class="match-res">${res||'—'}</div></div>`;
+    }).join('');
+    const matchesCard = ms.length?`<div class="card"><div class="card-title">Partidos</div><div class="match-list">${rows}</div></div>`
+      :'<div class="empty">Todavía no tiene partidos cargados.</div>';
+    body=summary+posCard+matchesCard;
+  }
+  el.innerHTML=filter+body;
 }
 
 function buildCoach(){
