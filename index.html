@@ -342,6 +342,34 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* Cards de métrica (Resumen) */
 .metrics-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px;}
+/* === Mi Perfil: hero unificado (info+asistencia | índice general) === */
+.perfil-hero{display:flex;gap:18px;align-items:stretch;background:linear-gradient(135deg,#0a513a,#0d6648);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;color:#fff;box-shadow:0 12px 30px rgba(10,81,58,.26);}
+.ph-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;}
+.ph-name{font-size:21px;font-weight:900;text-transform:uppercase;line-height:1.08;}
+.ph-cat{display:inline-block;align-self:flex-start;margin-top:6px;padding:2px 11px;border-radius:99px;font-size:10px;font-weight:800;}
+.ph-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:9px 16px;margin-top:13px;}
+.ph-it label{display:block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.55);margin-bottom:2px;}
+.ph-it span{font-size:13px;font-weight:700;color:#fff;}
+.ph-obj{margin-top:11px;}
+.ph-obj label{display:block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.55);margin-bottom:2px;}
+.ph-obj span{font-size:12px;color:rgba(255,255,255,.9);line-height:1.4;}
+.ph-ix{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;border-left:1px solid rgba(255,255,255,.14);padding-left:18px;}
+.ph-ix-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.6);margin-bottom:8px;text-align:center;}
+.ph-gauge{position:relative;width:112px;height:112px;}
+.ph-gauge svg{width:100%;height:100%;}
+.ph-gauge-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ph-gauge-n{font-size:30px;font-weight:900;line-height:1;color:#fff;}
+.ph-gauge-d{font-size:11px;color:rgba(255,255,255,.55);font-weight:700;}
+.ph-ix-sub{font-size:10px;color:rgba(255,255,255,.6);margin-top:8px;text-transform:capitalize;text-align:center;}
+@media(max-width:560px){
+  .perfil-hero{padding:16px;gap:13px;}
+  .ph-name{font-size:18px;}
+  .ph-ix{padding-left:13px;}
+  .ph-gauge{width:90px;height:90px;}
+  .ph-gauge-n{font-size:24px;}
+  .ph-grid{grid-template-columns:repeat(auto-fit,minmax(72px,1fr));gap:7px 12px;}
+}
+
 .metric-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:18px;text-align:left;}
 .mc-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
 .mc-value{font-size:30px;font-weight:700;line-height:1;color:var(--text);letter-spacing:-.01em;}
@@ -1091,7 +1119,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
 
 <div class="pin-overlay" id="rendimiento-info-overlay" onclick="if(event.target===this)closeRendInfo()">
   <div class="pin-modal" style="max-width:380px;">
-    <div class="pin-title">Cómo se mide Mi Rendimiento</div>
+    <div class="pin-title">Cómo se mide Mi Tenis</div>
     <div style="font-size:14px;color:var(--text);line-height:1.7;text-align:left;margin-top:4px;">
       <p style="margin:0 0 12px;">Tu rendimiento se mide en <strong>3 niveles</strong>, sumá 👍 a medida que mejorás.</p>
       <p style="margin:0;"><strong>Extra:</strong> Si hacés click en una habilidad <strong>Bien</strong> podés ver cómo seguir mejorando.</p>
@@ -1102,7 +1130,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
 
 <div class="pin-overlay" id="registro-info-overlay" onclick="if(event.target===this)closeRegistroInfo()">
   <div class="pin-modal" style="max-width:380px;">
-    <div class="pin-title">Cómo funciona Mi Registro</div>
+    <div class="pin-title">Cómo funcionan los Informes</div>
     <div style="font-size:14px;color:var(--text);line-height:1.7;text-align:left;margin-top:4px;">
       <p style="margin:0;">Los días en <span class="hl-azul">azul</span> tienen una sesión registrada — tocalos para ver el detalle. Al finalizar el mes, podés descargar tu registro completo.</p>
     </div>
@@ -1120,7 +1148,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
 
 <div class="pin-overlay" id="liga-info-overlay">
   <div class="pin-modal" style="max-width:380px;">
-    <div class="pin-title">🏆 Cómo funciona Mi Ranking</div>
+    <div class="pin-title">🏆 Cómo funciona el Ranking</div>
     <div id="liga-info-body" style="font-size:13px;color:var(--text);line-height:1.6;text-align:left;"></div>
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeLigaInfo()">Entendido</button></div>
   </div>
@@ -2621,22 +2649,6 @@ function buildCoach(){
     const dd=areas.map(a=>{ const vals=studs.map(p=>{const s=lastInMonth(p,curMonth); return s?avgLvlKeys(s,AREA_KEYS[a]):0;}).filter(v=>v>0); return vals.length?vals.reduce((x,y)=>x+y,0)/vals.length:0; });
     return {label:ct, data:dd, color:catColorHex(ct,i)};
   });
-  const planBtnHTML = (()=>{
-        const planMonth = (selectedMonth!=='all' && allMonths.indexOf(selectedMonth)>=0)
-          ? selectedMonth
-          : (allMonths.filter(m=>monthEnded(m)).pop() || '');
-        const planReady = planMonth && monthEnded(planMonth);
-        const catArg = (coachCat||'all').replace(/'/g,"\\'");
-        let inner;
-        if(planReady){
-          inner=`<button class="coach-dl" onclick="downloadCoachPlan('${planMonth}','${catArg}')" title="Descargar el resumen para planificar ${mLabelFull(planMonth)}">📄 Descargar resumen para planificar · ${mLabelFull(planMonth)}</button>`;
-        } else if(planMonth){
-          inner=`<div class="coach-dl-lock">🔒 El resumen para planificar estará disponible al cerrar ${mLabelFull(planMonth)}</div>`;
-        } else {
-          inner=`<div class="coach-dl-lock">🔒 El resumen para planificar estará disponible al cerrar el primer mes</div>`;
-        }
-        return `<div class="coach-dl-wrap">${inner}</div>`;
-      })();
 
   const asistCard = `<div class="card"><div class="card-title">Asistencia del mes</div>${withAt.length?`<div class="cz-asist"><div class="cz-stat"><div class="cz-stat-val">${genPct}%</div><div class="cz-stat-lbl">Asistencia general</div></div><div class="cz-stat"><div class="cz-stat-val">${metN}<span> / ${withAt.length}</span></div><div class="cz-stat-lbl">Cumplieron su objetivo</div></div></div>`:'<div class="nota" style="margin:0;">Sin datos de asistencia para este mes.</div>'}</div>`;
   el.innerHTML = `<div class="cz-filters">${monthChips}${catChips}</div>`
@@ -2647,7 +2659,7 @@ function buildCoach(){
         <div class="card cz-radar"><div class="card-title">Comparación por categoría${curMonth?' · '+mLabelFull(curMonth):''}</div><div class="chart-wrap" style="height:320px;margin-top:10px;"><canvas id="ch-coach-radar"></canvas></div></div>
         <div class="card cz-rank-card"><div class="card-title">Ranking de alumnos · ${players.length}</div><div class="cz-rank-scroll">${studRows||'<div class="empty" style="color:var(--muted);">Sin alumnos en este filtro.</div>'}</div></div>
       </div>`
-    + planBtnHTML;
+    ;
   if(charts['coachRadar']){ try{charts['coachRadar'].destroy();}catch(e){} }
   const _cv=document.getElementById('ch-coach-radar');
   if(_cv && catData.length){
@@ -2836,10 +2848,34 @@ function buildResumen(){
       </div>
     </div>`;
   }
-  let topRow='';
-  if(fichaHTML && asistHTML) topRow=`<div class="top-row">${fichaHTML}${asistHTML}</div>`;
-  else topRow=fichaHTML+asistHTML;
-  el.innerHTML = chips + topRow + `<div class="metrics-row">${cards}${totalCard}</div>` + radarHTML;
+  // Hero unificado: info personal + asistencia (izquierda) · Índice general del mes (derecha)
+  const ovPct=Math.max(0,Math.min(1,tot/3));
+  const _R=46, _C=2*Math.PI*_R, _dash=(ovPct*_C).toFixed(1);
+  const heroCat = catName ? `<span class="ph-cat" style="background:${catColor(catName)};color:${idealText(catColor(catName))};">${catName}</span>` : '';
+  const heroItems = [
+    (info&&info[INFO.brazo])?['Brazo hábil', info[INFO.brazo]]:null,
+    (info&&info[INFO.altura])?['Altura', info[INFO.altura]]:null,
+    (info&&info[INFO.edad])?['Edad', info[INFO.edad]+' años']:null,
+    at?['Asistencia', `${at.cumplidas|0}/${at.objetivo|0} · ${at.pct}%`]:null
+  ].filter(Boolean).map(it=>`<div class="ph-it"><label>${it[0]}</label><span>${it[1]}</span></div>`).join('');
+  const heroObj = (info&&info[INFO.objetivo])?`<div class="ph-obj"><label>Objetivo</label><span>${info[INFO.objetivo]}</span></div>`:'';
+  const perfilHero = `<div class="perfil-hero">
+    <div class="ph-info">
+      <div class="ph-name">${currentPlayer}</div>
+      ${heroCat}
+      <div class="ph-grid">${heroItems}</div>
+      ${heroObj}
+    </div>
+    <div class="ph-ix">
+      <div class="ph-ix-lbl">Índice general del mes</div>
+      <div class="ph-gauge">
+        <svg viewBox="0 0 112 112"><circle cx="56" cy="56" r="${_R}" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="11"/><circle cx="56" cy="56" r="${_R}" fill="none" stroke="#ffde59" stroke-width="11" stroke-linecap="round" stroke-dasharray="${_dash} ${_C.toFixed(1)}" transform="rotate(-90 56 56)"/></svg>
+        <div class="ph-gauge-c"><div class="ph-gauge-n">${tot>0?tot.toFixed(1):'—'}</div><div class="ph-gauge-d">/ 3</div></div>
+      </div>
+      <div class="ph-ix-sub">${monthLabel(curMonth)} · ${curSess.length} ses.</div>
+    </div>
+  </div>`;
+  el.innerHTML = chips + perfilHero + `<div class="metrics-row">${cards}</div>` + radarHTML;
   ldEl.style.display='none'; el.style.display='block';
 
   if(document.getElementById('ch-radar')){
@@ -2927,7 +2963,7 @@ function buildRubrica(){
     </div>
     <div class="acc-body"><div class="acc-body-inner">${evoInner}</div></div>
   </div>`;
-  el.innerHTML = `<button class="lg-info-btn" onclick="openRendInfo()">ℹ️ ¿Cómo se mide mi rendimiento?</button>` + monthChipsHTML() + legend + `<div class="perf-grid">${cards}</div>` + evoHTML;
+  el.innerHTML = `<button class="lg-info-btn" onclick="openRendInfo()">ℹ️ ¿Cómo se mide Mi Tenis?</button>` + monthChipsHTML() + legend + `<div class="perf-grid">${cards}</div>` + evoHTML;
   ldEl.style.display='none'; el.style.display='block';
   // Gráfico de evolución — usa TODAS las sesiones, sin filtro de mes
   if(charts['evolucion']){ try{charts['evolucion'].destroy();}catch(e){} }
@@ -3155,7 +3191,7 @@ function buildHistorial(){
   sess.forEach(s=>{ const mk=monthKey(s); if(!mk) return; (byMonth[mk]=byMonth[mk]||[]).push(s); });
   const months=Object.keys(byMonth).sort();
   const pl=currentPlayer.replace(/'/g,"\\'");
-  const infoBtn=`<button class="lg-info-btn" onclick="openRegistroInfo()">ℹ️ ¿Cómo funciona Mi Registro?</button>`;
+  const infoBtn=`<button class="lg-info-btn" onclick="openRegistroInfo()">ℹ️ ¿Cómo funcionan los Informes?</button>`;
   const legend=`<div class="cal-legend" style="margin:-2px 0 12px;">
     <span><span class="lg-swatch" style="background:var(--ball);"></span> Descargar reporte (mes cerrado)</span>
     <span><span class="lg-swatch" style="background:var(--surf2);border:1px dashed var(--border);"></span> Reporte 🔒</span>
@@ -3489,13 +3525,11 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
       const v=areaAvg[a.id]; const lv=Math.round(v)||0;
       const d=deltaOf(a.id); const st=statusOf(d);
       const w=Math.max(4,Math.min(100,(v/3)*100));
-      const bullets=upBullets(a.id);
       return `<div class="ac">
         <div class="ac-h"><div class="ac-ic" style="background:${a.col};">${a.emoji}</div><div class="ac-nm">${esc(a.nombre)}</div></div>
         <div class="ac-val" style="color:${v>0?a.col:'#9aaa9a'};">${v>0?v.toFixed(1):'—'}<span> / 3</span></div>
         <div class="ac-bar"><i style="width:${w}%;background:${a.col};"></i></div>
         ${d===null?'':`<div class="ac-st ${st.cls}">${st.ar} ${st.lbl}</div>${st.val!==''?`<div class="ac-dl">${st.val}${prevShort?' vs '+prevShort:''}</div>`:''}`}
-        ${bullets.length?`<div class="ac-ul">${bullets.map(b=>`<div class="ac-li">${thumbSVG(true).replace('width="26" height="26"','width="13" height="13"')}<div><b>${esc(b.t)}</b> · ${esc(b.s)}</div></div>`).join('')}</div>`:''}
       </div>`;
     }).join('')}
     </div>
@@ -3777,7 +3811,7 @@ function buildLiga(){
   let board=allPlayers.map(p=>scorePlayer(p, period)).filter(s=>s.sesiones>0);
   board.sort((a,b)=> b.total-a.total || b.asistencia-a.asistencia || b.actitud-a.actitud || b.torneos-a.torneos);
 
-  const explain=`<button class="lg-info-btn" onclick="openLigaInfo()">ℹ️ ¿Cómo funciona Mi Ranking?</button>`;
+  const explain=`<button class="lg-info-btn" onclick="openLigaInfo()">ℹ️ ¿Cómo funciona el Ranking?</button>`;
 
   const meScore=board.find(s=>s.name===currentPlayer);
   let meHTML;
