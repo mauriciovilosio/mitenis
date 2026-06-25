@@ -2651,10 +2651,30 @@ function buildCoach(){
   });
 
   const asistCard = `<div class="card"><div class="card-title">Asistencia del mes</div>${withAt.length?`<div class="cz-asist"><div class="cz-stat"><div class="cz-stat-val">${genPct}%</div><div class="cz-stat-lbl">Asistencia general</div></div><div class="cz-stat"><div class="cz-stat-val">${metN}<span> / ${withAt.length}</span></div><div class="cz-stat-lbl">Cumplieron su objetivo</div></div></div>`:'<div class="nota" style="margin:0;">Sin datos de asistencia para este mes.</div>'}</div>`;
+  // Hero de la clase: Alumnos + Asistencia del mes (izq) · Índice general del mes (der)
+  const _covPct=Math.max(0,Math.min(1,cTot/3));
+  const _cR=46,_cC=2*Math.PI*_cR,_cDash=(_covPct*_cC).toFixed(1);
+  const coachHero=`<div class="perfil-hero coach-hero">
+    <div class="ph-info">
+      <div class="ph-name">${coachCat==='all'?'Todas las categorías':coachCat}</div>
+      <div class="ph-grid">
+        <div class="ph-it"><label>Alumnos</label><span>${players.length}</span></div>
+        <div class="ph-it"><label>Asistencia general</label><span>${withAt.length?genPct+'%':'—'}</span></div>
+        <div class="ph-it"><label>Cumplieron objetivo</label><span>${withAt.length?metN+'/'+withAt.length:'—'}</span></div>
+      </div>
+    </div>
+    <div class="ph-ix">
+      <div class="ph-ix-lbl">Índice general del mes</div>
+      <div class="ph-gauge">
+        <svg viewBox="0 0 112 112"><circle cx="56" cy="56" r="${_cR}" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="11"/><circle cx="56" cy="56" r="${_cR}" fill="none" stroke="#ffde59" stroke-width="11" stroke-linecap="round" stroke-dasharray="${_cDash} ${_cC.toFixed(1)}" transform="rotate(-90 56 56)"/></svg>
+        <div class="ph-gauge-c"><div class="ph-gauge-n">${cTot>0?cTot.toFixed(1):'—'}</div><div class="ph-gauge-d">/ 3</div></div>
+      </div>
+      <div class="ph-ix-sub">${curMonth?mLabelFull(curMonth):''}</div>
+    </div>
+  </div>`;
   el.innerHTML = `<div class="cz-filters">${monthChips}${catChips}</div>`
-    + `<div class="cz-h">Promedio total${curMonth?' · '+mLabelFull(curMonth):''}</div>`
-    + `<div class="metrics-row">${obsCard}${areaCards}${totCard}</div>`
-    + asistCard
+    + coachHero
+    + `<div class="metrics-row">${areaCards}</div>`
     + `<div class="cz-bottom">
         <div class="card cz-radar"><div class="card-title">Comparación por categoría${curMonth?' · '+mLabelFull(curMonth):''}</div><div class="chart-wrap" style="height:320px;margin-top:10px;"><canvas id="ch-coach-radar"></canvas></div></div>
         <div class="card cz-rank-card"><div class="card-title">Ranking de alumnos · ${players.length}</div><div class="cz-rank-scroll">${studRows||'<div class="empty" style="color:var(--muted);">Sin alumnos en este filtro.</div>'}</div></div>
