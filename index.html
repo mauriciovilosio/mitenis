@@ -14,7 +14,7 @@
   --court-mid:  #178a54;
   --court-l:    #52c98c;
   --ball:       #ffde59;
-  --bg:         #0a513a;
+  --bg:         #f4f7ee;
   --surf:       #ffffff;
   --surf2:      #e8f7ef;
   --border:     rgba(10,81,58,0.14);
@@ -34,7 +34,7 @@
   --pf1:        #ffde59; --pf1-bg:#fff4d2;
   --pf2:        #9fe0bf; --pf2-bg:#dcf3e7;
   --pf3:        #0a513a; --pf3-bg:#d6f1e2;
-  --n1:#ff8585; --n2:#ffde59; --n3:#22b16c;
+  --n1:#ffde59; --n2:#a0b834; --n3:#148f67;
   --radius:     16px;
   --radius-sm:  10px;
 }
@@ -98,21 +98,23 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .app.visible{display:flex;}
 
 /* HEADER */
-.app-header{background:var(--ball);position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(32,34,58,.18);}
+.app-header{background:#0d4b34;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(10,61,42,.28);}
 .header-top{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 0;}
-.header-back{background:rgba(32,34,58,.07);border:none;border-radius:8px;padding:6px 10px;cursor:pointer;color:rgba(32,34,58,.7);font-size:12px;font-family:'Inter',sans-serif;transition:background .15s;}
-.header-back:hover{background:rgba(32,34,58,.13);}
+#app .header-top,#coach .header-top,#circuito .header-top{justify-content:flex-start;gap:16px;}
+#app .header-top > div[style],#coach .header-top > div[style],#circuito .header-top > div[style]{display:none;}
+.header-back{background:rgba(255,255,255,.14);border:none;border-radius:8px;padding:6px 10px;cursor:pointer;color:rgba(255,255,255,.9);font-size:12px;font-family:'Inter',sans-serif;transition:background .15s;}
+.header-back:hover{background:rgba(255,255,255,.24);}
 .header-player{display:flex;align-items:center;gap:10px;}
 .header-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;}
-.header-name{font-family:'Inter',sans-serif;font-size:19px;font-weight:800;color:var(--blue);letter-spacing:-.01em;display:inline-flex;align-items:center;}
+.header-name{font-family:'Inter',sans-serif;font-size:19px;font-weight:800;color:#fff;letter-spacing:-.01em;display:inline-flex;align-items:center;}
 .coach-header .header-top{padding-bottom:14px;}
 .coach-header .header-name .info-i{margin-left:7px;}
-.header-meta{font-size:11px;color:var(--muted);}
+.header-meta{font-size:11px;color:rgba(255,255,255,.72);}
 .app-tabs{display:flex;padding:10px 20px 0;overflow-x:auto;scrollbar-width:none;}
 .app-tabs::-webkit-scrollbar{display:none;}
-.tab-btn{padding:8px 16px;font-family:'Inter',sans-serif;font-size:13px;color:rgba(32,34,58,.5);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all .15s;}
-.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600;}
-.tab-btn:hover:not(.active){color:rgba(32,34,58,.8);}
+.tab-btn{padding:8px 16px;font-family:'Inter',sans-serif;font-size:13px;color:rgba(255,255,255,.6);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.tab-btn.active{color:#ffde59;border-bottom-color:#ffde59;font-weight:600;}
+.tab-btn:hover:not(.active){color:rgba(255,255,255,.88);}
 
 /* CONTENT */
 .app-content{flex:1;padding:20px 16px 48px;}
@@ -121,7 +123,27 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* CARDS */
 .card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px;}
-.card-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.card-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#ffde59;background:#0a513a;padding:8px 12px;border-radius:9px;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+#content-liga .card-title{color:#fff;margin:-16px -16px 14px;padding:10px 16px;border-radius:var(--radius) var(--radius) 0 0;}
+#content-liga .card{overflow:hidden;}
+#content-resumen .card-title{color:#fff;margin:-16px -16px 14px;padding:10px 16px;border-radius:var(--radius) var(--radius) 0 0;}
+.cz-radar, .cz-rank-card, .cz-areas{overflow:hidden;}
+.cz-radar > .card-title, .cz-rank-card > .card-title, .cz-areas > .card-title{color:#fff;margin:-16px -16px 14px;padding:10px 16px;border-radius:var(--radius) var(--radius) 0 0;}
+.lvl-pill{display:inline-block;padding:4px 14px;border-radius:999px;font-size:15px;font-weight:800;}
+/* Mi Perfil v6: info sola + fila 2 (Desempeño + Asistencia) */
+.perfil-info-solo{margin-bottom:14px;}
+.perfil-row2{display:flex;gap:14px;align-items:stretch;margin-bottom:16px;}
+.perfil-row2 .perfil-kpi2{flex:1 1 0;margin-bottom:0;}
+.perfil-row2 .asist-card{flex:2 1 0;margin-bottom:0;overflow:hidden;}
+@media(max-width:620px){ .perfil-row2{flex-wrap:wrap;} .perfil-row2 .perfil-kpi2,.perfil-row2 .asist-card{flex:1 1 100%;} }
+/* Mi Tenis: habilidades DENTRO de la card del KPI */
+.ac{overflow:hidden;}
+.mt-grid > .ac{margin-bottom:0;}
+.ac .skills-acc{background:transparent;border:none;box-shadow:none;border-radius:0;margin:10px -13px -12px;border-top:1px solid #eef3e8;overflow:hidden;}
+.ac .skills-acc .acc-head{padding:9px 13px;}
+.ac .skills-acc .acc-head:hover{background:rgba(10,81,58,.04);}
+.ac .skills-acc .acc-title{font-size:11px;font-weight:800;color:var(--blue);}
+.ac .skills-acc .acc-body-inner{padding:0 13px 10px;}
 .card-title::after{content:'';flex:1;height:1px;background:var(--border);}
 
 /* FICHA */
@@ -188,6 +210,143 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* MÉTRICAS RESUMEN TOP */
 .metrics-row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}
+/* === Mi Perfil v3: top (info + 2 KPIs) === */
+.perfil-top{display:flex;gap:14px;align-items:stretch;flex-wrap:wrap;margin-bottom:16px;}
+.ptile{background:linear-gradient(135deg,#0a513a,#0d6648);border-radius:var(--radius);padding:18px 20px;color:#fff;box-shadow:0 12px 30px rgba(10,81,58,.26);}
+.perfil-info{flex:1.6 1 280px;min-width:0;}
+.perfil-kpi{flex:1 1 150px;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.pk-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.6);margin-bottom:12px;}
+.pk-val{font-size:26px;font-weight:900;line-height:1.12;}
+.pk-msg{font-size:10.5px;color:rgba(255,255,255,.72);margin-top:7px;line-height:1.35;}
+.pk-month{font-size:10px;color:rgba(255,255,255,.55);margin-top:11px;text-transform:capitalize;}
+/* === Mi Perfil v3: cards de área con sparkline === */
+.area-card{display:flex;flex-direction:column;text-align:left;position:relative;overflow:hidden;padding:13px 13px 0;}
+.ac2-head{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:8px;}
+.ac2-title{font-size:12px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:5px;}
+.ac2-val{font-size:26px;font-weight:900;line-height:1;display:flex;align-items:baseline;gap:5px;}
+.ac2-val span{font-size:12px;font-weight:700;color:#9aaa9a;}
+.ac2-arrow{font-size:17px;font-weight:900;}
+.ac2-delta{font-size:11px;font-weight:700;margin-top:5px;}
+.ac2-spark{margin:10px -13px 0;height:44px;}
+.area-spark{display:block;width:100%;height:44px;}
+@media(max-width:560px){ .perfil-info{flex:1 1 100%;} .pk-val{font-size:22px;} }
+/* Mi Perfil v4: KPI cards blancas (Desempeño / Asistencia) */
+.perfil-kpi2{flex:1 1 150px;min-width:0;margin-bottom:0;display:flex;flex-direction:column;}
+.perfil-top > .card{margin-bottom:0;}
+.pk2-val{font-size:24px;font-weight:900;line-height:1.12;color:var(--text);}
+.pk2-val span{font-size:12px;font-weight:700;color:#9aaa9a;}
+.pk2-month{font-size:10px;color:var(--muted);margin-top:auto;padding-top:12px;text-transform:capitalize;}
+/* Mi Perfil: sparkline en cards Mi Desempeño / Mi Asistencia */
+.perfil-kpi2{overflow:hidden;}
+.pk2-month{margin-top:4px;}
+.pk2-spark{margin:10px 0 0;height:36px;}
+.pk2-spark .area-spark{display:block;width:100%;height:40px;}
+/* Mi Perfil v7: hero compacto + Desempeño enriquecido + racha */
+.ph-top{display:flex;align-items:center;gap:12px;}
+.ph-av2{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;flex-shrink:0;}
+.ph-id{flex:1;min-width:0;}
+.ph-name2{font-size:20px;font-weight:900;line-height:1.1;color:#fff;}
+.ph-meta2{font-size:12px;color:rgba(255,255,255,.7);margin-top:3px;}
+.perfil-info-solo .ph-cat{align-self:center;margin-top:0;flex-shrink:0;}
+.ph-obj-band{display:flex;align-items:center;gap:10px;margin-top:14px;background:rgba(255,255,255,.10);border-radius:10px;padding:10px 13px;}
+.ph-obj-ic{font-size:20px;line-height:1;flex-shrink:0;}
+.ph-obj-lbl{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6);}
+.ph-obj-txt{font-size:14px;font-weight:700;color:#fff;line-height:1.3;}
+.pk2-top{display:flex;align-items:center;gap:8px;}
+.pk2-idx{font-size:30px;font-weight:900;line-height:1;}
+.pk2-idx small{font-size:13px;font-weight:700;color:#9aaa9a;margin-left:2px;}
+.pk2-top .lvl-pill{margin-left:auto;font-size:12px;padding:3px 12px;}
+.pk2-trend{font-size:12px;font-weight:700;margin-top:8px;}
+.pk2-prog{margin-top:10px;padding-top:10px;border-top:1px solid #eef3e8;}
+.pk2-prog-lbl{display:flex;justify-content:space-between;gap:8px;font-size:10px;font-weight:700;color:#5d7466;margin-bottom:5px;}
+.pk2-bar{height:7px;border-radius:99px;background:#e4ece0;overflow:hidden;}
+.pk2-bar i{display:block;height:100%;background:#148f67;border-radius:99px;}
+.asist-streak{font-size:11px;font-weight:700;color:#148f67;margin-top:8px;}
+
+/* Mi Perfil v5: fila 1 (info + Mi Desempeño) + fila 2 (Mi Asistencia) === */
+.perfil-row1{display:flex;gap:14px;align-items:stretch;margin-bottom:14px;}
+.perfil-row1 .perfil-info{flex:1.5 1 0;min-width:0;}
+.perfil-row1 .perfil-kpi2{flex:1 1 0;min-width:0;}
+.asist-card{margin-bottom:16px;}
+.asist-body{display:flex;align-items:center;gap:16px;}
+.asist-left{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:92px;}
+.asist-donut{width:84px;height:84px;display:block;}
+.asist-count{font-size:11px;font-weight:700;color:var(--muted);text-align:center;}
+.asist-vline{width:1px;align-self:stretch;background:var(--border);flex-shrink:0;}
+.asist-right{flex:1 1 auto;min-width:0;}
+.asist-right-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px;}
+.asist-bars-svg{width:100%;height:98px;display:block;}
+.kpi-info{margin-left:auto;width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.15);color:#fff;font-size:11px;font-weight:800;font-style:italic;font-family:Georgia,serif;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.kpi-info:hover{background:rgba(255,255,255,.28);}
+/* Modo Profe: Foco del mes + ranking accionable */
+.foco-card{margin-bottom:14px;}
+.foco-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
+.foco-item{border-radius:10px;padding:11px 12px;}
+.foco-area{background:#f6faf3;} .foco-low{background:#fdeced;} .foco-drop{background:#fef6e6;}
+.foco-lbl{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#6b6f8a;}
+.foco-area .foco-lbl{color:#3b6d11;} .foco-low .foco-lbl{color:#a3473a;} .foco-drop .foco-lbl{color:#8a6a1a;}
+.foco-val{font-size:16px;font-weight:900;margin-top:5px;color:#0a513a;}
+.foco-low .foco-val{color:#dc2626;} .foco-drop .foco-val{color:#b97800;}
+.foco-val small{font-size:12px;color:#9aaa9a;font-weight:700;margin-left:3px;}
+.cz-trend{font-size:10.5px;font-weight:700;margin-top:2px;}
+.cz-row.cz-risk{background:#fef5f5;border-left:3px solid #dc2626;border-radius:0 8px 8px 0;padding-left:9px;margin-left:-9px;}
+.cz-att-chip{background:#fdeced;color:#dc2626;font-size:9px;font-weight:800;padding:1px 7px;border-radius:99px;margin-left:0;vertical-align:middle;flex-shrink:0;white-space:nowrap;}
+.cz-sort{display:inline-flex;gap:4px;margin-left:auto;}
+.cz-sort-btn{background:rgba(255,255,255,.15);color:#fff;font-size:10px;font-weight:700;padding:2px 9px;border-radius:99px;border:none;cursor:pointer;font-family:inherit;}
+.cz-sort-btn.active{background:#ffde59;color:#0a513a;font-weight:800;}
+/* Modo Profe v2: foco 2 cards + áreas compactas + modales */
+.foco2{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.foco2-card{flex:1;min-width:150px;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:11px 14px;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s;}
+.foco2-card:hover{border-color:var(--blue);transform:translateY(-1px);box-shadow:0 6px 16px rgba(10,81,58,.1);}
+.foco2-ic{font-size:22px;flex-shrink:0;line-height:1;}
+.foco2-tx{flex:1;min-width:0;display:flex;flex-direction:column;}
+.foco2-lbl{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#6b6f8a;}
+.foco2-val{font-size:15px;font-weight:900;color:#0a513a;}
+.foco2-chev{font-size:22px;color:#9aaa9a;flex-shrink:0;line-height:1;}
+.cz-areas{margin-bottom:12px;}
+.ag-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #eef3e8;}
+.cz-areas .ag-row:last-child{border-bottom:none;}
+.ag-name{width:74px;font-size:12px;font-weight:800;color:#1a3325;flex-shrink:0;}
+.ag-bar{flex:1;height:7px;border-radius:99px;background:#e4ece0;overflow:hidden;}
+.ag-bar i{display:block;height:100%;border-radius:99px;}
+.ag-val{font-size:13px;font-weight:900;color:#1a3325;width:30px;text-align:right;}
+.ag-trend{font-size:10px;font-weight:700;width:38px;text-align:right;}
+.fk-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #eef3e8;font-size:13px;color:#20223a;}
+.fk-row:last-child{border-bottom:none;}
+.fk-lvl{font-size:11px;font-weight:800;padding:2px 9px;border-radius:99px;color:#161616;}
+.fk-lvl.lb1{background:var(--n1);} .fk-lvl.lb2{background:var(--n2);} .fk-lvl.lb3{background:var(--n3);}
+
+
+@media(min-width:620px){ .asist-donut{width:108px;height:108px;} .asist-count{font-size:13px;} .asist-right-lbl{font-size:11px;} .asist-bars-svg{height:110px;} .asist-streak{font-size:12px;} .asist-body{gap:20px;} }
+/* Mi Tenis: badge +1 a la derecha del nombre de la habilidad */
+.rise-badge{display:inline-block;font-size:10px;font-weight:800;color:#16a34a;background:#dcfce7;padding:1px 7px;border-radius:999px;margin-left:7px;vertical-align:middle;}
+@media(max-width:560px){ .perfil-row1{flex-wrap:nowrap;} .asist-body{gap:10px;} .asist-left{min-width:78px;} .asist-donut{width:74px;height:74px;} }
+
+/* Mi Tenis: cards de área estilo Reporte mensual (.ac) */
+.ac{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:13px 13px 12px;box-shadow:0 2px 10px rgba(10,61,42,.06);}
+.ac-h{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.ac-ic{width:27px;height:27px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;flex-shrink:0;}
+.ac-nm{font-size:14px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;color:#1a3325;}
+.ac-val{font-size:30px;font-weight:900;line-height:1;}
+.ac-val span{font-size:13px;font-weight:700;color:#9aaa9a;}
+.ac-bar{height:6px;border-radius:99px;background:#e4ece0;margin:8px 0 7px;overflow:hidden;}
+.ac-bar i{display:block;height:100%;border-radius:99px;}
+.ac-st{font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;}
+.ac-st.st-up{color:#16a34a;} .ac-st.st-eq{color:#6b8a76;} .ac-st.st-dn{color:#c2185b;} .ac-st.st-new{color:#b97800;}
+.ac-dl{font-size:10px;font-weight:700;color:#6b8a76;margin-top:1px;}
+/* Mi Tenis: acordeón Mis Habilidades dentro de cada columna */
+.mt-col .acc{margin-bottom:0;}
+.skills-acc .acc-head{padding:11px 14px;}
+.skills-acc .acc-title{font-size:12px;font-weight:800;color:var(--blue);}
+
+/* Mi Tenis: grilla KPI de área + habilidades */
+.mt-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:start;margin-top:8px;}
+.mt-col{display:flex;flex-direction:column;gap:12px;min-width:0;}
+.mt-col .metric-card,.mt-col .perf-card{margin-bottom:0;}
+@media(max-width:900px){ .mt-grid{grid-template-columns:repeat(2,1fr);} }
+@media(max-width:520px){ .mt-grid{grid-template-columns:1fr;} }
+
+
 .metric-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:13px;text-align:center;}
 .metric-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
 .metric-icon{font-size:20px;margin-bottom:4px;}
@@ -231,10 +390,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .nota{background:var(--surf2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 13px;font-size:12px;color:var(--text);margin-bottom:14px;line-height:1.55;}
 
 /* EMPTY / SPINNER */
-.empty{text-align:center;padding:2rem;color:rgba(255,255,255,.9);font-size:13px;}
-.spinner{width:30px;height:30px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;margin:2rem auto;}
+.empty{text-align:center;padding:2rem;color:var(--muted);font-size:13px;}
+.spinner{width:30px;height:30px;border:3px solid rgba(10,81,58,.18);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:2rem auto;}
 .loading-view{text-align:center;padding:3rem 1rem;}
-.loading-view p{font-size:13px;color:rgba(255,255,255,.85);margin-top:10px;}
+.loading-view p{font-size:13px;color:var(--muted);margin-top:10px;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
 /* RÚBRICA TAB */
@@ -316,11 +475,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 /* SEMÁFORO (Plan) */
 .sem-legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
 .sem-leg{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:5px 10px;border-radius:7px;}
-.sem-leg-label{font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.05em;margin-right:2px;}
+.sem-leg-label{font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.05em;margin-right:2px;}
 .evo-acc{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);margin-top:14px;overflow:hidden;}
-.evo-acc .acc-head{padding:15px 18px;}
-.evo-acc .acc-title{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+.evo-acc .acc-head{padding:13px 16px;background:#0a513a;}
+.evo-acc .acc-head:hover{background:#0d6648;}
+.evo-acc .acc-title{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;}
+.evo-acc .acc-chevron{color:#ffde59;}
 .evo-acc .acc-body-inner{padding:0 18px 16px;}
+/* Modo Profe: mismo tamaño de fuente para los títulos de Áreas del grupo, Ranking de alumnos y Comparación por categoría */
+#coach-content .cz-areas .card-title, #coach-content .cz-rank-acc .acc-title, #coach-content .evo-acc .acc-title{font-size:11px !important;}
+#coach-content .cz-rank-acc .acc-title{text-transform:uppercase;}
 .sem-group{margin-bottom:16px;}
 .sem-group-h{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px;}
 .sem-group-h .dot{width:12px;height:12px;border-radius:50%;display:inline-block;}
@@ -347,7 +511,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .ph-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;}
 .ph-name{font-size:21px;font-weight:900;text-transform:uppercase;line-height:1.08;}
 .ph-cat{display:inline-block;align-self:flex-start;margin-top:6px;padding:2px 11px;border-radius:99px;font-size:10px;font-weight:800;}
-.ph-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:9px 16px;margin-top:13px;}
+.ph-grid{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:13px;align-items:flex-start;}
+.ph-it{min-width:0;}
+.ph-it-obj{flex:1 1 200px;}
 .ph-it label{display:block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.55);margin-bottom:2px;}
 .ph-it span{font-size:13px;font-weight:700;color:#fff;}
 .ph-obj{margin-top:11px;}
@@ -366,12 +532,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .ph-kpis{display:flex;align-items:stretch;gap:20px;margin-top:16px;flex-wrap:wrap;}
 .ph-kpi{display:flex;flex-direction:column;justify-content:center;}
 .coach-hero .ph-kpi{flex:1 1 0;min-width:0;}
-.ph-d{font-size:9px;font-weight:700;margin-left:5px;white-space:nowrap;vertical-align:middle;opacity:.9;}
+.ph-d{font-size:8px;font-weight:700;margin-left:5px;white-space:nowrap;vertical-align:middle;opacity:.9;}
 .ph-d.up{color:#9ff5c4;}.ph-d.down{color:#ffb3b3;}.ph-d.flat{color:rgba(255,255,255,.45);}
 .ph-kpi label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.55);margin-bottom:4px;}
-.ph-kpi span{font-size:19px;font-weight:800;color:#fff;line-height:1;}
+.ph-kpi span{font-size:15px;font-weight:800;color:#fff;line-height:1;}
 .ph-kpi-sep{width:1px;background:rgba(255,255,255,.2);margin:2px 2px;}
-@media(max-width:560px){ .ph-kpi span{font-size:16px;} .coach-hero .ph-kpis{flex-direction:column;align-items:stretch;gap:9px;} .coach-hero .ph-kpi{flex:1 1 auto;} .coach-hero .ph-kpi-sep{width:100%;height:1px;margin:2px 0;} .ph-d{font-size:9px;margin-left:4px;} }
+@media(max-width:560px){ .ph-kpi span{font-size:14px;} .coach-hero .ph-kpis{flex-direction:column;align-items:stretch;gap:9px;} .coach-hero .ph-kpi{flex:1 1 auto;} .coach-hero .ph-kpi-sep{width:100%;height:1px;margin:2px 0;} .ph-d{font-size:8px;margin-left:4px;} }
 
 @media(max-width:560px){
   .perfil-hero{padding:16px;gap:13px;}
@@ -379,7 +545,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   .ph-ix{padding-left:13px;}
   .ph-gauge{width:90px;height:90px;}
   .ph-gauge-n{font-size:24px;}
-  .ph-grid{grid-template-columns:repeat(auto-fit,minmax(72px,1fr));gap:7px 12px;}
+  .ph-grid{gap:8px 14px;} .ph-it-obj{flex:1 1 100%;}
 }
 
 .metric-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:18px;text-align:left;}
@@ -416,7 +582,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .top-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;margin-bottom:14px;}
 .top-row > .card{margin:0;height:100%;}
 @media(max-width:720px){.top-row{grid-template-columns:1fr;}}
-.radar-sub{text-align:center;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;}
+.radar-range{display:flex;gap:6px;flex-wrap:wrap;padding-bottom:2px;margin-top:16px;}
+.radar-range-btn{flex:1;min-width:96px;padding:8px 8px;border-radius:9px;border:1px solid var(--border);background:var(--surf);color:var(--muted);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.radar-range-btn:hover{border-color:var(--blue);color:var(--blue);}
+.radar-range-btn.active{background:var(--blue);border-color:var(--blue);color:#fff;}
 .mc-delta.down{color:var(--muted);}
 .perf-delta.neg{color:var(--muted);}
 .perf-tick{background:var(--blue-d);opacity:.75;}
@@ -525,6 +694,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .lg-badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;margin-left:5px;vertical-align:middle;}
 .lg-badge.improve{background:var(--pf1);color:#5b5400;}
 .lg-pts{font-size:17px;font-weight:800;color:var(--text);flex-shrink:0;}
+.lg-medal-pos{font-size:20px;line-height:1;margin-right:4px;flex-shrink:0;}
 .lg-pts span{font-size:10px;font-weight:600;color:var(--hint);}
 
 /* Medallas por área */
@@ -602,9 +772,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .lg-info-btn{background:var(--surf);border:1px solid var(--border);border-radius:999px;padding:8px 15px;font-size:12px;font-weight:600;color:var(--blue);font-family:'Inter',sans-serif;cursor:pointer;margin-bottom:14px;transition:background .15s;}
 /* === Mi Ranking: toggle Mensual / Anual === */
 .lg-toggle{display:flex;gap:8px;margin:10px 0 14px;}
-.lg-tg-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 10px;border-radius:12px;border:1.5px solid rgba(255,255,255,.4);background:rgba(255,255,255,.10);color:#fff;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;}
-.lg-tg-btn:hover{background:rgba(255,255,255,.18);border-color:#fff;color:#fff;}
-.lg-tg-btn.active{background:#fff;border-color:#fff;color:var(--blue);box-shadow:0 6px 16px rgba(0,0,0,.22);}
+.lg-tg-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px 10px;border-radius:12px;border:1.5px solid var(--border);background:var(--surf);color:var(--muted);font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;}
+.lg-tg-btn:hover{background:var(--surf2);border-color:var(--blue);color:var(--blue);}
+.lg-tg-btn.active{background:#0d4b34;border-color:#0d4b34;color:#fff;box-shadow:0 6px 16px rgba(10,61,42,.28);}
 
 .lg-info-btn:hover{background:var(--surf2);}
 
@@ -630,7 +800,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .cz-row:last-child{border-bottom:none;}
 .cz-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;box-shadow:inset 0 3px 6px rgba(255,255,255,.32),inset 0 -4px 8px rgba(0,0,0,.16);}
 .cz-info{flex:1;min-width:0;}
-.cz-name{font-size:13px;font-weight:600;color:var(--text);}
+.cz-name{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px;min-width:0;}
+.cz-name-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
 .cz-sub{font-size:10.5px;color:var(--muted);margin-top:2px;}
 .cz-right{text-align:right;flex-shrink:0;}
 .cz-score{font-size:16px;font-weight:800;color:var(--text);}
@@ -641,6 +812,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 /* === v15: paleta de niveles (chip fondo + texto negro) === */
 .ball-label{padding:4px 12px;border-radius:999px;color:#161616!important;font-weight:700;text-align:center;min-width:0;}
 .lb1{background:var(--n1);} .lb2{background:var(--n2);} .lb3{background:var(--n3);}
+.ball-label.lb3{color:#161616!important;}
 .dot-1{background:var(--n1);} .dot-2{background:var(--n2);} .dot-3{background:var(--n3);}
 .prio-row.lv1{border-left-color:var(--n1);}
 .prio-row.lv2{border-left-color:var(--n2);}
@@ -706,7 +878,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 /* === v18: Modo Profe (highlight + ranking compacto) === */
 .mc-hl{background:#ffde59;border-color:#e8c23e;}
 .cz-row{display:flex;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid var(--border);}
-.cz-name{font-size:14px;font-weight:600;color:var(--text);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cz-name{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px;min-width:0;}
 .cz-score{font-size:23px;font-weight:800;color:var(--text);line-height:1;}
 .cz-score span{font-size:11px;color:var(--hint);font-weight:600;}
 .cz-at{margin-left:auto;font-size:16px;font-weight:800;}
@@ -786,7 +958,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .cz-select{width:100%;margin-top:4px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--surf);color:var(--blue);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;cursor:pointer;}
 .cz-select:focus{outline:none;border-color:var(--blue);}
 
-.cz-filter-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:9px;letter-spacing:.01em;}
+.cz-filter-title{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:9px;letter-spacing:.01em;}
 .cz-filter .cz-cats{margin-bottom:0;}
 .cz-kpis{margin-bottom:16px;}
 .cz-next{display:flex;flex-direction:column;justify-content:flex-start;}
@@ -794,10 +966,15 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .cz-next-date{font-size:12px;font-weight:600;color:var(--muted);margin-top:4px;}
 .cz-next-empty{font-size:12px;color:var(--hint);margin-top:6px;line-height:1.3;}
 .cz-rank-acc .acc-sub{font-size:13px;font-weight:500;color:var(--muted);margin-left:4px;}
-.cz-rank-acc .acc-body-inner{padding:2px 14px 14px;}
+.cz-rank-acc .acc-body-inner{padding:12px 16px 14px;}
 .cz-rank-acc .cz-rank-scroll{max-height:360px;margin-top:0;}
-.cz-cat{border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.12);color:#fff;font-weight:600;font-size:12px;padding:6px 12px;border-radius:999px;cursor:pointer;}
-.cz-cat.active{background:#fff;color:var(--blue);border-color:#fff;}
+.cz-rank-acc .acc-head{background:#0a513a;padding:13px 16px;}
+.cz-rank-acc .acc-head:hover{background:#0d6648;}
+.cz-rank-acc .acc-title{color:#fff;}
+.cz-rank-acc .acc-chevron{color:#ffde59;}
+.cz-cat{border:1.5px solid var(--border);background:var(--surf);color:var(--muted);font-weight:700;font-size:12px;padding:8px 14px;border-radius:12px;cursor:pointer;transition:all .15s;}
+.cz-cat:hover{background:var(--surf2);border-color:var(--blue);color:var(--blue);}
+.cz-cat.active{background:#0d4b34;color:#fff;border-color:#0d4b34;font-weight:700;}
 .cz-stats{display:flex;gap:10px;margin:4px 0 12px;}
 .cz-stats > div{flex:1;text-align:center;background:var(--surf2);border-radius:10px;padding:8px 4px;}
 .cz-stats b{display:block;font-size:18px;color:var(--text);}
@@ -821,7 +998,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .mc-info{position:relative;display:inline-block;}
 #coach .metric-card:hover,#coach .metric-card:has(.mc-info.open){z-index:30;}
 .cz-pair{display:grid;grid-template-columns:1.5fr 1fr;gap:12px;align-items:stretch;margin-bottom:14px;}
-.cz-name-cell{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.cz-name-cell{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 auto;}
 .cz-act-tag{font-size:10px;font-weight:700;color:#a07800;display:flex;align-items:center;gap:3px;line-height:1.2;}
 .cz-pair .coach-badge,.cz-pair>.card{margin-bottom:0;}
 @media(max-width:600px){.cz-pair{grid-template-columns:1fr;}}
@@ -852,22 +1029,23 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .filter-acc{position:relative;margin-bottom:8px;background:transparent;border:none;border-radius:0;overflow:visible;}
 .filter-acc .acc-head{padding:8px 2px;}
 .filter-acc .acc-head:hover{background:transparent;}
-.filter-acc .acc-title{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#fff;display:inline-flex;align-items:center;gap:4px;}
-.filter-acc .acc-sub{font-size:12px;font-weight:500;color:rgba(255,255,255,.82);margin-left:4px;}
-.filter-acc .acc-chevron{color:#fff;}
-.filter-acc .acc-body{position:absolute;top:calc(100% + 2px);left:0;z-index:130;min-width:210px;max-width:min(90vw,330px);background:#0d5230;border:1px solid rgba(255,255,255,.2);border-radius:14px;box-shadow:0 18px 44px rgba(0,0,0,.42);max-height:0;overflow:hidden;transition:max-height .28s ease;}
-.filter-acc.open .acc-body{max-height:min(60vh,360px);overflow-y:auto;}
+.filter-acc .acc-title{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--blue);display:inline-flex;align-items:center;gap:4px;}
+.filter-acc .acc-sub{font-size:12px;font-weight:500;color:var(--muted);margin-left:4px;}
+.filter-acc .acc-chevron{color:var(--muted);}
+.filter-acc .acc-body{position:absolute;top:calc(100% + 2px);left:0;z-index:130;min-width:210px;max-width:min(90vw,330px);background:var(--surf);border:1px solid var(--border);border-radius:14px;box-shadow:0 18px 44px rgba(10,61,42,.22);max-height:0;overflow:hidden;transition:max-height .28s ease;border-color:transparent;}
+.filter-acc.open .acc-body{max-height:min(60vh,360px);overflow-y:auto;border-color:var(--border);}
 .filter-acc .acc-body-inner{padding:12px 14px;display:flex;flex-wrap:wrap;gap:8px;}
 /* chips: fuente blanca; el seleccionado queda con fondo blanco */
-.filter-acc .mf-chip{background:transparent;border-color:rgba(255,255,255,.55);color:#fff;}
-.filter-acc .mf-chip:hover{background:rgba(255,255,255,.14);border-color:#fff;color:#fff;}
-.filter-acc .mf-chip.active{background:#fff;border-color:#fff;color:var(--blue);font-weight:700;}
+.filter-acc .mf-chip{background:var(--surf);border:1.5px solid var(--border);color:var(--muted);border-radius:12px;font-weight:700;}
+.filter-acc .mf-chip:hover{background:var(--surf2);border-color:var(--blue);color:var(--blue);}
+.filter-acc .mf-chip.active{background:#0d4b34;border-color:#0d4b34;color:#fff;font-weight:700;}
 
 /* === Historial: calendario de sesiones (tamaño fijo, sin desbordes) === */
 .cal-months{display:flex;flex-wrap:wrap;gap:14px;max-width:1494px;}
 .cal-month-block{width:226px;display:flex;flex-direction:column;}
-.cal-card{width:100%;box-sizing:border-box;padding:10px;margin:0;}
-.cal-card .card-title{font-size:12px;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cal-card{width:100%;box-sizing:border-box;padding:10px;margin:0;background:var(--surf);border:1px solid var(--border);border-radius:14px;}
+.cal-card{overflow:hidden;}
+.cal-card .card-title{font-size:12px;margin:-10px -10px 8px;padding:8px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;background:#0a513a;border-radius:14px 14px 0 0;}
 .cal-dows{display:grid;grid-template-columns:repeat(7,26px);gap:3px;margin-bottom:4px;justify-content:center;}
 .cal-dow{width:26px;text-align:center;font-size:9px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.02em;}
 .cal-grid{display:grid;grid-template-columns:repeat(7,26px);gap:3px;justify-content:center;}
@@ -900,7 +1078,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
 .cal-dl-btn:hover{transform:translateY(-1px);}
 .cal-dl-note{margin-top:8px;width:100%;min-height:36px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);background:var(--surf2);border:1px dashed var(--border);border-radius:10px;padding:6px 8px;text-align:center;line-height:1.3;}
 .hl-azul{background:#0a513a;color:#fff;padding:1px 7px;border-radius:5px;font-weight:600;}
-.cal-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:rgba(255,255,255,.92);}
+.cal-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted);}
 .cal-legend span{display:inline-flex;align-items:center;gap:6px;}
 .cal-legend .lg-swatch{width:13px;height:13px;border-radius:4px;flex-shrink:0;}
 /* === Mi Registro — bloqueo por subscripción === */
@@ -1002,8 +1180,8 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
     <nav class="app-tabs" id="tabs-escuela">
       <button class="tab-btn active" onclick="switchTab('resumen',this)">Mi Perfil</button>
       <button class="tab-btn" onclick="switchTab('rubrica',this)">Mi Tenis</button>
+      <button class="tab-btn" onclick="switchTab('liga',this)">Mi Ranking</button>
       <button class="tab-btn" onclick="switchTab('historial',this)">Informes</button>
-      <button class="tab-btn" onclick="switchTab('liga',this)">Ranking</button>
     </nav>
     <nav class="app-tabs" id="tabs-torneos" style="display:none;">
       <button class="tab-btn active" onclick="switchTab('partidos',this)">🎾 Mis Partidos</button>
@@ -1047,12 +1225,12 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
   <header class="app-header coach-header">
     <div class="header-top">
       <button class="header-back" onclick="closeCoach()">← Volver</button>
-      <div class="header-player"><div class="header-name">🧢 Modo Profe <button class="info-i" onclick="openCoachInfo()" aria-label="Más información">i</button></div></div>
+      <div class="header-player"><div class="header-name">Modo Profe</div></div>
       <div style="width:60px;"></div>
     </div>
     <nav class="app-tabs" id="tabs-coach">
-      <button class="tab-btn active" onclick="switchCoachTab('resumen',this)">Mi Resumen</button>
-      <button class="tab-btn" onclick="switchCoachTab('planificacion',this)">Mi Planificación</button>
+      <button class="tab-btn active" onclick="switchCoachTab('resumen',this)">Resumen</button>
+      <button class="tab-btn" onclick="switchCoachTab('planificacion',this)">Planificación</button>
     </nav>
   </header>
   <main class="app-content">
@@ -1065,7 +1243,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
   <header class="app-header coach-header">
     <div class="header-top">
       <button class="header-back" onclick="closeCircuito()">← Volver</button>
-      <div class="header-player"><div class="header-name">🎾 Circuito interno</div></div>
+      <div class="header-player"><div class="header-name">🏆 Circuito interno</div></div>
       <div style="width:60px;"></div>
     </div>
     <nav class="app-tabs" id="tabs-circuito">
@@ -1137,12 +1315,38 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
   </div>
 </div>
 
+<div class="pin-overlay" id="foco-area-overlay" onclick="if(event.target===this)closeFocoArea()">
+  <div class="pin-modal" style="max-width:380px;">
+    <div class="pin-title">Área a reforzar</div>
+    <div id="foco-area-body" style="text-align:left;max-height:60vh;overflow-y:auto;margin-top:4px;"></div>
+    <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeFocoArea()">Entendido</button></div>
+  </div>
+</div>
+<div class="pin-overlay" id="foco-alum-overlay" onclick="if(event.target===this)closeFocoAlumnos()">
+  <div class="pin-modal" style="max-width:380px;">
+    <div class="pin-title">Alumnos para atender</div>
+    <div id="foco-alum-body" style="text-align:left;max-height:60vh;overflow-y:auto;margin-top:4px;"></div>
+    <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeFocoAlumnos()">Entendido</button></div>
+  </div>
+</div>
+<div class="pin-overlay" id="indice-info-overlay" onclick="if(event.target===this)closeIndiceInfo()">
+  <div class="pin-modal" style="max-width:340px;">
+    <div class="pin-title">¿Cómo se mide el índice?</div>
+    <div style="font-size:14px;color:var(--text);line-height:1.6;text-align:left;margin-top:4px;">
+      <p style="margin:0;">Escala <strong>1 a 3</strong> · promedio de las 4 áreas (Técnica, Táctica, Física y Mental).</p>
+    </div>
+    <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeIndiceInfo()">Entendido</button></div>
+  </div>
+</div>
 <div class="pin-overlay" id="rendimiento-info-overlay" onclick="if(event.target===this)closeRendInfo()">
   <div class="pin-modal" style="max-width:380px;">
     <div class="pin-title">Cómo se mide Mi Tenis</div>
     <div style="font-size:14px;color:var(--text);line-height:1.7;text-align:left;margin-top:4px;">
-      <p style="margin:0 0 12px;">Tu rendimiento se mide en <strong>3 niveles</strong>, sumá 👍 a medida que mejorás.</p>
-      <p style="margin:0;"><strong>Extra:</strong> Si hacés click en una habilidad <strong>Bien</strong> podés ver cómo seguir mejorando.</p>
+      <p style="margin:0 0 8px;">Tu rendimiento se mide teniendo en cuenta las <strong>4 áreas principales</strong> del tenis:</p>
+      <ul style="margin:0 0 10px;padding-left:20px;">
+        <li>Técnica</li><li>Táctica</li><li>Física</li><li>Mental</li>
+      </ul>
+      <p style="margin:0;">Los profes te observan y luego te ayudan a mejorar de nivel.</p>
     </div>
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeRendInfo()">Entendido</button></div>
   </div>
@@ -1168,7 +1372,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
 
 <div class="pin-overlay" id="liga-info-overlay">
   <div class="pin-modal" style="max-width:380px;">
-    <div class="pin-title">🏆 Cómo funciona el Ranking</div>
+    <div class="pin-title">🏆 Cómo funciona Mi Ranking</div>
     <div id="liga-info-body" style="font-size:13px;color:var(--text);line-height:1.6;text-align:left;"></div>
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeLigaInfo()">Entendido</button></div>
   </div>
@@ -1248,7 +1452,7 @@ const COL_DEFAULT = {
 };
 let COL = {...COL_DEFAULT};
 
-const INFO_DEFAULT = { alumno:0, brazo:1, altura:2, edad:3, categoria:4, objetivo:5, pin:6, subscripcion:7 };
+const INFO_DEFAULT = { alumno:0, brazo:1, altura:2, edad:3, categoria:4, objetivo:5, pin:6, subscripcion:7, estado:8 };
 let INFO = {...INFO_DEFAULT};
 const ASIST_DEFAULT = { fecha:0, jugador:1, cumplidas:2, objetivo:3, torneos:4 };
 let ASIST = {...ASIST_DEFAULT};
@@ -1342,7 +1546,8 @@ const INFO_ALIASES = {
   categoria:['categoria','categoría'],
   objetivo:['objetivo','objetivos'],
   pin:['pin','clave','codigo','código','contraseña','password'],
-  subscripcion:['subscripcion','subscripción','suscripcion','suscripción','subscription','membresia','membresía','registro','acceso registro']
+  subscripcion:['subscripcion','subscripción','suscripcion','suscripción','subscription','membresia','membresía','registro','acceso registro'],
+  estado:['estado','status','situación','situacion']
 };
 const ASIST_ALIASES = {
   fecha:['fecha','mes','marca temporal','periodo','período'],
@@ -1386,37 +1591,37 @@ const EV_ALIASES = {
 const RUBRICAS = {
   tecnica: [
     { key:'Drive_Preparacion', nombre:'Drive — Preparación',
-      desc:['Tarde o mecánica forzada bajo cualquier bola','Correcta en bolas cómodas, tardía bajo presión','Temprana y consistente en cualquier situación']},
+      desc:['Armado tarde del golpe','Correcta en bolas cómodas, tardía bajo presión','Armado a tiempo y bien hecho']},
     { key:'Drive_control', nombre:'Drive — Contacto y control',
-      desc:['Punto de impacto variable, errores no forzados frecuentes','Contacto estable en zona cómoda','Contacto sólido incluso en bolas difíciles']},
-    { key:'Drive_Direccion', nombre:'Drive — Dirección / profundidad',
-      desc:['Sin intención clara, cae corto o se va','Dirige en situación controlada','Usa el golpe con intención táctica en partido']},
+      desc:['Errores no forzados frecuentes','Controla en peloteo de fondo','Golpe sólido en bolas difíciles']},
+    { key:'Drive_Direccion', nombre:'Drive — Dirección',
+      desc:['Sin intención clara, bola corta o se va','Dirige la bola en situación controlada','Usa el golpe con intención táctica en partido']},
     { key:'Reves_Estabilidad', nombre:'Revés — Estabilidad',
-      desc:['Se abre o acorta el golpe cuando apuran','Estable en intercambio largo, falla en bola corta','Confiable como golpe de construcción en partido']},
-    { key:'Reves_slice', nombre:'Revés — Variante slice',
-      desc:['No la usa o solo como salida de emergencia','La usa para cambiar ritmo en situación cómoda','La incorpora tácticamente con control de altura y profundidad']},
+      desc:['Acorta el golpe cuando lo atacan','Estable en intercambio largo','Confiable como golpe de construcción en partido']},
+    { key:'Reves_slice', nombre:'Revés — Slice',
+      desc:['Usa slice como salida de emergencia','Lo usa para cambiar ritmo en situación cómoda','Lo incorpora tácticamente con control de altura y profundidad']},
     { key:'Saque_Primero', nombre:'Saque — Primer saque',
-      desc:['% bajo o sin dirección definida','Entra con regularidad pero sin variación','Dirige con intención, varía zona y velocidad']},
+      desc:['% bajo o sin dirección definida','Entra con regularidad pero sin variación','Dirige con intención y velocidad']},
     { key:'Saque_Segundo', nombre:'Saque — Segundo saque',
-      desc:['Defensivo y corto, invita al ataque','Consistente pero predecible','Con efecto y profundidad, no regala punto']},
+      desc:['Defensivo y corto, invita al ataque','Consistente pero predecible','Con efecto y profundidad, no regala el punto']},
     { key:'Volea_subida', nombre:'Volea — Decisión de subir',
-      desc:['No sube o sube sin timing correcto','Sube en situaciones obvias','Lee el punto y sube con propósito claro']},
+      desc:['Sube poco a la red','Sube en situaciones obvias','Lee el punto y sube con propósito claro']},
     { key:'Volea_Ejecucion', nombre:'Volea — Ejecución en red',
-      desc:['Pierde el punto por técnica (largo, a la red)','Devuelve pero sin terminar el punto','Cierra el punto con volea dirigida']}
+      desc:['No gana el punto en la red','Devuelve pero sin terminar el punto','Cierra el punto con volea dirigida']}
   ],
   tactica: [
     { key:'Punto', nombre:'Construcción del punto',
-      desc:['Golpea sin plan, reacciona solo','Patrón de 2–3 golpes en situación simple','Construye con variación de ritmo, dirección y profundidad']}
+      desc:['Golpea sin plan, reacciona al punto','Usa un patrón de 2 o 3 golpes en situación simple','Juega con estrategia clara']}
   ],
   fisico: [
-    { key:'Velocidad', nombre:'Velocidad / 1er paso',
+    { key:'Velocidad', nombre:'Velocidad',
       desc:['No llega a bolas que debería alcanzar','Llega pero sin tiempo para preparar el golpe','Llega con equilibrio y tiempo de preparación cómodo']},
     { key:'Resistencia', nombre:'Resistencia',
-      desc:['Errores no forzados aumentan notablemente en el 3er set','Mantiene nivel hasta el 2do set, cae al final','Igual o más intenso en sets largos; no pierde velocidad de golpe']}
+      desc:['Errores no forzados aumentan cuando el punto o set es largo','Mantiene buena energia durante los puntos','Saca un plus de energia cuando define los puntos']}
   ],
   mental: [
     { key:'Error', nombre:'Tolerancia al error',
-      desc:['Se cierra o cambia el juego tras 2 errores seguidos','Se recupera pero tarda 1–2 games en estabilizarse','Resetea entre puntos, sin arrastre emocional visible']},
+      desc:['Cambia su juego constantemente al errar sus golpes','Se recupera pero tarda en estabilizarse','Se resetea entre puntos rapidamente']},
     { key:'Actitud', nombre:'Actitud',
       desc:['Se frustra o se queja con frecuencia y le cuesta sostener una actitud positiva','Mantiene buena actitud cuando las cosas salen bien, pero decae ante la dificultad','Sostiene una actitud positiva y de compromiso durante toda la sesión, incluso en los momentos difíciles']}
   ]
@@ -1462,11 +1667,12 @@ const RESUMEN_GROUPS = {
 // ══════════════════════════════════════
 // ESTADO GLOBAL
 // ══════════════════════════════════════
-let allRows=[], infoRows=[], asistRows=[], videoRows=[], currentPlayer=null, playerSessions=[], charts={}, selectedMonth='all', coachCat=[];
+let allRows=[], infoRows=[], asistRows=[], videoRows=[], currentPlayer=null, playerSessions=[], charts={}, selectedMonth='all', coachCat=[], radarRange='30d', golpesRange='3m';
 let appMode='escuela'; // 'escuela' | 'torneos'
 let ligaView='mensual'; // 'mensual' | 'anual' (Mi Ranking)
 let adultRows=[], matchRows=[], eventRows=[], circuitoCat='all';
 let circuitoTab='torneos', circuitoPlayer=null;
+let coachSort='rendimiento';
 let __pendingCircuito=null, __circuitoUnlocked=new Set();
 let planRows=[], planHeader=[], planFilters={golpe:'all', categoria:'all', nivel:'all', q:''};
 
@@ -1593,6 +1799,19 @@ function isSubscribed(name){
   const v=(info[INFO.subscripcion]!=null?String(info[INFO.subscripcion]):'').trim().toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   return v!=='no';
+}
+
+// Alumno visible en rankings/selectores: columna "estado" en la hoja informacion.
+// Vacío, "Activo" o "Pausa" => se sigue mostrando (con su rendimiento y asistencia
+// tal como quedaron hasta su último registro; un alumno en pausa cumplió hasta ese día).
+// Solo "Baja" lo saca de rankings, selectores y conteos, sin borrar su historial en la planilla.
+function isAlumnoActivo(name){
+  if(INFO.estado==null || INFO.estado<0) return true; // sin columna => no filtrar
+  const info=getInfo(name);
+  if(!info) return true;
+  const v=(info[INFO.estado]!=null?String(info[INFO.estado]):'').trim().toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g,'');
+  return v!=='baja';
 }
 
 // Promedio de nivel para un array de keys en una sola sesión
@@ -1785,7 +2004,7 @@ function renderPlayers(){
     }).join('');
     return;
   }
-  const players=[...new Set(allRows.map(r=>r[COL.alumno]))].filter(Boolean);
+  const players=[...new Set(allRows.map(r=>r[COL.alumno]))].filter(Boolean).filter(isAlumnoActivo);
   if(!players.length){ grid.innerHTML='<div class="loading-state">No hay jugadores cargados.</div>'; return; }
   const catOf=p=>{ const i=getInfo(p); return i?(i[INFO.categoria]||'').trim():''; };
   // Agrupar por categoría
@@ -1858,6 +2077,7 @@ async function init(){
 // SELECT PLAYER
 // ══════════════════════════════════════
 let __pendingPlayer=null, __pinMode='player';
+let __pendingPreview=null;
 function selectPlayer(name){
   const info = appMode==='torneos' ? getAdultInfo(name) : getInfo(name);
   const pinCol = appMode==='torneos' ? ADULT.pin : INFO.pin;
@@ -1877,6 +2097,11 @@ function closePin(){ document.getElementById('pin-overlay').classList.remove('sh
   if(__pendingCircuito){ __pendingCircuito=null; circuitoPlayer=null; if(circuitoTab==='jugadores') buildCircuitoJugadores(); } }
 function submitPin(){
   const val=(document.getElementById('pin-input').value||'').trim();
+  if(__pinMode==='preview'){
+    if(val===coachPin()){ document.getElementById('pin-overlay').classList.remove('show'); const _pp=__pendingPreview; __pendingPreview=null; if(_pp) downloadMonthReport(_pp.name,_pp.mk); }
+    else { document.getElementById('pin-err').textContent='PIN incorrecto. Probá de nuevo.'; }
+    return;
+  }
   if(__pinMode==='coach'){
     if(val===coachPin()){ document.getElementById('pin-overlay').classList.remove('show'); openCoachView(); }
     else { document.getElementById('pin-err').textContent='PIN incorrecto. Probá de nuevo.'; }
@@ -1947,11 +2172,19 @@ function goBack(){
   document.getElementById('app').classList.remove('visible');
   saveNav();
 }
+function playerCurrentMonth(){
+  const ms=[...new Set(allRows.filter(r=>r[COL.alumno]===currentPlayer).map(monthKey).filter(Boolean))].sort();
+  const now=new Date(); const cmk=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  return ms.includes(cmk)?cmk:(ms[ms.length-1]||'all');
+}
 function switchTab(id,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.tab-view').forEach(v=>v.classList.remove('active'));
-  btn.classList.add('active');
+  if(btn) btn.classList.add('active');
   document.getElementById('tab-'+id).classList.add('active');
+  // Defaults de filtro por pestaña: Informes -> Todos · Mi Tenis -> mes actual
+  if(id==='historial'){ if(selectedMonth!=='all'){ selectedMonth='all'; try{buildHistorial();}catch(e){} } }
+  else if(id==='rubrica'){ const cm=playerCurrentMonth(); if(selectedMonth!==cm){ selectedMonth=cm; try{buildRubrica();}catch(e){} } }
   saveNav();
 }
 function toggleAcc(head){
@@ -1999,6 +2232,12 @@ function openAppInfo(){ const ov=document.getElementById('app-info-overlay'); if
 function closeAppInfo(){ const ov=document.getElementById('app-info-overlay'); if(ov) ov.classList.remove('show'); }
 function openTorneosInfo(){ const ov=document.getElementById('torneos-info-overlay'); if(ov) ov.classList.add('show'); }
 function closeTorneosInfo(){ const ov=document.getElementById('torneos-info-overlay'); if(ov) ov.classList.remove('show'); }
+function openFocoArea(){ const o=document.getElementById('foco-area-overlay'); if(o) o.classList.add('show'); }
+function closeFocoArea(){ const o=document.getElementById('foco-area-overlay'); if(o) o.classList.remove('show'); }
+function openFocoAlumnos(){ const o=document.getElementById('foco-alum-overlay'); if(o) o.classList.add('show'); }
+function closeFocoAlumnos(){ const o=document.getElementById('foco-alum-overlay'); if(o) o.classList.remove('show'); }
+function openIndiceInfo(){ const o=document.getElementById('indice-info-overlay'); if(o) o.classList.add('show'); }
+function closeIndiceInfo(){ const o=document.getElementById('indice-info-overlay'); if(o) o.classList.remove('show'); }
 function openRendInfo(){ const ov=document.getElementById('rendimiento-info-overlay'); if(ov) ov.classList.add('show'); }
 function closeRendInfo(){ const ov=document.getElementById('rendimiento-info-overlay'); if(ov) ov.classList.remove('show'); }
 function openRegistroInfo(){ const ov=document.getElementById('registro-info-overlay'); if(ov) ov.classList.add('show'); }
@@ -2219,6 +2458,7 @@ function openCoachView(){
 }
 function closeCoach(){ document.getElementById('coach').classList.remove('visible'); document.getElementById('landing').style.display=''; resetLanding(); saveNav(); }
 function setMonthCoach(m){ selectedMonth=m; buildCoach(); saveNav(); }
+function setCoachSort(s){ coachSort=s; try{buildCoach();}catch(e){} saveNav(); }
 function setCatCoach(c){
   if(c==='all'){ coachCat=[]; }
   else { const i=coachCat.indexOf(c); if(i>=0) coachCat.splice(i,1); else coachCat.push(c); }
@@ -2297,12 +2537,11 @@ function buildCoachPlanificacion(){
     return;
   }
   const filters=`<div class="plan-filters">
-      <input class="plan-search" type="search" placeholder="🔎 Buscar actividad…" value="${(planFilters.q||'').replace(/"/g,'&quot;')}" oninput="setPlanSearch(this.value)">
       ${planFilterAcc('golpe','Golpe','🎾')}
       ${planFilterAcc('categoria','Categoría','🏷️')}
       ${planFilterAcc('nivel','Nivel','📶')}
     </div>`;
-  el.innerHTML=`<div class="cz-h">📋 Actividades para planificar clases</div>${filters}<div class="plan-count" id="plan-count"></div><div id="plan-list-wrap"></div>`;
+  el.innerHTML=`${filters}<div class="plan-count" id="plan-count"></div><div id="plan-list-wrap"></div>`;
   renderPlanList();
 }
 // ══════════════════════════════════════
@@ -2490,9 +2729,9 @@ function buildCircuitoTorneos(){
   </div>`;
 
   const cards = `<div class="metrics-row cz-kpis">
-    <div class="metric-card"><div class="mc-label">🏆 Torneos disputados</div><div class="mc-value">${totT}</div>${delta(kT(curM),prevM?kT(prevM):0)}</div>
+    <div class="metric-card"><div class="mc-label">🏆 Torneos</div><div class="mc-value">${totT}</div>${delta(kT(curM),prevM?kT(prevM):0)}</div>
     <div class="metric-card"><div class="mc-label">🎾 Partidos jugados</div><div class="mc-value">${totM}</div>${delta(kM(curM),prevM?kM(prevM):0)}</div>
-    <div class="metric-card"><div class="mc-label">👥 Jugadores activos</div><div class="mc-value">${totP}</div>${delta(kP(curM),prevM?kP(prevM):0)}</div>
+    <div class="metric-card"><div class="mc-label">👥 Jugadores</div><div class="mc-value">${totP}</div>${delta(kP(curM),prevM?kP(prevM):0)}</div>
     ${nextCard}
   </div>`;
 
@@ -2573,7 +2812,7 @@ function buildCircuitoJugadores(){
 
 function buildCoach(){
   const el=document.getElementById('coach-content');
-  let players=[...new Set(allRows.map(r=>r[COL.alumno]))].filter(Boolean).sort();
+  let players=[...new Set(allRows.map(r=>r[COL.alumno]))].filter(Boolean).filter(isAlumnoActivo).sort();
   if(!players.length){ el.innerHTML='<div class="empty">No hay jugadores cargados.</div>'; return; }
   const _MES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']; const mLabelFull=(key)=>{ if(!key) return ''; const a=key.split('-'); const nm=_MES[Number(a[1])-1]||''; return (nm.charAt(0).toUpperCase()+nm.slice(1))+' '+a[0]; };
   const catOf=p=>{ const i=getInfo(p); return i?(i[INFO.categoria]||'').trim():''; };
@@ -2599,18 +2838,67 @@ function buildCoach(){
 
   const data=players.map(p=>{
     const cur=lastInMonth(p,curMonth);
-    const av={}; areas.forEach(a=>av[a]=cur?avgLvlKeys(cur,AREA_KEYS[a]):0);
+    const av={}; areas.forEach(a=>av[a]=areaAvgScope(p,curMonth,a));
     const tv=areas.map(a=>av[a]).filter(v=>v>0); const overall=tv.length?tv.reduce((x,y)=>x+y,0)/tv.length:0;
+    let prevOverall=0; if(prevMonth){ const pv=areas.map(a=>areaAvgScope(p,prevMonth,a)).filter(v=>v>0); prevOverall=pv.length?pv.reduce((x,y)=>x+y,0)/pv.length:0; }
     const obs=cur&&(cur[COL.obs_profe]||'').trim()!=='';
-    return {p, av, overall, obs, at:attendanceFor(p,curMonth)};
+    const _avAct=sessionsOf(p).filter(s=>monthKey(s)===curMonth).map(s=>toLvl(s[COL.Actitud])).filter(v=>v>0);
+    const actLvl=_avAct.length?Math.round(_avAct.reduce((x,y)=>x+y,0)/_avAct.length):0;
+    return {p, av, overall, prevOverall, obs, actLvl, at:attendanceFor(p,curMonth)};
   });
   const cAvg={}; areas.forEach(a=>{ const v=data.map(d=>d.av[a]).filter(x=>x>0); cAvg[a]=v.length?v.reduce((x,y)=>x+y,0)/v.length:0; });
   const ctv=areas.map(a=>cAvg[a]).filter(v=>v>0); const cTot=ctv.length?ctv.reduce((x,y)=>x+y,0)/ctv.length:0;
+  const _areaNom={tecnica:'Técnica',tactica:'Táctica',fisico:'Físico',mental:'Mental'};
+  const droppedOf=d=>(prevMonth && d.overall>0 && d.prevOverall>0 && Math.round(d.overall)<Math.round(d.prevOverall));
+  // La asistencia solo se evalúa en "Atención" a partir del día 15 del mes en curso real
+  // (antes de esa fecha el mes recién empieza y la asistencia todavía no es representativa).
+  // En meses ya cerrados/pasados esta restricción no aplica: se evalúa completo.
+  const _nowReal=new Date();
+  const _todayMkReal=_nowReal.getFullYear()+'-'+String(_nowReal.getMonth()+1).padStart(2,'0');
+  const _evalAsistencia = !(curMonth===_todayMkReal && _nowReal.getDate()<15);
+  const atRiskOf=d=>((_evalAsistencia && d.at && d.at.pct<50) || droppedOf(d) || (d.actLvl===1));
+  let _weakArea='', _weakVal=99; areas.forEach(a=>{ if(cAvg[a]>0 && cAvg[a]<_weakVal){ _weakVal=cAvg[a]; _weakArea=a; } });
+  const _lowAttN=data.filter(d=>d.at && d.at.pct<50).length;
+  const _dropN=data.filter(droppedOf).length;
+  const _prevShortC=prevMonth?mLabelFull(prevMonth).split(' ')[0]:'';
+  const _weakGroups=_weakArea?(RESUMEN_GROUPS[_weakArea]||[]).map(g=>{
+    const vals=players.map(p=>{ const ss=sessionsOf(p).filter(s=>monthKey(s)===curMonth); const vv=ss.map(s=>avgLvlKeys(s,g.keys)).filter(x=>x>0); return vv.length?vv.reduce((x,y)=>x+y,0)/vv.length:0; }).filter(x=>x>0);
+    const avg=vals.length?vals.reduce((x,y)=>x+y,0)/vals.length:0; return {nombre:g.nombre, avg};
+  }).filter(g=>g.avg>0).sort((a,b)=>a.avg-b.avg):[];
+  const _riskList=data.filter(atRiskOf).map(d=>{ const rs=[]; if(_evalAsistencia && d.at&&d.at.pct<50) rs.push('Asistencia '+d.at.pct+'%'); if(droppedOf(d)) rs.push('Bajó de nivel'); if(d.actLvl===1) rs.push('Actitud baja'); return {name:d.p, rs:rs.join(' · ')}; });
+  const _atendN=_riskList.length;
+  const foco2=`<div class="foco2">
+    <button class="foco2-card" onclick="openFocoArea()">
+      <span class="foco2-ic" style="color:#0d5230;">🎯</span>
+      <span class="foco2-tx"><span class="foco2-lbl">Área a reforzar</span><span class="foco2-val">${_weakArea?_areaNom[_weakArea]+' · '+_weakVal.toFixed(1):'—'}</span></span>
+      <span class="foco2-chev">›</span>
+    </button>
+    <button class="foco2-card" onclick="openFocoAlumnos()">
+      <span class="foco2-ic" style="color:#dc2626;">⚠️</span>
+      <span class="foco2-tx"><span class="foco2-lbl">Atención</span><span class="foco2-val" style="color:${_atendN?'#dc2626':'#16a34a'};">${_atendN} ${_atendN===1?'alumno':'alumnos'}</span></span>
+      <span class="foco2-chev">›</span>
+    </button>
+  </div>`;
+  const _pcAvg={}; if(prevMonth){ areas.forEach(a=>{ const v=players.map(p=>areaAvgScope(p,prevMonth,a)).filter(x=>x>0); _pcAvg[a]=v.length?v.reduce((x,y)=>x+y,0)/v.length:0; }); }
+  const _lvlBar=v=> v<1.5?'#ffde59' : v<=2.5?'#a0b834' : '#148f67';
+  const _areaRows=areas.map(a=>{
+    const v=cAvg[a]||0, pv=_pcAvg[a]||0; const w=Math.max(4,Math.min(100,(v/3)*100));
+    const dd=(prevMonth && v>0 && pv>0)?(v-pv):null;
+    const tA=dd===null?'':(dd>=0.05?'↑':dd<=-0.05?'↓':'='); const tC=dd===null?'#9aaa9a':(dd>=0.05?'#16a34a':dd<=-0.05?'#dc2626':'#6b8a76');
+    return `<div class="ag-row"><span class="ag-name">${_areaNom[a]}</span><div class="ag-bar"><i style="width:${w}%;background:${_lvlBar(v)};"></i></div><span class="ag-val">${v>0?v.toFixed(1):'—'}</span><span class="ag-trend" style="color:${tC};">${tA}${dd!==null?(dd>=0?'+':'')+dd.toFixed(1):''}</span></div>`;
+  }).join('');
+  const areasCard=`<div class="card cz-areas"><div class="card-title">Áreas del grupo</div>${_areaRows}</div>`;
+  const _focoAreaBody = _weakArea
+    ? `<p style="margin:0 0 10px;color:var(--muted);font-size:12px;">El área más floja del grupo es <strong style="color:#0a513a;">${_areaNom[_weakArea]}</strong> (${_weakVal.toFixed(1)}/3). Habilidades a mejorar:</p>`+(_weakGroups.length?_weakGroups.map(g=>{const lv=Math.round(g.avg)||1;return `<div class="fk-row"><span>${g.nombre}</span><span class="fk-lvl lb${lv}">${lvlLabel(lv)} · ${g.avg.toFixed(1)}</span></div>`;}).join(''):'<div class="empty" style="color:var(--muted);">Sin datos de habilidades este mes.</div>')
+    : '<div class="empty" style="color:var(--muted);">Sin datos suficientes este mes.</div>';
+  const _focoAlumBody = _riskList.length
+    ? _riskList.map(r=>`<div class="fk-row"><span>${r.name}</span><span style="font-size:11px;color:#dc2626;font-weight:700;">${r.rs}</span></div>`).join('')
+    : '<div class="empty" style="color:#16a34a;">¡Ningún alumno requiere atención este mes!</div>';
   const obsCur=data.filter(d=>d.obs).length;
 
   let pAvg={}, pTot=0, obsPrev=0;
   if(prevMonth){
-    const pd=players.map(p=>{ const s=lastInMonth(p,prevMonth); const av={}; areas.forEach(a=>av[a]=s?avgLvlKeys(s,AREA_KEYS[a]):0); return {av, obs:s&&(s[COL.obs_profe]||'').trim()!==''}; });
+    const pd=players.map(p=>{ const s=lastInMonth(p,prevMonth); const av={}; areas.forEach(a=>av[a]=areaAvgScope(p,prevMonth,a)); return {av, obs:s&&(s[COL.obs_profe]||'').trim()!==''}; });
     areas.forEach(a=>{ const v=pd.map(d=>d.av[a]).filter(x=>x>0); pAvg[a]=v.length?v.reduce((x,y)=>x+y,0)/v.length:0; });
     const ptv=areas.map(a=>pAvg[a]).filter(v=>v>0); pTot=ptv.length?ptv.reduce((x,y)=>x+y,0)/ptv.length:0;
     obsPrev=pd.filter(d=>d.obs).length;
@@ -2666,18 +2954,27 @@ function buildCoach(){
     if(!actByCat[ct] || lv>actByCat[ct].lv){ actByCat[ct]={name:d.p, lv}; }
   });
   const actLeaderSet=new Set(Object.values(actByCat).map(x=>x.name));
-  const studRows=data.slice().sort((a,b)=>b.overall-a.overall).map((d,i)=>{
+  const _sorted=data.slice();
+  if(coachSort==='atencion'){
+    _sorted.sort((a,b)=>{ const ra=atRiskOf(a)?0:1, rb=atRiskOf(b)?0:1; if(ra!==rb) return ra-rb; const pa=a.at?a.at.pct:999, pb=b.at?b.at.pct:999; if(pa!==pb) return pa-pb; return a.overall-b.overall; });
+  } else { _sorted.sort((a,b)=>b.overall-a.overall); }
+  const studRows=_sorted.map((d,i)=>{
     const a=d.at;
-    return `<div class="cz-row">
+    const dd=(prevMonth && d.overall>0 && d.prevOverall>0)?(d.overall-d.prevOverall):null;
+    const tArrow=dd===null?'':(dd>=0.05?'↑':dd<=-0.05?'↓':'=');
+    const tCol=dd===null?'#9aaa9a':(dd>=0.05?'#16a34a':dd<=-0.05?'#dc2626':'#6b8a76');
+    const tTxt=dd===null?'Nuevo':((dd>=0?'+':'')+dd.toFixed(1)+(_prevShortC?' vs '+_prevShortC:''));
+    const risk=atRiskOf(d);
+    return `<div class="cz-row${risk?' cz-risk':''}">
       <div class="cz-rank">${i+1}</div>
       <div class="cz-av" style="background:${avatarColor(d.p)};"></div>
       <div class="cz-name-cell">
-        <div class="cz-name">${d.p}</div>
-        ${actLeaderSet.has(d.p)?'<div class="cz-act-tag">🏅 Jugador con más actitud del mes</div>':''}
+        <div class="cz-name"><span class="cz-name-txt">${d.p}</span>${risk?'<span class="cz-att-chip">Atención</span>':''}</div>
+        <div class="cz-trend" style="color:${tCol};">${tArrow} ${tTxt}</div>
       </div>
       <div class="cz-ind">
         <div class="cz-ind-row"><span class="cz-ind-lbl">Promedio</span><span class="cz-ind-val">${d.overall>0?d.overall.toFixed(1):'—'}<span>/3</span></span></div>
-        <div class="cz-ind-row"><span class="cz-ind-lbl">Asistencia</span><span class="cz-ind-val cz-ind-val-sm ${a?(a.met?'ok':'low'):''}">${a?a.pct+'%':'—'}</span></div>
+        <div class="cz-ind-row"><span class="cz-ind-lbl">Asistencia</span><span class="cz-ind-val cz-ind-val-sm" style="color:${a?(a.pct<50?'#dc2626':a.pct<=80?'#e0a200':'#16a34a'):'inherit'};">${a?a.pct+'%':'—'}</span></div>
       </div>
     </div>`;
   }).join('');
@@ -2689,13 +2986,18 @@ function buildCoach(){
   const hexA=(h,a)=>{const n=(h||'').replace('#','');const r=parseInt(n.slice(0,2),16)||0,g=parseInt(n.slice(2,4),16)||0,b=parseInt(n.slice(4,6),16)||0;return 'rgba('+r+','+g+','+b+','+a+')';};
   const catData=cats.map((ct,i)=>{
     const studs=allPlayersList.filter(p=>catOf(p)===ct);
-    const dd=areas.map(a=>{ const vals=studs.map(p=>{const s=lastInMonth(p,curMonth); return s?avgLvlKeys(s,AREA_KEYS[a]):0;}).filter(v=>v>0); return vals.length?vals.reduce((x,y)=>x+y,0)/vals.length:0; });
+    const dd=areas.map(a=>{ const vals=studs.map(p=>areaAvgScope(p,curMonth,a)).filter(v=>v>0); return vals.length?vals.reduce((x,y)=>x+y,0)/vals.length:0; });
     return {label:ct, data:dd, color:catColorHex(ct,i)};
   });
 
   const asistCard = `<div class="card"><div class="card-title">Asistencia del mes</div>${withAt.length?`<div class="cz-asist"><div class="cz-stat"><div class="cz-stat-val">${genPct}%</div><div class="cz-stat-lbl">Asistencia general</div></div><div class="cz-stat"><div class="cz-stat-val">${metN}<span> / ${withAt.length}</span></div><div class="cz-stat-lbl">Cumplieron su objetivo</div></div></div>`:'<div class="nota" style="margin:0;">Sin datos de asistencia para este mes.</div>'}</div>`;
   // KPIs del mes en curso + variación vs mes anterior
-  const studsInMonth=mk=> mk? players.filter(p=>allRows.some(r=>r[COL.alumno]===p && monthKey(r)===mk)).length : 0;
+  // "Alumnos" ahora se calcula desde la hoja Asistencia: alumnos con al menos 1 sesión registrada ese mes.
+  const studsInMonth=mk=>{
+    if(!mk) return 0;
+    const withSes=new Set(asistRows.filter(r=>ymKey(r[ASIST.fecha])===mk && n(r[ASIST.cumplidas])>=1).map(r=>(r[ASIST.jugador]||'').trim()));
+    return players.filter(p=>withSes.has(p)).length;
+  };
   const _alCur=studsInMonth(curMonth), _alPrev=prevMonth?studsInMonth(prevMonth):0;
   const asistPctOf=mk=>{ if(!mk) return null; let c=0,o=0; players.forEach(p=>{const a=attendanceFor(p,mk); if(a){c+=a.cumplidas; o+=a.objetivo;}}); return o>0?Math.round(c/o*100):null; };
   const _asPrev=prevMonth?asistPctOf(prevMonth):null;
@@ -2722,14 +3024,19 @@ function buildCoach(){
       <div class="ph-ix-sub">${curMonth?mLabelFull(curMonth):''}</div>
     </div>
   </div>`;
+  const _rankCard=`<div class="acc cz-rank-acc" style="margin-top:14px;"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">🏆 Ranking de alumnos · ${players.length}</span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="cz-rank-scroll">${studRows||'<div class="empty" style="color:var(--muted);">Sin alumnos en este filtro.</div>'}</div></div></div></div>`;
+  const _radarAcc=`<div class="acc evo-acc" style="margin-top:14px;">
+    <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📊 Comparación por categoría${curMonth?' · '+mLabelFull(curMonth):''}</span><span class="acc-chevron">▾</span></div>
+    <div class="acc-body"><div class="acc-body-inner"><div class="chart-wrap" style="height:320px;margin-top:6px;"><canvas id="ch-coach-radar"></canvas></div></div></div>
+  </div>`;
   el.innerHTML = `<div class="cz-filters">${monthChips}${catChips}</div>`
     + coachHero
-    + `<div class="metrics-row">${areaCards}</div>`
-    + `<div class="cz-bottom">
-        <div class="card cz-radar"><div class="card-title">Comparación por categoría${curMonth?' · '+mLabelFull(curMonth):''}</div><div class="chart-wrap" style="height:320px;margin-top:10px;"><canvas id="ch-coach-radar"></canvas></div></div>
-        <div class="card cz-rank-card"><div class="card-title">Ranking de alumnos · ${players.length}</div><div class="cz-rank-scroll">${studRows||'<div class="empty" style="color:var(--muted);">Sin alumnos en este filtro.</div>'}</div></div>
-      </div>`
-    ;
+    + foco2
+    + areasCard
+    + _rankCard
+    + _radarAcc;
+  { const _fab=document.getElementById('foco-area-body'); if(_fab) _fab.innerHTML=_focoAreaBody;
+    const _flb=document.getElementById('foco-alum-body'); if(_flb) _flb.innerHTML=_focoAlumBody; }
   if(charts['coachRadar']){ try{charts['coachRadar'].destroy();}catch(e){} }
   const _cv=document.getElementById('ch-coach-radar');
   if(_cv && catData.length){
@@ -2777,6 +3084,58 @@ function monthLabel(key){
 function areaAvgForSessions(list, areaId){
   const v=list.map(s=>avgLvlKeys(s,AREA_KEYS[areaId])).filter(x=>x>0);
   return v.length? v.reduce((a,b)=>a+b,0)/v.length : 0;
+}
+
+const AREA_COL={tecnica:'#0a513a',tactica:'#e0a200',fisico:'#16a34a',mental:'#d6336c'};
+// Desempeño general — umbrales: BIEN <1.7 · MUY BIEN 1.7-2.3 · EXCELENTE >2.3
+function desempenoNivel(o){
+  if(o>2.5) return {lbl:'EXCELENTE', msg:'Gran mes de trabajo. ¡A sostenerlo!', bg:'#148f67', txt:'#161616', col:'#148f67', colLight:'#148f67', thumbs:3};
+  if(o>=1.5) return {lbl:'MUY BIEN', msg:'Buen mes de trabajo. Vamos por más.', bg:'#a0b834', txt:'#161616', col:'#a0b834', colLight:'#a0b834', thumbs:2};
+  return {lbl:'BIEN', msg:'Seguimos sumando, paso a paso.', bg:'#ffde59', txt:'#161616', col:'#ffde59', colLight:'#ffde59', thumbs:1};
+}
+function _smoothPath(pts){
+  if(pts.length<2) return '';
+  let d='M'+pts[0][0].toFixed(1)+','+pts[0][1].toFixed(1);
+  for(let i=0;i<pts.length-1;i++){
+    const p0=pts[i-1]||pts[i], p1=pts[i], p2=pts[i+1], p3=pts[i+2]||p2;
+    const c1x=p1[0]+(p2[0]-p0[0])/6, c1y=p1[1]+(p2[1]-p0[1])/6;
+    const c2x=p2[0]-(p3[0]-p1[0])/6, c2y=p2[1]-(p3[1]-p1[1])/6;
+    d+=' C'+c1x.toFixed(1)+','+c1y.toFixed(1)+' '+c2x.toFixed(1)+','+c2y.toFixed(1)+' '+p2[0].toFixed(1)+','+p2[1].toFixed(1);
+  }
+  return d;
+}
+function areaSparkline(values,color,gid,maxVal){
+  const vals=(values||[]).filter(v=>v!=null && !isNaN(v));
+  if(vals.length<2) return '';
+  const mx=maxVal||3;
+  const W=150,H=44,pad=4, n=vals.length;
+  const pts=vals.map((v,i)=>[(i/(n-1))*W, H-pad-((v)/(mx))*(H-2*pad)]);
+  const line=_smoothPath(pts);
+  const fill=line+' L'+W+','+H+' L0,'+H+' Z';
+  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" class="area-spark"><defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+color+'" stop-opacity="0.30"/><stop offset="100%" stop-color="'+color+'" stop-opacity="0"/></linearGradient></defs><path d="'+fill+'" fill="url(#'+gid+')"/><path d="'+line+'" fill="none" stroke="'+color+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+function donutSVG(pct,color){
+  pct=Math.max(0,Math.min(100,pct||0));
+  const R=30, C=2*Math.PI*R, dash=(pct/100*C);
+  return '<svg viewBox="0 0 76 76" class="asist-donut"><circle cx="38" cy="38" r="'+R+'" fill="none" stroke="#e4ece0" stroke-width="9"/><circle cx="38" cy="38" r="'+R+'" fill="none" stroke="'+color+'" stroke-width="9" stroke-linecap="round" stroke-dasharray="'+dash.toFixed(1)+' '+C.toFixed(1)+'" transform="rotate(-90 38 38)"/><text x="38" y="43" text-anchor="middle" font-size="17" font-weight="900" fill="'+color+'">'+Math.round(pct)+'%</text></svg>';
+}
+function attBarsSVG(series,color){
+  if(!series||!series.length) return '';
+  const n=series.length, H=98, padB=18, padT=10, gap=10;
+  const bw=Math.min(28,Math.max(12,170/n));
+  const W=gap+n*(bw+gap);
+  const maxV=Math.max(1,...series.map(s=>Math.max(s.val||0,s.obj||0)));
+  const chartH=H-padB-padT;
+  let out='<line x1="0" y1="'+(padT+chartH)+'" x2="'+W+'" y2="'+(padT+chartH)+'" stroke="#e4ece0" stroke-width="1"/>';
+  series.forEach((s,i)=>{
+    const x=gap+i*(bw+gap);
+    const objH=s.obj?(s.obj/maxV)*chartH:0, valH=(s.val/maxV)*chartH;
+    if(s.obj) out+='<rect x="'+x+'" y="'+(padT+chartH-objH)+'" width="'+bw+'" height="'+objH+'" rx="3" fill="'+color+'" opacity="0.13"/>';
+    out+='<rect x="'+x+'" y="'+(padT+chartH-valH)+'" width="'+bw+'" height="'+Math.max(0,valH)+'" rx="3" fill="'+color+'"/>';
+    out+='<text x="'+(x+bw/2)+'" y="'+(padT+chartH-valH-3)+'" text-anchor="middle" font-size="9" font-weight="800" fill="'+color+'">'+s.val+'</text>';
+    out+='<text x="'+(x+bw/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="8.5" fill="#9aaa9a">'+s.m+'</text>';
+  });
+  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet" class="asist-bars-svg">'+out+'</svg>';
 }
 function idealText(hex){
   if(!hex||hex[0]!=='#'||hex.length<7) return '#fff';
@@ -2865,21 +3224,7 @@ function buildResumen(){
   const curAvgs={}, prevAvgs={};
   areas.forEach(a=>{ curAvgs[a.id]=areaAvgForSessions(curSess,a.id); prevAvgs[a.id]=areaAvgForSessions(prevSess,a.id); });
 
-  const cards=areas.map(a=>{
-    const v=curAvgs[a.id], pv=prevAvgs[a.id];
-    const d=(prevMonth&&v>0&&pv>0)?(v-pv):null;
-    const deltaHTML = d===null ? `<div class="mc-delta flat">—</div>`
-      : (d>=0.05?`<div class="mc-delta up">↑ +${d.toFixed(1)} vs ${prevLbl}</div>`
-        :d<=-0.05?`<div class="mc-delta down">↓ ${d.toFixed(1)} vs ${prevLbl}</div>`
-        :`<div class="mc-delta flat">= vs ${prevLbl}</div>`);
-    const cat=bench?(bench['avg_'+a.id]||0):0;
-    return `<div class="metric-card">
-      <div class="mc-head"><div class="mc-label">${AREA_META[a.id].emoji} ${a.nombre}</div>${tipBtn(TIPS[a.id])}</div>
-      <div class="mc-value">${v>0?`${v.toFixed(1)}<span class="mc-max"> / 3</span>`:'—'}</div>
-      ${deltaHTML}
-      ${cat>0?`<div class="mc-cat">Cat.: ${cat.toFixed(1)}</div>`:''}
-    </div>`;
-  }).join('');
+  // (las cards de área se muestran ahora en la pestaña Mi Tenis)
 
   const totVals=areas.map(a=>curAvgs[a.id]).filter(v=>v>0);
   const tot=totVals.length?totVals.reduce((x,y)=>x+y,0)/totVals.length:0;
@@ -2889,16 +3234,7 @@ function buildResumen(){
     <div class="mc-cat">${monthLabel(curMonth)} · ${curSess.length} ses.</div>
   </div>`;
 
-  const radarHTML=`<div class="acc evo-acc">
-    <div class="acc-head" onclick="toggleAcc(this)">
-      <span class="acc-title">📊 Evaluación de mi Perfil</span>
-      <span class="acc-chevron">▾</span>
-    </div>
-    <div class="acc-body"><div class="acc-body-inner">
-      <div class="radar-sub">Perfil — ${monthLabel(curMonth)}${prevMonth?` vs ${prevLbl}`:''}</div>
-      <div class="chart-wrap" style="height:380px;"><canvas id="ch-radar"></canvas></div>
-    </div></div>
-  </div>`;
+
 
   const at=attendanceFor(currentPlayer, curMonth);
   let asistHTML='';
@@ -2926,145 +3262,274 @@ function buildResumen(){
     (info&&info[INFO.brazo])?['Brazo hábil', info[INFO.brazo]]:null,
     (info&&info[INFO.altura])?['Altura', info[INFO.altura]]:null,
     (info&&info[INFO.edad])?['Edad', info[INFO.edad]+' años']:null,
-    at?['Asistencia', `${at.cumplidas|0}/${at.objetivo|0} · ${at.pct}%`]:null
-  ].filter(Boolean).map(it=>`<div class="ph-it"><label>${it[0]}</label><span>${it[1]}</span></div>`).join('');
+    (info&&info[INFO.objetivo])?['Objetivo', info[INFO.objetivo], true]:null
+  ].filter(Boolean).map(it=>`<div class="ph-it${it[2]?' ph-it-obj':''}"><label>${it[0]}</label><span>${it[1]}</span></div>`).join('');
   const heroObj = (info&&info[INFO.objetivo])?`<div class="ph-obj"><label>Objetivo</label><span>${info[INFO.objetivo]}</span></div>`:'';
-  const perfilHero = `<div class="perfil-hero">
-    <div class="ph-info">
-      <div class="ph-name">${currentPlayer}</div>
-      ${heroCat}
-      <div class="ph-grid">${heroItems}</div>
-      ${heroObj}
-    </div>
-    <div class="ph-ix">
-      <div class="ph-ix-lbl">Índice general del mes</div>
-      <div class="ph-gauge">
-        <svg viewBox="0 0 112 112"><circle cx="56" cy="56" r="${_R}" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="11"/><circle cx="56" cy="56" r="${_R}" fill="none" stroke="#ffde59" stroke-width="11" stroke-linecap="round" stroke-dasharray="${_dash} ${_C.toFixed(1)}" transform="rotate(-90 56 56)"/></svg>
-        <div class="ph-gauge-c"><div class="ph-gauge-n">${tot>0?tot.toFixed(1):'—'}</div><div class="ph-gauge-d">/ 3</div></div>
+  const _dn=desempenoNivel(tot);
+  const _aDone=at?Math.min(at.objetivo|0,at.cumplidas|0):0, _aObj=at?(at.objetivo|0):0;
+  const _allMk=[...new Set(playerSessions.map(monthKey).filter(Boolean))].sort();
+  const _desSeries=_allMk.map(mk=>{ const vv=areas.map(a=>areaAvgScope(currentPlayer,mk,a.id)).filter(x=>x>0); return vv.length?vv.reduce((x,y)=>x+y,0)/vv.length:0; }).filter(x=>x>0).slice(-12);
+  const _desSpark=areaSparkline(_desSeries, _dn.colLight, 'sgdes', 3);
+  const _barSeries=attMonths(currentPlayer).map(mk=>{ const a=attendanceFor(currentPlayer,mk); return a?{m:monthLabel(mk).slice(0,3),val:Math.min(a.objetivo|0,a.cumplidas|0),obj:a.objetivo|0}:null; }).filter(Boolean).slice(-6);
+  const _ini=currentPlayer.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const _avc=avatarColor(currentPlayer);
+  const _metaParts=[ (info&&info[INFO.brazo])||'', (info&&info[INFO.altura])?(String(info[INFO.altura]).replace(/\s*m\.?\s*$/i,'').trim()+' m'):'', (info&&info[INFO.edad])?info[INFO.edad]+' años':'' ].filter(Boolean).join(' · ');
+  const _obj=(info&&info[INFO.objetivo])||'';
+  const _ptotV=(function(){ const v=areas.map(a=>prevAvgs[a.id]).filter(x=>x>0); return v.length?v.reduce((x,y)=>x+y,0)/v.length:0; })();
+  const _dTot=(prevMonth && tot>0 && _ptotV>0)?(tot-_ptotV):null;
+  const _dArrow=_dTot===null?'':(_dTot>=0.05?'↑':_dTot<=-0.05?'↓':'→');
+  const _dCol=_dTot===null?'#6b8a76':(_dTot>=0.05?'#16a34a':_dTot<=-0.05?'#dc2626':'#6b8a76');
+  const _dTxt=_dTot===null?'':((_dTot>=0?'+':'')+_dTot.toFixed(1)+' vs '+(prevLbl?prevLbl.split(' ')[0]:''));
+  let _progHTML='';
+  if(tot>0){
+    if(tot<1.5){ const pw=Math.max(4,Math.min(100,(tot/1.5)*100)); _progHTML='<div class="pk2-prog"><div class="pk2-prog-lbl"><span>Camino a Muy Bien</span><span>'+tot.toFixed(1)+' / 1.5</span></div><div class="pk2-bar"><i style="width:'+pw.toFixed(0)+'%;background:'+_dn.bg+';"></i></div></div>'; }
+    else if(tot<=2.5){ const pw=Math.max(4,Math.min(100,(tot/2.6)*100)); _progHTML='<div class="pk2-prog"><div class="pk2-prog-lbl"><span>Camino a Excelente</span><span>'+tot.toFixed(1)+' / 2.6</span></div><div class="pk2-bar"><i style="width:'+pw.toFixed(0)+'%;background:'+_dn.bg+';"></i></div></div>'; }
+    else { _progHTML='<div class="pk2-prog"><div class="pk2-prog-lbl" style="color:'+_dn.bg+';"><span>¡Nivel Excelente!</span></div><div class="pk2-bar"><i style="width:100%;background:'+_dn.bg+';"></i></div></div>'; }
+  }
+  const _attM=attMonths(currentPlayer); let _streak=0;
+  let _stStart=_attM.length-1;
+  if(_attM.length){ const _la=attendanceFor(currentPlayer,_attM[_attM.length-1]); if(!(_la&&_la.met)) _stStart--; }
+  for(let i=_stStart;i>=0;i--){ const a=attendanceFor(currentPlayer,_attM[i]); if(a&&a.met) _streak++; else break; }
+  const _rachaHTML=_streak>=1?`<div class="asist-streak">🔥 Racha: ${_streak} ${_streak===1?'mes':'meses'} cumpliendo</div>`:'';
+  const perfilTop = `<div class="ptile perfil-info perfil-info-solo">
+    <div class="ph-top">
+      <div class="ph-av2" style="background:${_avc};color:${idealText(_avc)};">${_ini}</div>
+      <div class="ph-id">
+        <div class="ph-name2">${currentPlayer}</div>
+        ${_metaParts?`<div class="ph-meta2">${_metaParts}</div>`:''}
       </div>
-      <div class="ph-ix-sub">${monthLabel(curMonth)} · ${curSess.length} ses.</div>
+      ${heroCat}
+    </div>
+    ${_obj?`<div class="ph-obj-band"><span class="ph-obj-ic">🎯</span><div><div class="ph-obj-lbl">Mi objetivo</div><div class="ph-obj-txt">${_obj}</div></div></div>`:''}
+  </div>
+  <div class="perfil-row2">
+    <div class="card perfil-kpi2">
+      <div class="card-title">Mi Desempeño <button class="kpi-info" onclick="openIndiceInfo()" aria-label="Cómo se mide el índice">i</button></div>
+      <div class="pk2-top">
+        <span class="pk2-idx" style="color:${_dn.colLight};">${tot>0?tot.toFixed(1):'—'}<small>/3</small></span>
+        <span class="lvl-pill" style="background:${_dn.bg};color:${_dn.txt};">${_dn.lbl}</span>
+      </div>
+      ${_dTxt?`<div class="pk2-trend" style="color:${_dCol};">${_dArrow} ${_dTxt}</div>`:''}
+      <div class="pk2-spark">${_desSpark}</div>
+      ${_progHTML}
+      <div class="pk2-month">${monthLabel(curMonth)}</div>
+    </div>
+    <div class="card asist-card">
+      <div class="card-title">Mi Asistencia</div>
+      <div class="asist-body">
+        <div class="asist-left">
+          ${donutSVG(at?at.pct:0,'#0a513a')}
+          <div class="asist-count">${at?`${_aDone}/${_aObj} clases`:'—'}</div>
+        </div>
+        <div class="asist-vline"></div>
+        <div class="asist-right">
+          <div class="asist-right-lbl">Clases por mes</div>
+          ${attBarsSVG(_barSeries,'#0a513a')}
+          ${_rachaHTML}
+        </div>
+      </div>
     </div>
   </div>`;
-  el.innerHTML = chips + perfilHero + `<div class="metrics-row">${cards}</div>` + radarHTML;
+  el.innerHTML = perfilTop;
   ldEl.style.display='none'; el.style.display='block';
-
-  if(document.getElementById('ch-radar')){
-    const cur=[curAvgs.tecnica,curAvgs.tactica,curAvgs.fisico,curAvgs.mental];
-    const prv=[prevAvgs.tecnica,prevAvgs.tactica,prevAvgs.fisico,prevAvgs.mental];
-    charts['radar']=new Chart(document.getElementById('ch-radar'),{
-      type:'radar',
-      data:{labels:['Técnica','Táctica','Físico','Mental'],datasets:[
-        ...(prevMonth?[{label:prevLbl,data:prv,borderColor:'rgba(107,111,138,0.55)',backgroundColor:'rgba(107,111,138,0.05)',borderDash:[5,4],borderWidth:1.5,pointRadius:3,pointBackgroundColor:'rgba(107,111,138,0.6)'}]:[]),
-        {label:monthLabel(curMonth),data:cur,borderColor:'#0a513a',backgroundColor:'rgba(10,81,58,0.16)',borderWidth:2,pointRadius:5,pointBackgroundColor:'#0a513a',pointBorderColor:'#0a513a'}
-      ]},
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:true,position:'bottom',labels:{color:'#20223a',font:{size:12},boxWidth:10,padding:14}},
-          tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${(c.raw||0).toFixed(1)} / 3`}}},
-        scales:{r:{min:0,max:3,ticks:{stepSize:1,backdropColor:'transparent',color:'#6b6f8a',font:{size:10},callback:v=>['','Bien','Muy Bien','Excelente'][v]||''},grid:{color:'rgba(10,81,58,0.14)'},angleLines:{color:'rgba(10,81,58,0.14)'},pointLabels:{color:'#20223a',font:{size:13,weight:'700'}}}}
-      }
-    });
-  }
 }
 
 // ══════════════════════════════════════
+// Radar de Mi Perfil — rango seleccionable (30 días / 3 meses / desde el inicio)
+function profileRadarWindows(range){
+  const sess=playerSessions||[]; const now=new Date();
+  const dateOf=s=>new Date(parseDate(s[COL.fecha])+'T12:00:00');
+  const between=(a,b)=>sess.filter(s=>{const d=dateOf(s); return !isNaN(d)&&d>=a&&d<b;});
+  const end=new Date(now.getTime()+86400000); // incluye hoy
+  if(range==='all') return {cur:sess, prev:null, curLbl:'Desde el inicio', prevLbl:null};
+  let curStart, prevStart, labels;
+  if(range==='30d'){
+    curStart=new Date(now); curStart.setDate(curStart.getDate()-30);
+    prevStart=new Date(now); prevStart.setDate(prevStart.getDate()-60);
+    labels=['Últimos 30 días','30 días previos'];
+  } else {
+    curStart=new Date(now); curStart.setMonth(curStart.getMonth()-3);
+    prevStart=new Date(now); prevStart.setMonth(prevStart.getMonth()-6);
+    labels=['Últimos 3 meses','3 meses previos'];
+  }
+  return {cur:between(curStart,end), prev:between(prevStart,curStart), curLbl:labels[0], prevLbl:labels[1]};
+}
+function _radarArr(list){ return ['tecnica','tactica','fisico','mental'].map(a=>areaAvgForSessions(list,a)); }
+function renderProfileRadar(){
+  const cv=document.getElementById('ch-radar'); if(!cv||typeof Chart==='undefined') return;
+  if(charts['radar']){ try{charts['radar'].destroy();}catch(e){} }
+  const w=profileRadarWindows(radarRange);
+  const datasets=[];
+  if(w.prev && w.prev.length){
+    datasets.push({label:w.prevLbl,data:_radarArr(w.prev),borderColor:'rgba(107,111,138,0.6)',backgroundColor:'rgba(107,111,138,0.06)',borderDash:[5,4],borderWidth:1.5,pointRadius:3,pointBackgroundColor:'rgba(107,111,138,0.7)'});
+  }
+  datasets.push({label:w.curLbl,data:_radarArr(w.cur),borderColor:'#0a513a',backgroundColor:'rgba(10,81,58,0.16)',borderWidth:2,pointRadius:5,pointBackgroundColor:'#0a513a',pointBorderColor:'#0a513a'});
+  charts['radar']=new Chart(cv,{ type:'radar',
+    data:{labels:['Técnica','Táctica','Físico','Mental'],datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:'bottom',labels:{color:'#20223a',font:{size:12},boxWidth:10,padding:14}},
+        tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${(c.raw||0).toFixed(1)} / 3`}}},
+      scales:{r:{min:0,max:3,ticks:{stepSize:1,backdropColor:'transparent',color:'#6b6f8a',font:{size:10},callback:v=>['','Bien','Muy Bien','Excelente'][v]||''},grid:{color:'rgba(10,81,58,0.14)'},angleLines:{color:'rgba(10,81,58,0.14)'},pointLabels:{color:'#20223a',font:{size:12,weight:'600'}}}}
+    }
+  });
+}
+function setRadarRange(r){ radarRange=r; try{document.querySelectorAll('.radar-range-btn').forEach(b=>b.classList.toggle('active', b.getAttribute('data-range')===r));}catch(e){} renderProfileRadar(); }
+
+// EVOLUCIÓN DE MIS GOLPES — línea mensual por golpe (Drive, Revés, Saque, Volea)
+const GOLPES_LINE=[
+  {nombre:'Drive', keys:['Drive_Preparacion','Drive_control','Drive_Direccion'], col:'#0a513a'},
+  {nombre:'Revés', keys:['Reves_Estabilidad','Reves_slice'], col:'#178a54'},
+  {nombre:'Saque', keys:['Saque_Primero','Saque_Segundo'], col:'#e0a200'},
+  {nombre:'Volea', keys:['Volea_subida','Volea_Ejecucion'], col:'#d6336c'}
+];
+function golpesMonths(range){
+  const allM=[...new Set(playerSessions.map(monthKey).filter(Boolean))].sort();
+  if(range==='all') return allM;
+  if(range==='1y') return allM.slice(-12);
+  return allM.slice(-3);
+}
+function golpeAvgInMonth(mk, keys){
+  const ss=playerSessions.filter(s=>monthKey(s)===mk);
+  const vals=ss.map(s=>avgLvlKeys(s,keys)).filter(v=>v>0);
+  return vals.length? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+}
+function renderGolpesChart(){
+  const cv=document.getElementById('ch-golpes'); if(!cv||typeof Chart==='undefined') return;
+  if(charts['golpes']){ try{charts['golpes'].destroy();}catch(e){} }
+  const months=golpesMonths(golpesRange);
+  if(!months.length) return;
+  const labels=months.map(mk=>monthLabel(mk).split(' ')[0]);
+  const datasets=GOLPES_LINE.map(g=>({
+    label:g.nombre,
+    data:months.map(mk=>golpeAvgInMonth(mk,g.keys)),
+    borderColor:g.col, backgroundColor:g.col,
+    borderWidth:2, pointRadius:3, pointBackgroundColor:g.col, spanGaps:true, tension:.3
+  }));
+  charts['golpes']=new Chart(cv,{ type:'line',
+    data:{labels, datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:'bottom',labels:{color:'#20223a',font:{size:12},boxWidth:10,padding:14}},
+        tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${(c.raw||0).toFixed(1)} / 3`}}},
+      scales:{
+        y:{min:0,max:3,ticks:{stepSize:1,color:'#6b6f8a',font:{size:10},callback:v=>['','Bien','Muy Bien','Excelente'][v]||''},grid:{color:'rgba(10,81,58,0.14)'}},
+        x:{ticks:{color:'#6b6f8a',font:{size:10}},grid:{display:false}}
+      }
+    }
+  });
+}
+function setGolpesRange(r){ golpesRange=r; try{document.querySelectorAll('.golpes-range-btn').forEach(b=>b.classList.toggle('active', b.getAttribute('data-range')===r));}catch(e){} renderGolpesChart(); }
+
 // RENDIMIENTO — pelotas por nivel · 3 niveles
 // ══════════════════════════════════════
 function buildRubrica(){
   const el=document.getElementById('content-rubrica');
   const ldEl=document.getElementById('loading-rubrica');
+  const infoBtn=`<button class="lg-info-btn" onclick="openRendInfo()">ℹ️ ¿Cómo se mide Mi Tenis?</button>`;
   const sess=playerSessions;
   if(!sess.length){
     ldEl.style.display='none'; el.style.display='block';
-    el.innerHTML='<div class="empty">No hay sesiones para mostrar.</div>'; return;
+    el.innerHTML=infoBtn+monthChipsHTML()+'<div class="empty">No hay sesiones para mostrar.</div>'; return;
   }
   const fsess=filterByMonth(sess);
   const last=fsess[fsess.length-1];
   const _months=[...new Set(playerSessions.map(monthKey).filter(Boolean))].sort();
   const _curMk=last?monthKey(last):'';
   const _prevMk=_months.indexOf(_curMk)>0?_months[_months.indexOf(_curMk)-1]:null;
-  const prevLast=(_prevMk?playerSessions.filter(s=>monthKey(s)===_prevMk):[]).slice(-1)[0]||null;
-  const bench=calcBench(currentPlayer);
-  const info=getInfo(currentPlayer);
-  const catName=info?info[INFO.categoria]:'';
-  const areas=[{id:'tecnica',nombre:'Técnica'},{id:'tactica',nombre:'Táctica'},{id:'fisico',nombre:'Físico'},{id:'mental',nombre:'Mental'}];
-  const balls=(lv)=>[1,2,3].map(i=>`<span class="thumb ${i<=lv?'on':'off'}">👍</span>`).join('');
-  const PERF_Q={'Construcción del punto':'¿Construye variando sus golpes?','Lectura del rival':'¿Ajusta su juego?','Gestión del marcador':'¿Sabe cuándo arriesgar?','Resistencia':'¿Se cansa rápido?','Velocidad':'¿Llega con equilibrio y tiempo?','Agilidad':'¿Recupera posición rápido?','Fuerza':'¿Juega profundo bajo cansancio?','Tolerancia al error':'¿Resetea entre puntos?','Actitud':'¿Mantiene una actitud positiva?','Comunicación':'¿Postura activa y positiva?','Concentración':'¿Se mantiene presente?'};
-  const cards=areas.map(a=>{
+  const _prevShort=_prevMk?monthLabel(_prevMk).split(' ')[0]:'';
+  const prevSessList = _prevMk?playerSessions.filter(s=>monthKey(s)===_prevMk):[];
+  const latestIn=(list,key)=>{ for(let i=list.length-1;i>=0;i--){ const lv=toLvl(list[i][COL[key]]); if(lv>0) return lv; } return 0; };
+  const RAREAS=[
+    {id:'tecnica',nombre:'Técnica',  emoji:'🎾',col:'#0d5230'},
+    {id:'tactica',nombre:'Táctica',  emoji:'♟️',col:'#b97800'},
+    {id:'fisico', nombre:'Físico',   emoji:'⚡',col:'#1f9d57'},
+    {id:'mental', nombre:'Mentalidad',emoji:'🧠',col:'#c2185b'}
+  ];
+  const PERF_Q={'Construcción del punto':'¿Construye con variación?','Velocidad':'¿Llega con equilibrio?','Resistencia':'¿Mantiene su nivel?','Tolerancia al error':'¿Resetea entre puntos?','Actitud':'¿Postura activa y positiva?'};
+
+  // KPI por área — formato del Reporte mensual (ícono + barra + estado)
+  const kpiCard=(a)=>{
+    const v=areaAvgScope(currentPlayer,_curMk,a.id);
+    const pv=_prevMk?areaAvgScope(currentPlayer,_prevMk,a.id):0;
+    const w=Math.max(4,Math.min(100,(v/3)*100));
+    const d=(_prevMk&&v>0&&pv>0)?(v-pv):null;
+    let st='';
+    if(d!==null){
+      let cls,ar,lbl,val;
+      if(Math.abs(d)<0.05){cls='st-eq';ar='→';lbl='ESTABLE';val='0.0';}
+      else if(d>0){cls='st-up';ar='↗';lbl='EN EVOLUCIÓN';val='+'+d.toFixed(1);}
+      else {cls='st-dn';ar='↘';lbl='EN AJUSTE';val=d.toFixed(1);}
+      st=`<div class="ac-st ${cls}">${ar} ${lbl}</div><div class="ac-dl">${val}${_prevShort?' vs '+_prevShort:''}</div>`;
+    }
+    return `<div class="ac">
+      <div class="ac-h"><div class="ac-ic" style="background:${a.col};">${a.emoji}</div><div class="ac-nm">${a.nombre}</div></div>
+      <div class="ac-val" style="color:${v>0?a.col:'#9aaa9a'};">${v>0?v.toFixed(1):'—'}<span> / 3</span></div>
+      <div class="ac-bar"><i style="width:${w}%;background:${a.col};"></i></div>
+      ${st}
+      ${skillsCard(a)}
+    </div>`;
+  };
+  // Habilidades por área — acordeón "Mis Habilidades" (sin pulgares, solo nivel)
+  const skillsCard=(a)=>{
     const grupos=RESUMEN_GROUPS[a.id];
     const rows=grupos.map(g=>{
-      const arr=g.keys.map(k=>toLvl(last[COL[k]])).filter(v=>v>0);
+      const arr=g.keys.map(k=>latestIn(fsess,k)).filter(v=>v>0);
       if(!arr.length) return '';
-      const p=arr.reduce((x,y)=>x+y,0)/arr.length;
-      const lv=Math.round(p);
-      let prevLv=0; if(prevLast){ const pa=g.keys.map(k=>toLvl(prevLast[COL[k]])).filter(v=>v>0); if(pa.length) prevLv=Math.round(pa.reduce((x,y)=>x+y,0)/pa.length); }
+      const lv=Math.round(arr.reduce((x,y)=>x+y,0)/arr.length);
+      let prevLv=0; { const pa=g.keys.map(k=>latestIn(prevSessList,k)).filter(v=>v>0); if(pa.length) prevLv=Math.round(pa.reduce((x,y)=>x+y,0)/pa.length); }
       const rise = prevLv>0 && lv>prevLv;
       const q=PERF_Q[g.nombre]||'';
       return `<div class="ball-item">
         <div class="ball-row">
-          <span class="ball-name">${g.nombre}${vidIconsHTML(g.nombre)}</span>
-          <span class="balls">${balls(lv)}</span>
+          <span class="ball-name">${g.nombre}${vidIconsHTML(g.nombre)}${rise?'<span class="rise-badge">+1</span>':''}</span>
           ${(lv===1||lv===2)
-            ? `<span class="ball-label lb${lv} mejora-trigger" onclick="openMejora('${g.nombre}',${lv})" title="Cómo mejorar">${lvlLabel(lv)}</span>`
+            ? `<span class="ball-label lb${lv} mejora-trigger" onclick="openMejora('${g.nombre.replace(/'/g,"\\'")}',${lv})" title="Cómo mejorar">${lvlLabel(lv)}</span>`
             : `<span class="ball-label lb${lv}">${lvlLabel(lv)}</span>`}
         </div>
         ${q?`<div class="ball-q">${q}</div>`:''}
-        ${rise?`<div class="rise-tag">¡Subiste de nivel!</div>`:''}
       </div>`;
     }).filter(Boolean).join('');
-    if(!rows) return '';
-    return `<div class="perf-card"><div class="perf-card-title">${AREA_META[a.id].emoji} ${a.nombre}</div>${rows}</div>`;
-  }).join('');
-  const legend=`<div class="sem-legend" style="margin-bottom:14px;align-items:center;">
-      <span class="sem-leg-label">Niveles</span>
-      <span class="sem-leg" style="background:var(--n1);color:#161616;">👍 Bien</span>
-      <span class="sem-leg" style="background:var(--n2);color:#161616;">👍👍 Muy Bien</span>
-      <span class="sem-leg" style="background:var(--n3);color:#161616;">👍👍👍 Excelente</span>
+    const body = rows || '<div class="empty" style="color:var(--muted);padding:10px 0;font-size:12px;">Sin evaluación este mes.</div>';
+    return `<div class="acc skills-acc">
+      <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">Mis Habilidades</span><span class="acc-chevron">▾</span></div>
+      <div class="acc-body"><div class="acc-body-inner">${body}</div></div>
     </div>`;
-  let evoInner;
-  if(playerSessions.length>=2){
-    evoInner=`<div class="nota" style="margin-top:0;">Histórico completo · no depende del mes seleccionado.</div><div class="chart-wrap" style="height:320px;"><canvas id="ch-evolucion"></canvas></div>`;
-  } else {
-    evoInner=`<div class="empty" style="color:var(--muted);">Necesitás al menos 2 sesiones para ver la evolución.</div>`;
-  }
-  const evoHTML=`<div class="acc evo-acc">
+  };
+
+  const grid=`<div class="mt-grid">${RAREAS.map(kpiCard).join('')}</div>`;
+  const radarHTML=`<div class="acc evo-acc" style="margin-top:18px;">
     <div class="acc-head" onclick="toggleAcc(this)">
-      <span class="acc-title">📈 Evolución mensual por área</span>
+      <span class="acc-title">📊 Evaluación de Mi Tenis</span>
       <span class="acc-chevron">▾</span>
     </div>
-    <div class="acc-body"><div class="acc-body-inner">${evoInner}</div></div>
+    <div class="acc-body"><div class="acc-body-inner">
+      <div class="radar-range">
+        <button class="radar-range-btn ${radarRange==='30d'?'active':''}" data-range="30d" onclick="setRadarRange('30d')">Últimos 30 días</button>
+        <button class="radar-range-btn ${radarRange==='3m'?'active':''}" data-range="3m" onclick="setRadarRange('3m')">Últimos 3 meses</button>
+        <button class="radar-range-btn ${radarRange==='all'?'active':''}" data-range="all" onclick="setRadarRange('all')">Desde el inicio</button>
+      </div>
+      <div class="chart-wrap" style="height:380px;margin-top:16px;"><canvas id="ch-radar"></canvas></div>
+    </div></div>
   </div>`;
-  el.innerHTML = `<button class="lg-info-btn" onclick="openRendInfo()">ℹ️ ¿Cómo se mide Mi Tenis?</button>` + monthChipsHTML() + legend + `<div class="perf-grid">${cards}</div>` + evoHTML;
+  const golpesHTML=`<div class="acc evo-acc" style="margin-top:14px;">
+    <div class="acc-head" onclick="toggleAcc(this)">
+      <span class="acc-title">🎾 EVOLUCIÓN DE MIS GOLPES</span>
+      <span class="acc-chevron">▾</span>
+    </div>
+    <div class="acc-body"><div class="acc-body-inner">
+      <div class="radar-range">
+        <button class="golpes-range-btn radar-range-btn ${golpesRange==='3m'?'active':''}" data-range="3m" onclick="setGolpesRange('3m')">Últimos 3 meses</button>
+        <button class="golpes-range-btn radar-range-btn ${golpesRange==='1y'?'active':''}" data-range="1y" onclick="setGolpesRange('1y')">Último año</button>
+        <button class="golpes-range-btn radar-range-btn ${golpesRange==='all'?'active':''}" data-range="all" onclick="setGolpesRange('all')">Desde el inicio</button>
+      </div>
+      <div class="chart-wrap" style="height:380px;margin-top:16px;"><canvas id="ch-golpes"></canvas></div>
+    </div></div>
+  </div>`;
+  el.innerHTML = infoBtn + grid + radarHTML + golpesHTML;
   ldEl.style.display='none'; el.style.display='block';
-  // Gráfico de evolución — usa TODAS las sesiones, sin filtro de mes
-  if(charts['evolucion']){ try{charts['evolucion'].destroy();}catch(e){} }
-  const allSess=playerSessions;
-  if(allSess.length>=2){
-    const evLabels=allSess.map(s=>fmtDate(s[COL.fecha]));
-    const evAreas=[
-      {id:'tecnica', nombre:'Técnica', color:'#0a513a'},
-      {id:'tactica', nombre:'Táctica', color:'#e0a200'},
-      {id:'fisico',  nombre:'Físico',  color:'#16a34a'},
-      {id:'mental',  nombre:'Mental',  color:'#d6336c'}
-    ];
-    charts['evolucion']=new Chart(document.getElementById('ch-evolucion'),{
-      type:'line',
-      data:{labels:evLabels, datasets:evAreas.map(a=>({
-        label:a.nombre,
-        data:allSess.map(s=>{const v=avgLvlKeys(s,AREA_KEYS[a.id]); return v>0?v:null;}),
-        borderColor:a.color, backgroundColor:a.color,
-        tension:.45, cubicInterpolationMode:'monotone', pointRadius:4, pointBackgroundColor:a.color, spanGaps:true, borderWidth:3
-      }))},
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:true,position:'bottom',labels:{font:{size:11},boxWidth:14,padding:14,usePointStyle:true}},
-          tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${(c.raw||0).toFixed(1)} 👍`}}},
-        scales:{
-          y:{min:0,max:3,ticks:{stepSize:1,font:{size:10},callback:v=>['','Bien','Muy Bien','Excelente'][v]||''},grid:{color:'rgba(10,81,58,0.10)'},title:{display:false}},
-          x:{ticks:{font:{size:10},maxRotation:40,autoSkip:true,maxTicksLimit:8},grid:{color:'rgba(10,81,58,0.06)'}}
-        }
-      }
-    });
-  }
+  renderProfileRadar();
+  renderGolpesChart();
 }
+
 
 // ══════════════════════════════════════
 // PLAN DE ACCIÓN — objetivo, observación y focos (acordeón + checklist)
@@ -3205,10 +3670,10 @@ function buildMonthCalendar(mk, monthSessions, pl){
         ${dayCount[day]>1?`<span class="cal-badge">${dayCount[day]}</span>`:''}
       </button>`;
     } else if(isLast){
-      // Mes en curso, sin sesión ese día: descarga bloqueada hasta que termine el mes
-      cells+=`<div class="cal-cell cal-dl-lock" title="El reporte estará disponible cuando termine el mes">
-        <span class="cal-num">${day}</span><span class="cal-dlico">🔒</span>
-      </div>`;
+      // Mes en curso: el profe puede ver una vista previa (con PIN); el alumno lo verá al cerrar el mes
+      cells+=`<button class="cal-cell cal-dl cal-prev" onclick="previewMonthReport('${pl}','${mk}')" title="Vista previa del reporte (profe)">
+        <span class="cal-num">${day}</span><span class="cal-dlico">👁</span>
+      </button>`;
     } else {
       cells+=`<div class="cal-cell"><span class="cal-num">${day}</span></div>`;
     }
@@ -3217,10 +3682,11 @@ function buildMonthCalendar(mk, monthSessions, pl){
   const n=monthSessions.length;
   const footer = ended
     ? `<button class="cal-dl-btn" onclick="downloadMonthReport('${pl}','${mk}')" title="Descargar el reporte completo de ${monthLabel(mk)}">📄 Descargar reporte</button>`
-    : `<div class="cal-dl-note">🔒 Disponible al cerrar el mes</div>`;
+    : `<button class="cal-dl-btn cal-prev-btn" onclick="previewMonthReport('${pl}','${mk}')" title="Vista previa del reporte (solo profe, con PIN)">👁 Vista previa (profe)</button>
+       <div class="cal-dl-note cal-prev-note">El alumno verá el reporte al cerrar el mes</div>`;
   return `<div class="cal-month-block">
     <div class="card cal-card">
-      <div class="card-title">${monthLabel(mk)} · ${n} sesión${n!==1?'es':''}</div>
+      <div class="card-title">${monthLabel(mk)}</div>
       <div class="cal-dows">${dows.map(d=>`<div class="cal-dow">${d}</div>`).join('')}</div>
       <div class="cal-grid">${cells}</div>
     </div>
@@ -3260,16 +3726,26 @@ function buildHistorial(){
   const months=Object.keys(byMonth).sort();
   const pl=currentPlayer.replace(/'/g,"\\'");
   const infoBtn=`<button class="lg-info-btn" onclick="openRegistroInfo()">ℹ️ ¿Cómo funcionan los Informes?</button>`;
-  const legend=`<div class="cal-legend" style="margin:-2px 0 12px;">
+  const legend=`<div class="cal-legend" style="margin:18px 0 12px;">
     <span><span class="lg-swatch" style="background:var(--ball);"></span> Descargar reporte (mes cerrado)</span>
-    <span><span class="lg-swatch" style="background:var(--surf2);border:1px dashed var(--border);"></span> Reporte 🔒</span>
+    <span><span class="lg-swatch" style="background:var(--ball);"></span> 👁 Vista previa profe (mes en curso)</span>
   </div>`;
   const calsHTML=months.map(mk=>buildMonthCalendar(mk, byMonth[mk], pl)).join('');
-  el.innerHTML=infoBtn+monthChipsHTML()+legend+`<div class="cal-months">${calsHTML}</div>`;
+  el.innerHTML=infoBtn+`<div class="cal-months">${calsHTML}</div>`;
   ldEl.style.display='none'; el.style.display='block';
 }
 
 // ── Reporte de Rendimiento mensual (descarga HTML autónomo) ──
+function previewMonthReport(name, mk){
+  const pin=coachPin();
+  if(!pin){ downloadMonthReport(name, mk); return; }
+  __pinMode='preview'; __pendingPreview={name:name, mk:mk};
+  const sub=document.getElementById('pin-sub'); if(sub) sub.textContent='PIN de profe · vista previa del mes en curso';
+  const inp=document.getElementById('pin-input'); if(inp) inp.value='';
+  const err=document.getElementById('pin-err'); if(err) err.textContent='';
+  document.getElementById('pin-overlay').classList.add('show');
+  setTimeout(()=>{try{inp.focus();}catch(e){}},60);
+}
 function downloadMonthReport(name, mk){
   try{
     const html=buildMonthReportHTML(name, mk);
@@ -3294,6 +3770,7 @@ function buildMonthReportHTML(name, mk){
   const color=avatarColor(name);
   const catCol=catColor(cat)||'#0d5230';
   const hoy=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'long',year:'numeric'});
+  const _provisional=!monthEnded(mk);
 
   const areas=[
     {id:'tecnica',nombre:'Técnica',  emoji:'🎾',col:'#0d5230'},
@@ -3366,10 +3843,40 @@ function buildMonthReportHTML(name, mk){
   const fortItems=fortCol.length?splitItems(fortCol[fortCol.length-1][COL.fortalezas]):[];
   const aspCol=ms.filter(s=>(s[COL.aspecto]||'').trim()!=='');
   const aspText=aspCol.length?(aspCol[aspCol.length-1][COL.aspecto]||'').trim():'';
+  const aspItems=aspText?splitItems(aspText):[];
 
   // OBSERVACIÓN DEL PROFE (más reciente con texto)
-  const obsList=ms.filter(s=>(s[COL.obs_profe]||'').trim()!=='');
-  const coachQuote=obsList.length?(obsList[obsList.length-1][COL.obs_profe]||'').trim():'';
+  // Observaciones del Profe del mes, en orden cronológico, conectadas como un texto corrido
+  const obsAll=ms.filter(s=>(s[COL.obs_profe]||'').trim()!=='').map(s=>(s[COL.obs_profe]||'').trim());
+  const _connMids=['Luego','Más adelante','En el transcurso del mes','A continuación','Con el correr de las semanas'];
+  const _fname=(name.split(' ')[0]||'').toLowerCase();
+  const _lcFirst=(txt)=>{
+    if(!txt) return txt;
+    const fw=(txt.split(/\s+/)[0]||'').replace(/[^A-Za-zÀ-ÿ]/g,'').toLowerCase();
+    if(fw && fw===_fname) return txt;            // mantiene el nombre del alumno en mayúscula
+    return txt.charAt(0).toLowerCase()+txt.slice(1);
+  };
+  const coachQuote = obsAll.length<=1
+    ? (obsAll[0]||'')
+    : obsAll.map((txt,i)=>{
+        const conn = i===0 ? 'Para comenzar el mes, '
+          : (i===obsAll.length-1 ? 'Hacia el cierre del mes, ' : _connMids[(i-1)%_connMids.length]+', ');
+        let t=_lcFirst(txt.trim()); if(t && !/[.!?…]$/.test(t)) t+='.';
+        return conn + t;
+      }).join(' ');
+
+  // COMENTARIO DEL PROFE — cuentito preautomatizado
+  const _fn = (name.split(' ')[0]) || 'Jugador';
+  const _topArea = [...areas].filter(a=>areaAvg[a.id]>0).sort((x,y)=>areaAvg[y.id]-areaAvg[x.id])[0] || null;
+  const _compromiso = (actitudExcelente(name,mk) || (at&&at.met)) ? 'alto' : ((at&&at.pct>=60) ? 'medio' : 'en crecimiento');
+  const _joinES = (arr)=> arr.length<=1 ? (arr[0]||'') : (arr.slice(0,-1).join(', ') + ' y ' + arr[arr.length-1]);
+  const _aspList = aspItems.length ? aspItems : (foco ? [foco.nombre] : []);
+  const _aspTxt = _joinES(_aspList);
+  let coachStory = 'Hola ' + esc(_fn) + ', te felicito por estos días de trabajo.';
+  coachStory += ' Este mes tuviste un compromiso ' + _compromiso + ' de asistencia a clases';
+  coachStory += _topArea ? (' y tu área de mayor fortaleza fue: <b>' + esc(_topArea.nombre) + '</b> 💪.') : ' 💪.';
+  if(_aspTxt) coachStory += ' Recomendamos para el próximo mes seguir trabajando ' + esc(_aspTxt) + '.';
+  coachStory += ' Vamos por más ' + esc(_fn) + ' 🎾.';
 
   // ÚLTIMA SESIÓN
   const last=ms.length?ms[ms.length-1]:null;
@@ -3386,10 +3893,8 @@ function buildMonthReportHTML(name, mk){
   const pct=Math.max(0,Math.min(1,overall/3));
   const R=52, C=2*Math.PI*R, dash=(pct*C).toFixed(1);
   // DESEMPEÑO GENERAL — pulgares
-  let thumbs, perfLbl, perfMsg, perfCol;
-  if(overall>=2.3){ thumbs=3; perfLbl='EXCELENTE'; perfMsg='Gran mes de trabajo. ¡A sostenerlo!'; perfCol='#22b16c'; }
-  else if(overall>=1.5){ thumbs=2; perfLbl='MUY BIEN'; perfMsg='Buen mes de trabajo. Vamos por más.'; perfCol='#ffde59'; }
-  else { thumbs=1; perfLbl='BIEN'; perfMsg='Seguimos sumando, paso a paso.'; perfCol='#7ed957'; }
+  const _dn=desempenoNivel(overall);
+  let thumbs=_dn.thumbs, perfLbl=_dn.lbl, perfMsg=_dn.msg, perfCol=_dn.col;
   // COMPROMISO
   const compromiso = (actitudExcelente(name,mk) || (at&&at.met)) ? 'ALTO' : ((at&&at.pct>=60)?'MEDIO':'EN CRECIMIENTO');
 
@@ -3537,6 +4042,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
 </style></head><body>
 <button class="no-print" onclick="window.print()">🖨️ Guardar como PDF / Imprimir</button>
 <div class="page">
+  ${_provisional?'<div style="margin:0 0 14px;padding:10px 14px;border-radius:10px;background:#fff4d2;border:1px solid #e8c23e;color:#5b5400;font-size:13px;font-weight:600;text-align:center;line-height:1.4;">👁 Vista previa · mes en curso — datos provisionales, pueden cambiar hasta el cierre del mes.</div>':''}
 
   <!-- HEADER -->
   <div class="hd">
@@ -3546,7 +4052,6 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
     </div>
     <div class="hd-rep">
       <div class="hd-rep-m">📅 ${esc(monthName)}</div>
-      <div class="hd-rep-s">Reporte mensual de rendimiento</div>
     </div>
   </div>
 
@@ -3568,7 +4073,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
       <div class="ix-body"><div class="ix-g">
         <svg width="128" height="128" viewBox="0 0 128 128">
           <circle cx="64" cy="64" r="${R}" fill="none" stroke="rgba(255,255,255,.13)" stroke-width="12"/>
-          <circle cx="64" cy="64" r="${R}" fill="none" stroke="#ffde59" stroke-width="12" stroke-linecap="round"
+          <circle cx="64" cy="64" r="${R}" fill="none" stroke="${_dn.bg}" stroke-width="12" stroke-linecap="round"
                   stroke-dasharray="${dash} ${C.toFixed(1)}"/>
         </svg>
         <div class="ix-c"><div class="ix-n">${overall>0?overall.toFixed(1):'—'}</div><div class="ix-d">/ 3</div></div>
@@ -3577,8 +4082,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
     <div class="pf">
       <div class="pf-lbl">Desempeño general</div>
       <div class="pf-body">
-        <div class="pf-th">${[1,2,3].map(i=>thumbSVG(i<=thumbs)).join('')}</div>
-        <div class="pf-st" style="color:${perfCol};">${perfLbl}</div>
+        <div class="pf-st"><span style="background:${_dn.bg};color:${_dn.txt};padding:3px 14px;border-radius:99px;font-weight:900;display:inline-block;">${perfLbl}</span></div>
         <div class="pf-msg">${perfMsg}</div>
       </div>
     </div>
@@ -3607,20 +4111,18 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
       <div class="panel">
         <div class="ph"><span class="ph-ic">⭐</span><span class="ph-tx">Fortalezas del mes</span></div>
         <div class="pb">
-        ${fortItems.length
-          ? fortItems.map((t,i)=>`<div class="str"><div class="str-ic str-num">${i+1}</div><div><div class="str-t">${esc(t)}</div></div></div>`).join('')
-          : (fortalezas.length?fortalezas.map(g=>`<div class="str">
+        ${fortalezas.length?fortalezas.map(g=>`<div class="str">
           <div class="str-ic">${g.area.emoji}</div>
           <div><div class="str-t">${esc(g.nombre)} · ${lvlLabel(g.curLv)}</div>
           <div class="str-s">${esc(g.desc||lvlSub(g.curLv))}</div></div>
-        </div>`).join(''):'<div class="str-s">Aún sin datos suficientes este mes.</div>')}
+        </div>`).join(''):'<div class="str-s">Aún sin datos suficientes este mes.</div>'}
         </div>
       </div>
       <div class="panel">
         <div class="ph"><span class="ph-ic">🎯</span><span class="ph-tx">Aspecto principal a trabajar</span></div>
         <div class="pb">
-        ${aspText
-          ? `<div class="foco-d"><strong>${esc(aspText)}</strong></div>`
+        ${aspItems.length
+          ? aspItems.map(t=>`<div class="str"><div class="str-ic">🎯</div><div><div class="str-t">${esc(t)}</div></div></div>`).join('')
           : (foco?`<div class="foco-t">${esc(foco.nombre)} <span style="font-size:11px;font-weight:700;color:${foco.area.col};">· ${esc(foco.area.nombre)}</span></div>
           <div class="foco-d">${esc(foco.desc||'Foco de trabajo para el próximo período.')}</div>`:'<div class="foco-d">Aún sin datos suficientes este mes.</div>')}
         </div>
@@ -3632,7 +4134,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
       <div class="panel">
         <div class="ph"><span class="ph-ic">💬</span><span class="ph-tx">Comentario del Profe</span></div>
         <div class="pb">
-          <div class="coach-q">${coachQuote?esc(coachQuote):'Buen mes de trabajo. Seguimos construyendo el proceso de '+esc(name.split(' ')[0])+' con foco y constancia.'}</div>
+          <div class="coach-q">${coachStory}</div>
           <div class="coach-sig">
             <div class="coach-av">PM</div>
             <div class="coach-nm">Profe Mauri</div>
@@ -3665,7 +4167,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#0a3d2a;color:#1326
 // Lista, por área, cada rúbrica con los jugadores que la tienen en «Bien»
 // ══════════════════════════════════════
 function coachPlayersFor(cat){
-  let players=[...new Set(allRows.map(r=>r[COL.alumno]))].filter(Boolean).sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base'}));
+  let players=[...new Set(allRows.map(r=>r[COL.alumno]))].filter(Boolean).filter(isAlumnoActivo).sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base'}));
   const catOf=p=>{ const i=getInfo(p); return i?(i[INFO.categoria]||'').trim():''; };
   if(cat && cat!=='all') players=players.filter(p=>catOf(p)===cat);
   return players;
@@ -3818,6 +4320,7 @@ function lastEndedMonth(){
 }
 function monthCategoryChampion(cat, mk){
   const ps=[...new Set(allRows.map(r=>r[COL.alumno]).filter(Boolean))]
+    .filter(isAlumnoActivo)
     .filter(p=>{ const i=getInfo(p); return (i?(i[INFO.categoria]||'').trim():'')===cat; });
   const board=ps.map(p=>scorePlayer(p, mk)).filter(s=>s.sesiones>0);
   if(!board.length) return null;
@@ -3868,7 +4371,7 @@ function buildLiga(){
     ? `<div class="nota" style="margin-bottom:12px;">🏆 El <strong>Ranking Anual</strong> acumula los resultados de todos los meses del año. Al finalizar el año se premia al campeón de cada categoría.</div>`
     : '';
   // La Liga compara a cada jugador solo con sus compañeros de la misma categoría
-  const allPlayers=[...new Set(allRows.map(r=>r[COL.alumno]))].filter(Boolean).filter(p=>catOf(p)===myCat);
+  const allPlayers=[...new Set(allRows.map(r=>r[COL.alumno]))].filter(Boolean).filter(isAlumnoActivo).filter(p=>catOf(p)===myCat);
   if(!allPlayers.length){
     ldEl.style.display='none'; el.style.display='block';
     el.innerHTML=toggleHTML+'<div class="empty">Todavía no hay datos para armar la liga.</div>'; return;
@@ -3879,7 +4382,7 @@ function buildLiga(){
   let board=allPlayers.map(p=>scorePlayer(p, period)).filter(s=>s.sesiones>0);
   board.sort((a,b)=> b.total-a.total || b.asistencia-a.asistencia || b.actitud-a.actitud || b.torneos-a.torneos);
 
-  const explain=`<button class="lg-info-btn" onclick="openLigaInfo()">ℹ️ ¿Cómo funciona el Ranking?</button>`;
+  const explain=`<button class="lg-info-btn" onclick="openLigaInfo()">ℹ️ ¿Cómo funciona Mi Ranking?</button>`;
 
   const meScore=board.find(s=>s.name===currentPlayer);
   let meHTML;
@@ -3924,6 +4427,7 @@ function buildLiga(){
         <div class="lg-name">${s.name}${isMe?'<span class="lg-you">vos</span>':''}</div>
         <div class="lg-sub">📅 ${s.asistencia} · 💪 ${s.actitud} · 🏆 ${s.torneos}</div>
       </div>
+      ${i<3?`<div class="lg-medal-pos">${['🥇','🥈','🥉'][i]}</div>`:''}
       <div class="lg-pts">${s.total}<span> pts</span></div>
     </div>`;
   }).join('');
@@ -3941,7 +4445,6 @@ function buildLiga(){
   }).join('');
 
   el.innerHTML = explain + toggleHTML + yearNote + meHTML
-    + (podiumHTML?`<div class="card"><div class="card-title">Podio · ${catLbl}</div>${podiumHTML}</div>`:'')
     + `<div class="card"><div class="card-title">Tabla de posiciones · ${catLbl}</div>${rowsHTML||'<div class="empty" style="color:var(--muted);">Sin jugadores en este período.</div>'}</div>`;
   ldEl.style.display='none'; el.style.display='block';
 }
