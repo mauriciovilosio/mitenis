@@ -2254,7 +2254,7 @@ function openLigaInfo(){
   if(b) b.innerHTML=`<p style="margin-bottom:10px;">Mi Ranking es una <strong>competencia amistosa</strong> que premia la <strong>constancia, la buena actitud y la competencia</strong>. Te motiva a venir, a entrenar con la mejor energía y a animarte a jugar torneos.</p>
     <p style="margin:0 0 6px;font-weight:600;">Cómo se suman los puntos:</p>
     <ul style="margin:0 0 0 18px;padding:0;">
-      <li style="margin-bottom:5px;"><strong>+${LG.ATTEND}</strong> por tu asistencia completa del mes 📅</li>
+      <li style="margin-bottom:5px;"><strong>+${LG.ATTEND}</strong> por cada clase a la que asistís 📅</li>
       <li style="margin-bottom:5px;"><strong>+${LG.ACTITUD}</strong> si tu Actitud del mes es <strong>Excelente</strong> 💪</li>
       <li><strong>+${LG.TORNEO}</strong> por cada torneo que jugaste en el mes 🏆</li>
     </ul>
@@ -4255,11 +4255,11 @@ function buildCoachPlanHTML(mk, cat){
 
 // ══════════════════════════════════════
 // LIGA — puntaje:
-// +5 por asistencia completa del mes (cumple el objetivo)
+// +1 por cada clase a la que asistió en el mes (columna 'Clases cumplidas' de la hoja asistencia)
 // +3 si la Actitud del mes es Excelente
 // +1 por cada torneo jugado en el mes (columna 'Torneos jugados' de la hoja asistencia)
 // ══════════════════════════════════════
-const LG = { ATTEND:5, ACTITUD:3, TORNEO:1 };
+const LG = { ATTEND:1, ACTITUD:3, TORNEO:1 };
 function sessionsOf(name){
   return allRows.filter(r=>r[COL.alumno]===name)
     .sort((a,b)=>new Date(parseDate(a[COL.fecha]))-new Date(parseDate(b[COL.fecha])));
@@ -4291,9 +4291,9 @@ function scorePlayer(name, period){
   const inP = mk => period==='all' ? true : (inYear ? (mk||'').startsWith(yr) : mk===period);
   const sessScope=sessionsOf(name).filter(s=> inP(monthKey(s)));
   const aMonths = period==='all' ? attMonths(name) : (inYear ? attMonths(name).filter(mk=>mk.startsWith(yr)) : [period]);
-  // +5 por cada mes con asistencia completa
+  // +1 por cada clase a la que asistió en los meses del período
   let asistencia=0;
-  aMonths.forEach(mk=>{ const at=attendanceFor(name,mk); if(at && at.met) asistencia+=LG.ATTEND; });
+  aMonths.forEach(mk=>{ const at=attendanceFor(name,mk); if(at) asistencia+=at.cumplidas*LG.ATTEND; });
   // +1 por cada torneo jugado en los meses del período
   let torneos=0;
   aMonths.forEach(mk=>{ torneos+=tournamentsForMonth(name,mk)*LG.TORNEO; });
