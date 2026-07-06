@@ -54,11 +54,15 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .landing-sub{font-size:14px;font-weight:700;color:rgba(10,81,58,.92);margin-bottom:2.5rem;letter-spacing:.01em;}
 /* === Logo lockup nuevo (Inicio) — icono MT + nombre inclinado === */
 .logo-lockup{display:flex;align-items:center;justify-content:center;gap:16px;margin:0 auto 2.4rem;flex-wrap:nowrap;}
-.logo-icon{width:86px;height:86px;border-radius:23px;background:#2b2b2b;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 10px 26px rgba(0,0,0,.22);}
+.logo-icon{width:86px;height:86px;border-radius:23px;background:#2b2b2b;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 10px 26px rgba(0,0,0,.22);animation:introIconIn .55s cubic-bezier(.34,1.4,.64,1) both;}
 .logo-icon span{font-family:'Archivo Black','Arial Black',Impact,sans-serif;font-size:32px;line-height:1;color:#fefefe;letter-spacing:-.01em;transform:skewX(-12deg);display:inline-block;}
-.logo-words{text-align:left;min-width:0;}
+.logo-words{text-align:left;min-width:0;overflow:hidden;white-space:nowrap;animation:introWordsIn .6s ease .4s both;}
 .logo-name{font-family:'Archivo Black','Arial Black',Impact,sans-serif;font-size:clamp(26px,7vw,42px);line-height:1;color:#2b2b2b;letter-spacing:-.02em;transform:skewX(-10deg);display:inline-block;}
 .logo-tag{font-family:'Inter',sans-serif;font-size:clamp(12px,3vw,15px);font-weight:700;color:var(--muted);line-height:1.35;margin-top:6px;}
+@keyframes introIconIn{0%{opacity:0;transform:scale(.4);}65%{opacity:1;transform:scale(1.08);}100%{opacity:1;transform:scale(1);}}
+@keyframes introWordsIn{0%{max-width:0;opacity:0;}100%{max-width:600px;opacity:1;}}
+@keyframes introMenuIn{0%{opacity:0;transform:translateY(16px);}100%{opacity:1;transform:translateY(0);}}
+.start-menu{animation:introMenuIn .5s ease 1s both;}
 @media(max-width:520px){.landing{padding:1.25rem;}.logo-lockup{gap:12px;}.logo-icon{width:60px;height:60px;border-radius:17px;}.logo-icon span{font-size:23px;}.logo-name{font-size:clamp(20px,7vw,30px);}.logo-tag{font-size:clamp(10px,3vw,13px);white-space:nowrap;margin-top:4px;}}
 
 .select-card{background:var(--surf);border:1px solid var(--border);border-radius:20px;padding:1.5rem;width:100%;box-shadow:0 10px 34px rgba(10,81,58,0.14);}
@@ -337,6 +341,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .mt-col .acc{margin-bottom:0;}
 .skills-acc .acc-head{padding:11px 14px;}
 .skills-acc .acc-title{font-size:12px;font-weight:800;color:var(--blue);}
+.skills-acc .acc-chevron{font-size:19px;}
 
 /* Mi Tenis: grilla KPI de área + habilidades */
 .mt-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:start;margin-top:8px;}
@@ -3301,8 +3306,12 @@ function buildResumen(){
     ${_obj?`<div class="ph-obj-band"><span class="ph-obj-ic">🎯</span><div><div class="ph-obj-lbl">Mi objetivo</div><div class="ph-obj-txt">${_obj}</div></div></div>`:''}
   </div>
   <div class="perfil-row2">
-    <div class="card perfil-kpi2">
-      <div class="card-title">Mi Desempeño <button class="kpi-info" onclick="openIndiceInfo()" aria-label="Cómo se mide el índice">i</button></div>
+    <div class="acc perfil-kpi2">
+      <div class="acc-head" onclick="toggleAcc(this)">
+        <span class="acc-title">Mi Desempeño <button class="kpi-info" onclick="event.stopPropagation();openIndiceInfo()" aria-label="Cómo se mide el índice">i</button></span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body"><div class="acc-body-inner">
       <div class="pk2-top">
         <span class="pk2-idx" style="color:${_dn.colLight};">${tot>0?tot.toFixed(1):'—'}<small>/3</small></span>
         <span class="lvl-pill" style="background:${_dn.bg};color:${_dn.txt};">${_dn.lbl}</span>
@@ -3311,9 +3320,14 @@ function buildResumen(){
       <div class="pk2-spark">${_desSpark}</div>
       ${_progHTML}
       <div class="pk2-month">${monthLabel(curMonth)}</div>
+      </div></div>
     </div>
-    <div class="card asist-card">
-      <div class="card-title">Mi Asistencia</div>
+    <div class="acc asist-card">
+      <div class="acc-head" onclick="toggleAcc(this)">
+        <span class="acc-title">Mi Asistencia</span>
+        <span class="acc-chevron">▾</span>
+      </div>
+      <div class="acc-body"><div class="acc-body-inner">
       <div class="asist-body">
         <div class="asist-left">
           ${donutSVG(at?at.pct:0,'#0a513a')}
@@ -3326,6 +3340,7 @@ function buildResumen(){
           ${_rachaHTML}
         </div>
       </div>
+      </div></div>
     </div>
   </div>`;
   el.innerHTML = perfilTop;
@@ -3488,7 +3503,7 @@ function buildRubrica(){
     }).filter(Boolean).join('');
     const body = rows || '<div class="empty" style="color:var(--muted);padding:10px 0;font-size:12px;">Sin evaluación este mes.</div>';
     return `<div class="acc skills-acc">
-      <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">Mis Habilidades</span><span class="acc-chevron">▾</span></div>
+      <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">Ver mis habilidades</span><span class="acc-chevron">▾</span></div>
       <div class="acc-body"><div class="acc-body-inner">${body}</div></div>
     </div>`;
   };
