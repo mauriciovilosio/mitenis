@@ -139,6 +139,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .perfil-row2{display:flex;gap:14px;align-items:stretch;margin-bottom:16px;}
 .perfil-row2 .perfil-kpi2{flex:1 1 0;margin-bottom:0;}
 .perfil-row2 .asist-card{flex:2 1 0;margin-bottom:0;overflow:hidden;}
+.perfil-kpi2 .acc-head,.asist-card .acc-head{background:#2b2b2b;}
+.perfil-kpi2 .acc-head:hover,.asist-card .acc-head:hover{background:#3a3a3a;}
+.perfil-kpi2 .acc-title,.asist-card .acc-title{color:#fff;}
+.perfil-kpi2 .acc-chevron,.asist-card .acc-chevron{color:#ffde59;}
 @media(max-width:620px){ .perfil-row2{flex-wrap:wrap;} .perfil-row2 .perfil-kpi2,.perfil-row2 .asist-card{flex:1 1 100%;} }
 /* Mi Tenis: habilidades DENTRO de la card del KPI */
 .ac{overflow:hidden;}
@@ -3305,7 +3309,7 @@ function buildResumen(){
       </div>
       ${heroCat}
     </div>
-    ${_obj?`<div class="ph-obj-band"><span class="ph-obj-ic">🎯</span><div><div class="ph-obj-lbl">Mi objetivo</div><div class="ph-obj-txt">${_obj}</div></div></div>`:''}
+    ${_obj?`<div class="ph-obj-band"><span class="ph-obj-ic">🎯</span><div><div class="ph-obj-lbl">Objetivo</div><div class="ph-obj-txt">${_obj}</div></div></div>`:''}
   </div>
   <div class="perfil-row2">
     <div class="acc perfil-kpi2">
