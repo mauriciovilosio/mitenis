@@ -1311,7 +1311,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
 
 <div class="pin-overlay" id="torneos-info-overlay" onclick="if(event.target===this)closeTorneosInfo()">
   <div class="pin-modal" style="max-width:380px;">
-    <div class="pin-title">🏆 Torneos internos</div>
+    <div class="pin-title">🏆 Circuito interno</div>
     <div style="font-size:14px;color:var(--text);line-height:1.7;text-align:left;margin-top:2px;">
       <p style="margin-bottom:10px;font-weight:600;">Con <strong>mi tenis</strong> vas a poder:</p>
       <ul style="margin:0;padding:0;list-style:none;">
@@ -2228,12 +2228,13 @@ function toggleTip(btn){
 }
 function openCoachInfo(){
   const b=document.getElementById('coach-info-body');
-  if(b) b.innerHTML='¡Hola Profe! En esta sección podés observar un resumen del rendimiento de todos los alumnos registrados en Mi Tenis. Además, podés:'
-    +'<ol style="margin:10px 0 0;padding-left:20px;line-height:1.7;">'
-    +'<li>comparar las distintas categorías</li>'
-    +'<li>hacer un seguimiento de asistencia a clases</li>'
-    +'<li>ver qué alumno viene bien y a quién hay que darle más foco.</li>'
-    +'</ol>';
+  if(b) b.innerHTML='<p style="margin-bottom:10px;font-weight:600;">Con <strong>mi tenis</strong> vas a poder:</p>'
+    +'<ul style="margin:0;padding:0;list-style:none;">'
+    +'<li style="margin-bottom:8px;">🎾 ver el rendimiento de tus alumnos</li>'
+    +'<li style="margin-bottom:8px;">☑️ hacer un seguimiento de asistencia a clases</li>'
+    +'<li style="margin-bottom:8px;">📊 comparar las distintas categorías</li>'
+    +'<li>🎯 ver qué alumno viene bien y a quién hay que darle más foco.</li>'
+    +'</ul>';
   const ov=document.getElementById('coach-info-overlay'); if(ov) ov.classList.add('show');
 }
 function closeCoachInfo(){ const ov=document.getElementById('coach-info-overlay'); if(ov) ov.classList.remove('show'); }
