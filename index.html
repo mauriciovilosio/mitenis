@@ -3919,6 +3919,7 @@ function buildMonthReportHTML(name, mk){
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Reporte ${esc(name)} · ${esc(monthName)}</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#13261a;-webkit-font-smoothing:antialiased;
@@ -3934,8 +3935,8 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
 /* HEADER */
 .hd{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:22px 26px 18px;}
 .hd-brand{display:flex;align-items:center;gap:13px;}
-.hd-mark{width:46px;height:46px;border-radius:11px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.hd-mark span{font-weight:800;font-size:30px;color:#ffde59;line-height:1;}
+.hd-mark{width:46px;height:46px;border-radius:12px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.hd-mark span{font-family:'Archivo Black','Arial Black',Impact,sans-serif;font-weight:800;font-size:18px;color:#fefefe;letter-spacing:-.01em;transform:skewX(-10deg);display:inline-block;line-height:1;}
 .hd-bn{font-size:21px;font-weight:800;color:#fff;line-height:1;}
 .hd-bt{font-size:9.5px;font-weight:600;color:rgba(255,255,255,.62);margin-top:4px;line-height:1.3;}
 .hd-rep{text-align:right;}
@@ -4036,9 +4037,20 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
 .ft{background:#2b2b2b;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 22px;}
 .ft-l{font-size:11px;color:rgba(255,255,255,.8);font-style:italic;}
 .ft-r{font-size:11px;font-weight:800;color:#ffde59;display:flex;align-items:center;gap:10px;}
-.ft-m{width:26px;height:26px;border-radius:7px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;}
-.ft-m span{color:#ffde59;font-weight:800;font-size:16px;}
+.ft-m{width:30px;height:26px;border-radius:7px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ft-m span{font-family:'Archivo Black','Arial Black',Impact,sans-serif;color:#fefefe;font-weight:800;font-size:11px;letter-spacing:-.01em;transform:skewX(-10deg);display:inline-block;line-height:1;}
 @media(max-width:680px){
+  .hd{flex-wrap:wrap;row-gap:10px;padding:18px 18px 14px;}
+  .hd-brand{gap:10px;}
+  .hd-mark{width:40px;height:40px;border-radius:11px;}
+  .hd-mark span{font-size:15px;}
+  .hd-bn{font-size:18px;}
+  .hd-bt{font-size:9px;}
+  .hd-rep{text-align:left;}
+  .hd-rep-m{font-size:13px;}
+  .ft{flex-direction:column;align-items:flex-start;gap:10px;padding:16px 18px;}
+  .ft-l{font-size:11px;line-height:1.45;}
+  .ft-r{font-size:11px;}
   .top{grid-template-columns:1fr 1fr;grid-template-areas:"pl ix" "pf pf";gap:16px 12px;align-items:center;}
   .ix{border-left:none;border-right:none;}
   .ix-lbl{font-size:8px;}
@@ -4060,7 +4072,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
   <!-- HEADER -->
   <div class="hd">
     <div class="hd-brand">
-      <div class="hd-mark"><span>M</span></div>
+      <div class="hd-mark"><span>MT</span></div>
       <div><div class="hd-bn">mi tenis</div><div class="hd-bt">Observamos. Acompañamos. Potenciamos.</div></div>
     </div>
     <div class="hd-rep">
@@ -4170,7 +4182,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
   <!-- FOOTER -->
   <div class="ft">
     <div class="ft-l">Cada entrenamiento cuenta. Cada paso te acerca a tu mejor versión.</div>
-    <div class="ft-r">¡Seguimos juntos! <span class="ft-m"><span>M</span></span></div>
+    <div class="ft-r">¡Seguimos juntos! <span class="ft-m"><span>MT</span></span></div>
   </div>
 
 </div></body></html>`;
