@@ -3889,15 +3889,15 @@ function buildMonthReportHTML(name, mk){
   // COMENTARIO DEL PROFE — cuentito preautomatizado
   const _fn = (name.split(' ')[0]) || 'Jugador';
   const _topArea = [...areas].filter(a=>areaAvg[a.id]>0).sort((x,y)=>areaAvg[y.id]-areaAvg[x.id])[0] || null;
-  const _compromiso = (actitudExcelente(name,mk) || (at&&at.met)) ? 'alto' : ((at&&at.pct>=60) ? 'medio' : 'en crecimiento');
+  const _pctAsist = at ? at.pct : 0;
+  const _compromisoLbl = _pctAsist>=100 ? 'excelente' : (_pctAsist>=75 ? 'muy buen' : (_pctAsist>=50 ? 'buen' : 'creciente'));
   const _joinES = (arr)=> arr.length<=1 ? (arr[0]||'') : (arr.slice(0,-1).join(', ') + ' y ' + arr[arr.length-1]);
   const _aspList = aspItems.length ? aspItems : (foco ? [foco.nombre] : []);
   const _aspTxt = _joinES(_aspList);
-  let coachStory = 'Hola ' + esc(_fn) + ', te felicito por estos días de trabajo.';
-  coachStory += ' Este mes tuviste un compromiso ' + _compromiso + ' de asistencia a clases';
-  coachStory += _topArea ? (' y tu área de mayor fortaleza fue: <b>' + esc(_topArea.nombre) + '</b> 💪.') : ' 💪.';
-  if(_aspTxt) coachStory += ' Recomendamos para el próximo mes seguir trabajando ' + esc(_aspTxt) + '.';
-  coachStory += ' Vamos por más ' + esc(_fn) + ' 🎾.';
+  let coachStory = 'Hola ' + esc(_fn) + ', te felicito por estos días de trabajo y por tu ' + _compromisoLbl + ' compromiso a clases.';
+  if(_topArea) coachStory += ' Durante el último mes tu área de mayor fortaleza fue: <b>' + esc(_topArea.nombre) + '</b> 💪. ¡A mantenerlo!';
+  if(_aspTxt) coachStory += ' Con los Profes recomendamos para el próximo mes seguir trabajando ' + esc(_aspTxt) + '.';
+  coachStory += ' ¡Vamos por más ' + esc(_fn) + '! 🎾.';
 
   // ÚLTIMA SESIÓN
   const last=ms.length?ms[ms.length-1]:null;
