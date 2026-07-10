@@ -109,6 +109,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .header-back{background:rgba(255,255,255,.14);border:none;border-radius:8px;padding:6px 10px;cursor:pointer;color:rgba(255,255,255,.9);font-size:12px;font-family:'Inter',sans-serif;transition:background .15s;}
 .header-back:hover{background:rgba(255,255,255,.24);}
 .header-player{display:flex;align-items:center;gap:10px;}
+/* Mi Perfil: el nombre/avatar/meta del alumno ya se muestra en la tarjeta informativa de la sección, así que se oculta acá para no duplicar */
+#app:has(#tab-resumen.active) .header-player{display:none;}
 .header-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;}
 .header-name{font-family:'Inter',sans-serif;font-size:19px;font-weight:800;color:#fff;letter-spacing:-.01em;display:inline-flex;align-items:center;}
 .coach-header .header-top{padding-bottom:14px;}
@@ -133,6 +135,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 #content-resumen .card-title{color:#fefefe;margin:-16px -16px 14px;padding:10px 16px;border-radius:var(--radius) var(--radius) 0 0;}
 .cz-radar, .cz-rank-card, .cz-areas{overflow:hidden;}
 .cz-radar > .card-title, .cz-rank-card > .card-title, .cz-areas > .card-title{color:#fefefe;margin:-16px -16px 14px;padding:10px 16px;border-radius:var(--radius) var(--radius) 0 0;}
+#circuito-content .card{overflow:hidden;}
+#circuito-content .card-title{color:#fefefe;margin:-16px -16px 14px;padding:10px 16px;border-radius:var(--radius) var(--radius) 0 0;}
 .lvl-pill{display:inline-block;padding:4px 14px;border-radius:999px;font-size:15px;font-weight:800;}
 /* Mi Perfil v6: info sola + fila 2 (Desempeño + Asistencia) */
 .perfil-info-solo{margin-bottom:14px;}
@@ -966,6 +970,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 /* === Circuito interno: pestañas + selector de jugador === */
 .cz-select{width:100%;margin-top:4px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--surf);color:var(--blue);font-family:'Inter',sans-serif;font-size:15px;font-weight:600;cursor:pointer;}
 .cz-select:focus{outline:none;border-color:var(--blue);}
+.cz-search{width:100%;box-sizing:border-box;margin-top:4px;padding:11px 14px;border-radius:12px;border:1.5px solid var(--border);background:var(--surf);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;}
+.cz-search:focus{outline:none;border-color:var(--blue);}
+.cz-search-empty{font-size:12px;color:var(--muted);margin-top:8px;}
 
 .cz-filter-title{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:9px;letter-spacing:.01em;}
 .cz-filter .cz-cats{margin-bottom:0;}
@@ -1417,7 +1424,7 @@ const ADULTS_SHEET = 'informacion adultos'; // alumno | categoria | edad | brazo
 const MATCHES_SHEET = 'Partidos Torneos';   // torneo | categoria | fecha | jugadorA | jugadorB | resultado | ganador
 const EVENTS_SHEET = 'Torneos';  // (opcional) torneo | categoria | fecha | estado
 const PLAN_SHEET = 'Planificacion'; // golpe | actividad | categoria | descripcion | (opcionales: objetivo | material | duracion | nivel)
-const MATCH_WIN_PTS = 3;         // puntaje por victoria para el ranking interno
+const MATCH_WIN_PTS = 10;        // puntaje por victoria para el ranking interno
 
 // ══════════════════════════════════════
 // COLUMNAS — exactamente como las renombró el usuario
@@ -1680,7 +1687,7 @@ let allRows=[], infoRows=[], asistRows=[], videoRows=[], currentPlayer=null, pla
 let appMode='escuela'; // 'escuela' | 'torneos'
 let ligaView='mensual'; // 'mensual' | 'anual' (Mi Ranking)
 let adultRows=[], matchRows=[], eventRows=[], circuitoCat='all';
-let circuitoTab='torneos', circuitoPlayer=null;
+let circuitoTab='torneos', circuitoPlayer=null, circuitoPlayerQ='';
 let coachSort='rendimiento';
 let __pendingCircuito=null, __circuitoUnlocked=new Set();
 let planRows=[], planHeader=[], planFilters={golpe:'all', categoria:'all', nivel:'all', q:''};
@@ -2650,7 +2657,7 @@ function buildCalendario(){
   el.innerHTML=html; ld.style.display='none'; el.style.display='block';
 }
 function openCircuito(){
-  circuitoCat='all'; circuitoTab='torneos'; circuitoPlayer=null;
+  circuitoCat='all'; circuitoTab='torneos'; circuitoPlayer=null; circuitoPlayerQ='';
   document.getElementById('landing').style.display='none';
   document.getElementById('app').classList.remove('visible');
   document.getElementById('circuito').classList.add('visible');
@@ -2665,6 +2672,12 @@ function buildCircuito(){
   if(circuitoTab==='jugadores') buildCircuitoJugadores(); else buildCircuitoTorneos();
 }
 function setCircuitoTab(t){ circuitoTab=t; buildCircuito(); saveNav(); }
+function setCircuitoQ(v){
+  circuitoPlayerQ=v;
+  buildCircuitoJugadores();
+  const inp=document.getElementById('cz-player-q');
+  if(inp){ inp.focus(); const p=inp.value.length; try{ inp.setSelectionRange(p,p); }catch(e){} }
+}
 function setCircuitoPlayer(name){
   name=name||null;
   if(!name){ circuitoPlayer=null; buildCircuitoJugadores(); return; }
@@ -2776,12 +2789,16 @@ function buildCircuitoJugadores(){
   if(!list.length){ el.innerHTML='<div class="empty">No hay jugadores de torneos cargados todavía.</div>'; return; }
   if(circuitoPlayer && !list.includes(circuitoPlayer)) circuitoPlayer=null;
   const esc=v=>String(v||'').replace(/"/g,'&quot;');
+  const q=normCat(circuitoPlayerQ).trim();
+  const filteredList=q?list.filter(n=>normCat(n).includes(q)):list;
   const filter=`<div class="cz-filter">
     <div class="cz-filter-title">Seleccioná un jugador</div>
+    <input type="text" id="cz-player-q" class="cz-search" placeholder="🔍 Buscar por nombre…" value="${esc(circuitoPlayerQ)}" oninput="setCircuitoQ(this.value)">
     <select class="cz-select" onchange="setCircuitoPlayer(this.value)">
       <option value="" ${!circuitoPlayer?'selected':''}>— Elegí un jugador —</option>
-      ${list.map(n=>`<option value="${esc(n)}" ${circuitoPlayer===n?'selected':''}>${n}</option>`).join('')}
+      ${filteredList.map(n=>`<option value="${esc(n)}" ${circuitoPlayer===n?'selected':''}>${n}</option>`).join('')}
     </select>
+    ${q && !filteredList.length ? `<div class="cz-search-empty">Sin resultados para "${esc(circuitoPlayerQ)}".</div>` : ''}
   </div>`;
   let body='';
   if(!circuitoPlayer){
@@ -3339,6 +3356,7 @@ function buildResumen(){
         <div class="asist-left">
           ${donutSVG(at?at.pct:0,'#0a513a')}
           <div class="asist-count">${at?`${_aDone}/${_aObj} clases`:'—'}</div>
+          <div class="pk2-month">${monthLabel(curMonth)}</div>
         </div>
         <div class="asist-vline"></div>
         <div class="asist-right">
