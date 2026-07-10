@@ -937,9 +937,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .mode-info:focus-visible{outline:2px solid #fff;outline-offset:1px;}
 .mode-btn.active .mode-info{background:rgba(10,81,58,.14);}
 .rec-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
-.rec-item{flex:1;min-width:64px;text-align:center;background:var(--surf2);border-radius:12px;padding:10px 6px;}
-.rec-val{font-size:20px;font-weight:800;color:var(--text);}
-.rec-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:3px;}
+.rec-item{flex:1;min-width:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:14px 6px 12px;}
+.rec-ic{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:8px;flex-shrink:0;}
+.rec-val{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.02em;}
+.rec-lbl{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:5px;}
+.rec-bar{width:100%;height:4px;border-radius:99px;background:var(--surf2);margin-top:7px;overflow:hidden;}
+.rec-bar i{display:block;height:100%;border-radius:99px;}
 .match-list{display:flex;flex-direction:column;gap:8px;}
 .match-row{display:flex;align-items:center;gap:12px;background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:10px 12px;}
 .match-badge{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;flex-shrink:0;font-size:13px;}
@@ -951,8 +954,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .match-meta{font-size:11px;color:var(--muted);margin-top:2px;}
 .match-res{font-weight:700;color:var(--text);white-space:nowrap;}
 .rank-list{display:flex;flex-direction:column;gap:6px;margin-top:6px;}
-.rank-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;background:var(--surf2);}
-.rank-row.me{background:#fffceb;border:1px solid #f3e07a;}
+.rank-row{display:flex;align-items:center;gap:10px;padding:10px 6px;border-bottom:1px solid var(--border);}
+.rank-row:last-child{border-bottom:none;}
+.rank-row.me{background:#fffceb;border:1px solid #f3e07a;border-radius:10px;padding:9px 10px;}
 .rank-pos{font-weight:800;color:var(--muted);width:20px;text-align:center;flex-shrink:0;}
 .rank-name{flex:1;min-width:0;}
 .rank-nm{font-weight:700;color:var(--text);font-size:14px;}
@@ -2596,12 +2600,14 @@ function buildPartidos(){
   const ms=playerMatches(currentPlayer).slice().sort((a,b)=>(parseDate(b[MATCH.fecha])||'').localeCompare(parseDate(a[MATCH.fecha])||''));
   const rec=playerRecord(currentPlayer);
   const winPct=rec.dec?Math.round(rec.w/rec.dec*100):0;
+  const _pctCol=winPct>=60?'var(--lv3)':winPct>=40?'var(--lv2)':'var(--lv1)';
+  const _pctBg=winPct>=60?'var(--lv3-bg)':winPct>=40?'var(--lv2-bg)':'var(--lv1-bg)';
   const summary=`<div class="card"><div class="card-title">Mi resumen en torneos</div>
     <div class="rec-row">
-      <div class="rec-item"><div class="rec-val">${rec.w}-${rec.l}</div><div class="rec-lbl">Récord G-P</div></div>
-      <div class="rec-item"><div class="rec-val">${rec.p}</div><div class="rec-lbl">Partidos</div></div>
-      <div class="rec-item"><div class="rec-val">${winPct}%</div><div class="rec-lbl">Victorias</div></div>
-      <div class="rec-item"><div class="rec-val">${rec.pts}</div><div class="rec-lbl">Puntos</div></div>
+      <div class="rec-item"><div class="rec-ic" style="background:var(--lv3-bg);">🏆</div><div class="rec-val"><span style="color:var(--lv3);">${rec.w}</span><span style="color:var(--muted);">-</span><span style="color:var(--lv1);">${rec.l}</span></div><div class="rec-lbl">Récord G-P</div></div>
+      <div class="rec-item"><div class="rec-ic" style="background:var(--surf2);">🎾</div><div class="rec-val">${rec.p}</div><div class="rec-lbl">Partidos</div></div>
+      <div class="rec-item"><div class="rec-ic" style="background:${_pctBg};">📈</div><div class="rec-val" style="color:${_pctCol};">${winPct}%</div><div class="rec-bar"><i style="width:${winPct}%;background:${_pctCol};"></i></div><div class="rec-lbl">Victorias</div></div>
+      <div class="rec-item"><div class="rec-ic" style="background:var(--ball);color:#5b5400;">⭐</div><div class="rec-val">${rec.pts}</div><div class="rec-lbl">Puntos</div></div>
     </div></div>`;
   const list=ms.map(m=>{
     const opp=sameName(m[MATCH.jugadorA],currentPlayer)?(m[MATCH.jugadorB]||''):(m[MATCH.jugadorA]||'');
@@ -2810,15 +2816,17 @@ function buildCircuitoJugadores(){
     const info=getAdultInfo(name); const cat=(info?info[ADULT.categoria]:'')||'';
     let posTxt='—';
     if(cat){ const arr=rankingForCat(cat); const idx=arr.findIndex(p=>sameName(p.name,name)); if(idx>=0) posTxt=(idx+1)+'º de '+arr.length; }
+    const _pctCol=winPct>=60?'var(--lv3)':winPct>=40?'var(--lv2)':'var(--lv1)';
+    const _pctBg=winPct>=60?'var(--lv3-bg)':winPct>=40?'var(--lv2-bg)':'var(--lv1-bg)';
     const summary=`<div class="card"><div class="card-title">Mi resumen en torneos</div>
       <div class="rec-row">
-        <div class="rec-item"><div class="rec-val">${rec.w}-${rec.l}</div><div class="rec-lbl">Récord G-P</div></div>
-        <div class="rec-item"><div class="rec-val">${rec.p}</div><div class="rec-lbl">Partidos</div></div>
-        <div class="rec-item"><div class="rec-val">${winPct}%</div><div class="rec-lbl">Victorias</div></div>
-        <div class="rec-item"><div class="rec-val">${rec.pts}</div><div class="rec-lbl">Puntos</div></div>
+        <div class="rec-item"><div class="rec-ic" style="background:var(--lv3-bg);">🏆</div><div class="rec-val"><span style="color:var(--lv3);">${rec.w}</span><span style="color:var(--muted);">-</span><span style="color:var(--lv1);">${rec.l}</span></div><div class="rec-lbl">Récord G-P</div></div>
+        <div class="rec-item"><div class="rec-ic" style="background:var(--surf2);">🎾</div><div class="rec-val">${rec.p}</div><div class="rec-lbl">Partidos</div></div>
+        <div class="rec-item"><div class="rec-ic" style="background:${_pctBg};">📈</div><div class="rec-val" style="color:${_pctCol};">${winPct}%</div><div class="rec-bar"><i style="width:${winPct}%;background:${_pctCol};"></i></div><div class="rec-lbl">Victorias</div></div>
+        <div class="rec-item"><div class="rec-ic" style="background:var(--ball);color:#5b5400;">⭐</div><div class="rec-val">${rec.pts}</div><div class="rec-lbl">Puntos</div></div>
       </div></div>`;
     const posCard = cat?`<div class="card"><div class="card-title">Posición en el ranking · ${catLabel(cat)}</div>
-      <div class="rec-row"><div class="rec-item"><div class="rec-val">${posTxt}</div><div class="rec-lbl">Posición</div></div></div></div>`:'';
+      <div class="rec-row"><div class="rec-item"><div class="rec-ic" style="background:var(--ball);color:#5b5400;">🥇</div><div class="rec-val">${posTxt}</div><div class="rec-lbl">Posición</div></div></div></div>`:'';
     const ms=playerMatches(name).slice().sort((a,b)=>(parseDate(b[MATCH.fecha])||'').localeCompare(parseDate(a[MATCH.fecha])||''));
     const rows=ms.map(m=>{
       const opp=sameName(m[MATCH.jugadorA],name)?(m[MATCH.jugadorB]||''):(m[MATCH.jugadorA]||'');
