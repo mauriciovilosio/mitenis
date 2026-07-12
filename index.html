@@ -283,6 +283,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .pk2-bar i{display:block;height:100%;background:#148f67;border-radius:99px;}
 .asist-streak{font-size:11px;font-weight:700;color:#148f67;margin-top:8px;}
 
+/* Mi Perfil v8: fila de KPIs (Desempeño / Asistencia / Racha / Fortaleza) */
+.pf-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+.pf-kpi{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:14px 8px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.pf-kpi-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+.pf-kpi-val{font-size:19px;font-weight:800;color:var(--text);margin-top:7px;letter-spacing:-.01em;line-height:1.15;}
+.pf-kpi-val small{font-size:11px;font-weight:600;color:var(--muted);margin-left:1px;}
+.pf-kpi-val.pf-kpi-skill{font-size:15px;min-height:23px;display:flex;align-items:center;}
+.pf-kpi-month{font-size:10px;color:var(--muted);margin-top:7px;text-transform:capitalize;}
+@media(max-width:560px){ .pf-kpi-row{grid-template-columns:repeat(2,1fr);} }
+
 /* Mi Perfil v5: fila 1 (info + Mi Desempeño) + fila 2 (Mi Asistencia) === */
 .perfil-row1{display:flex;gap:14px;align-items:stretch;margin-bottom:14px;}
 .perfil-row1 .perfil-info{flex:1.5 1 0;min-width:0;}
@@ -531,7 +541,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .perfil-hero{display:flex;gap:18px;align-items:stretch;background:linear-gradient(135deg,#2b2b2b,#1a1a1a);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;color:#fff;box-shadow:0 12px 30px rgba(0,0,0,.28);}
 .ph-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;}
 .ph-name{font-size:21px;font-weight:900;text-transform:uppercase;line-height:1.08;}
-.ph-cat{display:inline-block;align-self:flex-start;margin-top:6px;padding:2px 11px;border-radius:99px;font-size:10px;font-weight:800;}
+.ph-cat{display:inline-block;align-self:flex-start;margin-top:6px;padding:6px 16px;border-radius:99px;font-size:14px;font-weight:800;letter-spacing:.01em;}
 .ph-grid{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:13px;align-items:flex-start;}
 .ph-it{min-width:0;}
 .ph-it-obj{flex:1 1 200px;}
@@ -3309,6 +3319,12 @@ function buildResumen(){
   ].filter(Boolean).map(it=>`<div class="ph-it${it[2]?' ph-it-obj':''}"><label>${it[0]}</label><span>${it[1]}</span></div>`).join('');
   const heroObj = (info&&info[INFO.objetivo])?`<div class="ph-obj"><label>Objetivo</label><span>${info[INFO.objetivo]}</span></div>`:'';
   const _dn=desempenoNivel(tot);
+  const _allSkillGroups=[].concat(...Object.values(RESUMEN_GROUPS));
+  const _skillAvgs=_allSkillGroups.map(g=>{
+    const vals=curSess.map(s=>avgLvlKeys(s,g.keys)).filter(v=>v>0);
+    return {nombre:g.nombre, avg:vals.length?vals.reduce((x,y)=>x+y,0)/vals.length:0};
+  }).filter(g=>g.avg>0).sort((a,b)=>b.avg-a.avg);
+  const _topSkill=_skillAvgs[0]||null;
   const _aDone=at?Math.min(at.objetivo|0,at.cumplidas|0):0, _aObj=at?(at.objetivo|0):0;
   const _allMk=[...new Set(playerSessions.map(monthKey).filter(Boolean))].sort();
   const _desSeries=_allMk.map(mk=>{ const vv=areas.map(a=>areaAvgScope(currentPlayer,mk,a.id)).filter(x=>x>0); return vv.length?vv.reduce((x,y)=>x+y,0)/vv.length:0; }).filter(x=>x>0).slice(-12);
@@ -3345,16 +3361,37 @@ function buildResumen(){
     </div>
     ${_obj?`<div class="ph-obj-band"><span class="ph-obj-ic">🎯</span><div><div class="ph-obj-lbl">Objetivo</div><div class="ph-obj-txt">${_obj}</div></div></div>`:''}
   </div>
+  <div class="pf-kpi-row">
+    <div class="pf-kpi">
+      <div class="pf-kpi-lbl">Desempeño</div>
+      <div class="pf-kpi-val" style="color:${_dn.colLight};">${tot>0?_dn.lbl.charAt(0)+_dn.lbl.slice(1).toLowerCase():'—'}</div>
+      <div class="pf-kpi-month">${monthLabel(curMonth)}</div>
+    </div>
+    <div class="pf-kpi">
+      <div class="pf-kpi-lbl">Asistencia</div>
+      <div class="pf-kpi-val" style="color:${at&&at.met?'#0a513a':'#e0a200'};">${at?`${_aDone}<small>/${_aObj}</small>`:'—'}</div>
+      <div class="pf-kpi-month">${monthLabel(curMonth)}</div>
+    </div>
+    <div class="pf-kpi">
+      <div class="pf-kpi-lbl">Racha</div>
+      <div class="pf-kpi-val" style="color:${_streak>=1?'#e0a200':'var(--muted)'};">${_streak>=1?`${_streak}<small>${_streak===1?' mes':' meses'}</small>`:'—'}</div>
+      <div class="pf-kpi-month">${monthLabel(curMonth)}</div>
+    </div>
+    <div class="pf-kpi">
+      <div class="pf-kpi-lbl">Fortaleza</div>
+      <div class="pf-kpi-val pf-kpi-skill" style="color:${_topSkill?'#0a513a':'var(--muted)'};">${_topSkill?_topSkill.nombre:'—'}</div>
+      <div class="pf-kpi-month">${monthLabel(curMonth)}</div>
+    </div>
+  </div>
   <div class="perfil-row2">
     <div class="acc perfil-kpi2">
       <div class="acc-head" onclick="toggleAcc(this)">
-        <span class="acc-title">Mi Desempeño <button class="kpi-info" onclick="event.stopPropagation();openIndiceInfo()" aria-label="Cómo se mide el índice">i</button></span>
+        <span class="acc-title">Índice general del mes <button class="kpi-info" onclick="event.stopPropagation();openIndiceInfo()" aria-label="Cómo se mide el índice">i</button></span>
         <span class="acc-chevron">▾</span>
       </div>
       <div class="acc-body"><div class="acc-body-inner">
       <div class="pk2-top">
         <span class="pk2-idx" style="color:${_dn.colLight};">${tot>0?tot.toFixed(1):'—'}<small>/3</small></span>
-        <span class="lvl-pill" style="background:${_dn.bg};color:${_dn.txt};">${_dn.lbl}</span>
       </div>
       ${_dTxt?`<div class="pk2-trend" style="color:${_dCol};">${_dArrow} ${_dTxt}</div>`:''}
       <div class="pk2-spark">${_desSpark}</div>
