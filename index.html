@@ -287,7 +287,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 /* Mi Perfil v8: fila de KPIs (Desempeño / Asistencia / Racha / Fortaleza) */
 .pf-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;align-items:start;}
 .pf-kpi{background:var(--surf);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:186px;}
-.pf-kpi-lbl{background:#2b2b2b;color:#fefefe;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:8px 8px;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px;}
+.pf-kpi-lbl{background:#2b2b2b;color:#fefefe;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:8px 8px;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px;min-height:38px;box-sizing:border-box;}
 .pf-kpi-body{flex:1;padding:12px 8px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .pf-kpi-val{font-size:19px;font-weight:800;color:var(--text);letter-spacing:-.01em;line-height:1.15;}
 .pf-kpi-val small{font-size:11px;font-weight:600;color:var(--muted);margin-left:1px;}
@@ -296,7 +296,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .pf-kpi .skills-acc .acc-head{padding:9px 10px;}
 .pf-kpi .skills-acc .acc-head:hover{background:rgba(10,81,58,.04);}
 .pf-kpi .skills-acc .acc-title{font-size:11px;font-weight:800;color:var(--blue);}
-.pf-kpi .skills-acc .acc-body-inner{padding:0 10px 12px;min-height:148px;box-sizing:border-box;}
+.pf-kpi .skills-acc .acc-body-inner{padding:0 10px 12px;min-height:185px;box-sizing:border-box;}
 .pf-kpi-month{font-size:10px;color:var(--muted);margin-top:7px;text-transform:capitalize;}
 .pf-kpi-lbl .kpi-info{margin-left:0;}
 @media(max-width:560px){ .pf-kpi-row{grid-template-columns:repeat(2,1fr);} }
@@ -1388,7 +1388,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
   <div class="pin-modal" style="max-width:340px;">
     <div class="pin-title">¿Cómo se mide la racha?</div>
     <div style="font-size:14px;color:var(--text);line-height:1.6;text-align:left;margin-top:4px;">
-      <p style="margin:0;">Meses <strong>consecutivos</strong> cumpliendo tu objetivo de asistencia. Si el mes en curso todavía no lo cumplió, no corta la racha — solo espera a que cierre.</p>
+      <p style="margin:0;">Meses <strong>consecutivos</strong> con más del <strong>85%</strong> de asistencia. Si el mes en curso todavía no llegó a ese porcentaje, no corta la racha — solo espera a que cierre.</p>
     </div>
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeRachaInfo()">Entendido</button></div>
   </div>
@@ -3364,10 +3364,11 @@ function buildResumen(){
     else if(tot<=2.5){ const pw=Math.max(4,Math.min(100,(tot/2.6)*100)); _progHTML='<div class="pk2-prog"><div class="pk2-prog-lbl"><span>Camino a Excelente</span><span>'+tot.toFixed(1)+' / 2.6</span></div><div class="pk2-bar"><i style="width:'+pw.toFixed(0)+'%;background:'+_dn.bg+';"></i></div></div>'; }
     else { _progHTML='<div class="pk2-prog"><div class="pk2-prog-lbl" style="color:'+_dn.bg+';"><span>¡Nivel Excelente!</span></div><div class="pk2-bar"><i style="width:100%;background:'+_dn.bg+';"></i></div></div>'; }
   }
+  const _mesCumplido=a=>!!(a && a.pct>85);
   const _attM=attMonths(currentPlayer); let _streak=0;
   let _stStart=_attM.length-1;
-  if(_attM.length){ const _la=attendanceFor(currentPlayer,_attM[_attM.length-1]); if(!(_la&&_la.met)) _stStart--; }
-  for(let i=_stStart;i>=0;i--){ const a=attendanceFor(currentPlayer,_attM[i]); if(a&&a.met) _streak++; else break; }
+  if(_attM.length){ const _la=attendanceFor(currentPlayer,_attM[_attM.length-1]); if(!_mesCumplido(_la)) _stStart--; }
+  for(let i=_stStart;i>=0;i--){ const a=attendanceFor(currentPlayer,_attM[i]); if(_mesCumplido(a)) _streak++; else break; }
   const _rachaHTML=_streak>=1?`<div class="asist-streak">🔥 Racha: ${_streak} ${_streak===1?'mes':'meses'} cumpliendo</div>`:'';
   const perfilTop = `<div class="ptile perfil-info perfil-info-solo">
     <div class="ph-top">
@@ -3416,15 +3417,13 @@ function buildResumen(){
     <div class="pf-kpi">
       <div class="pf-kpi-lbl">Racha <button class="kpi-info" onclick="openRachaInfo()" aria-label="Cómo se mide la racha">i</button></div>
       <div class="pf-kpi-body">
-        <div class="pf-kpi-val" style="color:${_streak>=1?'#e0a200':'var(--muted)'};">${_streak>=1?`${_streak}<small>${_streak===1?' mes':' meses'}</small>`:'—'}</div>
-        <div class="pf-kpi-month">${monthLabel(curMonth)}</div>
+        <div class="pf-kpi-val" style="color:${_streak>=1?'#e0a200':'var(--muted)'};">${_streak>=1?`🔥${_streak} ${_streak===1?'mes':'meses'}`:'—'}</div>
       </div>
     </div>
     <div class="pf-kpi">
       <div class="pf-kpi-lbl">Fortaleza</div>
       <div class="pf-kpi-body">
-        <div class="pf-kpi-val pf-kpi-skill" style="color:${_topSkill?'#0a513a':'var(--muted)'};">${_topSkill?_topSkill.nombre:'—'}</div>
-        <div class="pf-kpi-month">${monthLabel(curMonth)}</div>
+        <div class="pf-kpi-val pf-kpi-skill" style="color:${_topSkill?'var(--text)':'var(--muted)'};">${_topSkill?_topSkill.nombre:'—'}</div>
       </div>
     </div>
   </div>`;
