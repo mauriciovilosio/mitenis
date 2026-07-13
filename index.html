@@ -286,18 +286,19 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* Mi Perfil v8: fila de KPIs (Desempeño / Asistencia / Racha / Fortaleza) */
 .pf-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;align-items:start;}
-.pf-kpi{background:var(--surf);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;}
-.pf-kpi-lbl{background:#2b2b2b;color:#fefefe;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:8px 8px;text-align:center;}
+.pf-kpi{background:var(--surf);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:186px;}
+.pf-kpi-lbl{background:#2b2b2b;color:#fefefe;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:8px 8px;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px;}
 .pf-kpi-body{flex:1;padding:12px 8px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .pf-kpi-val{font-size:19px;font-weight:800;color:var(--text);letter-spacing:-.01em;line-height:1.15;}
 .pf-kpi-val small{font-size:11px;font-weight:600;color:var(--muted);margin-left:1px;}
-.pf-kpi-val.pf-kpi-skill{font-size:15px;min-height:23px;display:flex;align-items:center;}
+.pf-kpi-val.pf-kpi-skill{min-height:23px;display:flex;align-items:center;}
 .pf-kpi .skills-acc{background:transparent;border:none;box-shadow:none;border-radius:0;margin:0;border-top:1px solid #eef3e8;overflow:hidden;}
 .pf-kpi .skills-acc .acc-head{padding:9px 10px;}
 .pf-kpi .skills-acc .acc-head:hover{background:rgba(10,81,58,.04);}
 .pf-kpi .skills-acc .acc-title{font-size:11px;font-weight:800;color:var(--blue);}
-.pf-kpi .skills-acc .acc-body-inner{padding:0 10px 12px;}
+.pf-kpi .skills-acc .acc-body-inner{padding:0 10px 12px;min-height:148px;box-sizing:border-box;}
 .pf-kpi-month{font-size:10px;color:var(--muted);margin-top:7px;text-transform:capitalize;}
+.pf-kpi-lbl .kpi-info{margin-left:0;}
 @media(max-width:560px){ .pf-kpi-row{grid-template-columns:repeat(2,1fr);} }
 
 /* Mi Perfil v5: fila 1 (info + Mi Desempeño) + fila 2 (Mi Asistencia) === */
@@ -1383,6 +1384,15 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeIndiceInfo()">Entendido</button></div>
   </div>
 </div>
+<div class="pin-overlay" id="racha-info-overlay" onclick="if(event.target===this)closeRachaInfo()">
+  <div class="pin-modal" style="max-width:340px;">
+    <div class="pin-title">¿Cómo se mide la racha?</div>
+    <div style="font-size:14px;color:var(--text);line-height:1.6;text-align:left;margin-top:4px;">
+      <p style="margin:0;">Meses <strong>consecutivos</strong> cumpliendo tu objetivo de asistencia. Si el mes en curso todavía no lo cumplió, no corta la racha — solo espera a que cierre.</p>
+    </div>
+    <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeRachaInfo()">Entendido</button></div>
+  </div>
+</div>
 <div class="pin-overlay" id="rendimiento-info-overlay" onclick="if(event.target===this)closeRendInfo()">
   <div class="pin-modal" style="max-width:380px;">
     <div class="pin-title">Cómo se mide Mi Tenis</div>
@@ -2284,6 +2294,8 @@ function openFocoAlumnos(){ const o=document.getElementById('foco-alum-overlay')
 function closeFocoAlumnos(){ const o=document.getElementById('foco-alum-overlay'); if(o) o.classList.remove('show'); }
 function openIndiceInfo(){ const o=document.getElementById('indice-info-overlay'); if(o) o.classList.add('show'); }
 function closeIndiceInfo(){ const o=document.getElementById('indice-info-overlay'); if(o) o.classList.remove('show'); }
+function openRachaInfo(){ const o=document.getElementById('racha-info-overlay'); if(o) o.classList.add('show'); }
+function closeRachaInfo(){ const o=document.getElementById('racha-info-overlay'); if(o) o.classList.remove('show'); }
 function openRendInfo(){ const ov=document.getElementById('rendimiento-info-overlay'); if(ov) ov.classList.add('show'); }
 function closeRendInfo(){ const ov=document.getElementById('rendimiento-info-overlay'); if(ov) ov.classList.remove('show'); }
 function openRegistroInfo(){ const ov=document.getElementById('registro-info-overlay'); if(ov) ov.classList.add('show'); }
@@ -3370,13 +3382,13 @@ function buildResumen(){
   </div>
   <div class="pf-kpi-row">
     <div class="pf-kpi">
-      <div class="pf-kpi-lbl">Desempeño</div>
+      <div class="pf-kpi-lbl">Desempeño <button class="kpi-info" onclick="openIndiceInfo()" aria-label="Cómo se mide el índice">i</button></div>
       <div class="pf-kpi-body">
         <div class="pf-kpi-val" style="color:${_dn.colLight};">${tot>0?_dn.lbl.charAt(0)+_dn.lbl.slice(1).toLowerCase():'—'}</div>
         <div class="pf-kpi-month">${monthLabel(curMonth)}</div>
       </div>
       <div class="acc skills-acc">
-        <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">Mi evolución <button class="kpi-info" onclick="event.stopPropagation();openIndiceInfo()" aria-label="Cómo se mide el índice">i</button></span><span class="acc-chevron">▾</span></div>
+        <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">Mi evolución</span><span class="acc-chevron">▾</span></div>
         <div class="acc-body"><div class="acc-body-inner">
         <div class="pk2-top">
           <span class="pk2-idx" style="color:${_dn.colLight};">${tot>0?tot.toFixed(1):'—'}<small>/3</small></span>
@@ -3396,14 +3408,13 @@ function buildResumen(){
       <div class="acc skills-acc">
         <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">Mi asistencia por mes</span><span class="acc-chevron">▾</span></div>
         <div class="acc-body"><div class="acc-body-inner">
-        <div class="asist-right-lbl">Clases por mes</div>
         ${attBarsSVG(_barSeries,'#0a513a')}
         ${_rachaHTML}
         </div></div>
       </div>
     </div>
     <div class="pf-kpi">
-      <div class="pf-kpi-lbl">Racha</div>
+      <div class="pf-kpi-lbl">Racha <button class="kpi-info" onclick="openRachaInfo()" aria-label="Cómo se mide la racha">i</button></div>
       <div class="pf-kpi-body">
         <div class="pf-kpi-val" style="color:${_streak>=1?'#e0a200':'var(--muted)'};">${_streak>=1?`${_streak}<small>${_streak===1?' mes':' meses'}</small>`:'—'}</div>
         <div class="pf-kpi-month">${monthLabel(curMonth)}</div>
