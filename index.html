@@ -313,7 +313,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .asist-vline{width:1px;align-self:stretch;background:var(--border);flex-shrink:0;}
 .asist-right{flex:1 1 auto;min-width:0;}
 .asist-right-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px;}
-.asist-bars-svg{width:100%;height:98px;display:block;}
+.asist-bars-svg{width:100%;height:auto;display:block;}
 .kpi-info{margin-left:auto;width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.15);color:#fff;font-size:11px;font-weight:800;font-style:italic;font-family:Georgia,serif;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
 .kpi-info:hover{background:rgba(255,255,255,.28);}
 /* Modo Profe: Foco del mes + ranking accionable */
@@ -355,7 +355,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .fk-lvl.lb1{background:var(--n1);} .fk-lvl.lb2{background:var(--n2);} .fk-lvl.lb3{background:var(--n3);}
 
 
-@media(min-width:620px){ .asist-donut{width:108px;height:108px;} .asist-count{font-size:13px;} .asist-right-lbl{font-size:11px;} .asist-bars-svg{height:110px;} .asist-streak{font-size:12px;} .asist-body{gap:20px;} }
+@media(min-width:620px){ .asist-donut{width:108px;height:108px;} .asist-count{font-size:13px;} .asist-right-lbl{font-size:11px;} .asist-streak{font-size:12px;} .asist-body{gap:20px;} }
 /* Mi Tenis: badge +1 a la derecha del nombre de la habilidad */
 .rise-badge{display:inline-block;font-size:10px;font-weight:800;color:#16a34a;background:#dcfce7;padding:1px 7px;border-radius:999px;margin-left:7px;vertical-align:middle;}
 @media(max-width:560px){ .perfil-row1{flex-wrap:nowrap;} .asist-body{gap:10px;} .asist-left{min-width:78px;} .asist-donut{width:74px;height:74px;} }
@@ -3193,8 +3193,8 @@ function donutSVG(pct,color){
 }
 function attBarsSVG(series,color){
   if(!series||!series.length) return '';
-  const n=series.length, H=98, padB=18, padT=10, gap=10;
-  const bw=Math.min(28,Math.max(12,170/n));
+  const n=series.length, H=90, padB=20, padT=14, gap=12;
+  const bw=Math.min(34,Math.max(14,190/n));
   const W=gap+n*(bw+gap);
   const maxV=Math.max(1,...series.map(s=>Math.max(s.val||0,s.obj||0)));
   const chartH=H-padB-padT;
@@ -3202,12 +3202,12 @@ function attBarsSVG(series,color){
   series.forEach((s,i)=>{
     const x=gap+i*(bw+gap);
     const objH=s.obj?(s.obj/maxV)*chartH:0, valH=(s.val/maxV)*chartH;
-    if(s.obj) out+='<rect x="'+x+'" y="'+(padT+chartH-objH)+'" width="'+bw+'" height="'+objH+'" rx="3" fill="'+color+'" opacity="0.13"/>';
-    out+='<rect x="'+x+'" y="'+(padT+chartH-valH)+'" width="'+bw+'" height="'+Math.max(0,valH)+'" rx="3" fill="'+color+'"/>';
-    out+='<text x="'+(x+bw/2)+'" y="'+(padT+chartH-valH-3)+'" text-anchor="middle" font-size="9" font-weight="800" fill="'+color+'">'+s.val+'</text>';
-    out+='<text x="'+(x+bw/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="8.5" fill="#9aaa9a">'+s.m+'</text>';
+    if(s.obj) out+='<rect x="'+x+'" y="'+(padT+chartH-objH)+'" width="'+bw+'" height="'+objH+'" rx="4" fill="'+color+'" opacity="0.13"/>';
+    out+='<rect x="'+x+'" y="'+(padT+chartH-valH)+'" width="'+bw+'" height="'+Math.max(0,valH)+'" rx="4" fill="'+color+'"/>';
+    out+='<text x="'+(x+bw/2)+'" y="'+(padT+chartH-valH-4)+'" text-anchor="middle" font-size="10" font-weight="800" fill="'+color+'">'+s.val+'</text>';
+    out+='<text x="'+(x+bw/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="9" fill="#9aaa9a">'+s.m+'</text>';
   });
-  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" class="asist-bars-svg">'+out+'</svg>';
+  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet" style="aspect-ratio:'+W+'/'+H+';" class="asist-bars-svg">'+out+'</svg>';
 }
 function idealText(hex){
   if(!hex||hex[0]!=='#'||hex.length<7) return '#fff';
