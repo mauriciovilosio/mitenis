@@ -2953,7 +2953,7 @@ function buildCoach(){
   </div>`;
   const _pcAvg={}; if(prevMonth){ areas.forEach(a=>{ const v=players.map(p=>areaAvgScope(p,prevMonth,a)).filter(x=>x>0); _pcAvg[a]=v.length?v.reduce((x,y)=>x+y,0)/v.length:0; }); }
   const _lvlBar=v=> v<1.5?'#ffde59' : v<=2.5?'#a0b834' : '#148f67';
-  const _areaRows=areas.map(a=>{
+  const _areaRows=[...areas].sort((x,y)=>(cAvg[y]||0)-(cAvg[x]||0)).map(a=>{
     const v=cAvg[a]||0, pv=_pcAvg[a]||0; const w=Math.max(4,Math.min(100,(v/3)*100));
     const dd=(prevMonth && v>0 && pv>0)?(v-pv):null;
     const tA=dd===null?'':(dd>=0.05?'↑':dd<=-0.05?'↓':'='); const tC=dd===null?'#9aaa9a':(dd>=0.05?'#16a34a':dd<=-0.05?'#dc2626':'#6b8a76');
