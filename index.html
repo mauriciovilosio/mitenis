@@ -285,13 +285,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .asist-streak{font-size:11px;font-weight:700;color:#148f67;margin-top:8px;}
 
 /* Mi Perfil v8: fila de KPIs (Desempeño / Asistencia / Racha / Fortaleza) */
-.pf-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+.pf-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;align-items:start;}
 .pf-kpi{background:var(--surf);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;}
 .pf-kpi-lbl{background:#2b2b2b;color:#fefefe;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:8px 8px;text-align:center;}
 .pf-kpi-body{flex:1;padding:12px 8px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .pf-kpi-val{font-size:19px;font-weight:800;color:var(--text);letter-spacing:-.01em;line-height:1.15;}
 .pf-kpi-val small{font-size:11px;font-weight:600;color:var(--muted);margin-left:1px;}
 .pf-kpi-val.pf-kpi-skill{font-size:15px;min-height:23px;display:flex;align-items:center;}
+.pf-kpi .skills-acc{background:transparent;border:none;box-shadow:none;border-radius:0;margin:0;border-top:1px solid #eef3e8;overflow:hidden;}
+.pf-kpi .skills-acc .acc-head{padding:9px 10px;}
+.pf-kpi .skills-acc .acc-head:hover{background:rgba(10,81,58,.04);}
+.pf-kpi .skills-acc .acc-title{font-size:11px;font-weight:800;color:var(--blue);}
+.pf-kpi .skills-acc .acc-body-inner{padding:0 10px 12px;}
 .pf-kpi-month{font-size:10px;color:var(--muted);margin-top:7px;text-transform:capitalize;}
 @media(max-width:560px){ .pf-kpi-row{grid-template-columns:repeat(2,1fr);} }
 
@@ -3370,12 +3375,31 @@ function buildResumen(){
         <div class="pf-kpi-val" style="color:${_dn.colLight};">${tot>0?_dn.lbl.charAt(0)+_dn.lbl.slice(1).toLowerCase():'—'}</div>
         <div class="pf-kpi-month">${monthLabel(curMonth)}</div>
       </div>
+      <div class="acc skills-acc">
+        <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">Mi evolución <button class="kpi-info" onclick="event.stopPropagation();openIndiceInfo()" aria-label="Cómo se mide el índice">i</button></span><span class="acc-chevron">▾</span></div>
+        <div class="acc-body"><div class="acc-body-inner">
+        <div class="pk2-top">
+          <span class="pk2-idx" style="color:${_dn.colLight};">${tot>0?tot.toFixed(1):'—'}<small>/3</small></span>
+        </div>
+        ${_dTxt?`<div class="pk2-trend" style="color:${_dCol};">${_dArrow} ${_dTxt}</div>`:''}
+        <div class="pk2-spark">${_desSpark}</div>
+        ${_progHTML}
+        </div></div>
+      </div>
     </div>
     <div class="pf-kpi">
       <div class="pf-kpi-lbl">Asistencia</div>
       <div class="pf-kpi-body">
         <div class="pf-kpi-val" style="color:${at&&at.met?'#0a513a':'#e0a200'};">${at?`${_aDone}<small>/${_aObj}</small>`:'—'}</div>
         <div class="pf-kpi-month">${monthLabel(curMonth)}</div>
+      </div>
+      <div class="acc skills-acc">
+        <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">Mi asistencia por mes</span><span class="acc-chevron">▾</span></div>
+        <div class="acc-body"><div class="acc-body-inner">
+        <div class="asist-right-lbl">Clases por mes</div>
+        ${attBarsSVG(_barSeries,'#0a513a')}
+        ${_rachaHTML}
+        </div></div>
       </div>
     </div>
     <div class="pf-kpi">
@@ -3391,44 +3415,6 @@ function buildResumen(){
         <div class="pf-kpi-val pf-kpi-skill" style="color:${_topSkill?'#0a513a':'var(--muted)'};">${_topSkill?_topSkill.nombre:'—'}</div>
         <div class="pf-kpi-month">${monthLabel(curMonth)}</div>
       </div>
-    </div>
-  </div>
-  <div class="perfil-row2">
-    <div class="acc perfil-kpi2">
-      <div class="acc-head" onclick="toggleAcc(this)">
-        <span class="acc-title">Índice general del mes <button class="kpi-info" onclick="event.stopPropagation();openIndiceInfo()" aria-label="Cómo se mide el índice">i</button></span>
-        <span class="acc-chevron">▾</span>
-      </div>
-      <div class="acc-body"><div class="acc-body-inner">
-      <div class="pk2-top">
-        <span class="pk2-idx" style="color:${_dn.colLight};">${tot>0?tot.toFixed(1):'—'}<small>/3</small></span>
-      </div>
-      ${_dTxt?`<div class="pk2-trend" style="color:${_dCol};">${_dArrow} ${_dTxt}</div>`:''}
-      <div class="pk2-spark">${_desSpark}</div>
-      ${_progHTML}
-      <div class="pk2-month">${monthLabel(curMonth)}</div>
-      </div></div>
-    </div>
-    <div class="acc asist-card">
-      <div class="acc-head" onclick="toggleAcc(this)">
-        <span class="acc-title">Mi Asistencia</span>
-        <span class="acc-chevron">▾</span>
-      </div>
-      <div class="acc-body"><div class="acc-body-inner">
-      <div class="asist-body">
-        <div class="asist-left">
-          ${donutSVG(at?at.pct:0,'#0a513a')}
-          <div class="asist-count">${at?`${_aDone}/${_aObj} clases`:'—'}</div>
-          <div class="pk2-month">${monthLabel(curMonth)}</div>
-        </div>
-        <div class="asist-vline"></div>
-        <div class="asist-right">
-          <div class="asist-right-lbl">Clases por mes</div>
-          ${attBarsSVG(_barSeries,'#0a513a')}
-          ${_rachaHTML}
-        </div>
-      </div>
-      </div></div>
     </div>
   </div>`;
   el.innerHTML = perfilTop;
@@ -4033,9 +4019,9 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
 .hd-rep-s{font-size:9.5px;color:rgba(255,255,255,.6);margin-top:2px;}
 
 /* PLAYER / INDEX / PERF ROW */
-.top{display:grid;grid-template-columns:1.15fr 1fr 1fr;grid-template-areas:"pl ix pf";gap:14px;padding:0 26px 22px;align-items:stretch;}
+.top{display:grid;grid-template-columns:1.15fr 1fr 1fr;grid-template-areas:"pl ix pf";gap:14px;padding:18px 26px 22px;align-items:stretch;border-top:1px solid rgba(255,255,255,.12);}
 .pl{grid-area:pl;}.ix{grid-area:ix;}.pf{grid-area:pf;}
-.pl{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;}
+.pl{display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;}
 .pl-av{width:62px;height:62px;border-radius:14px;display:flex;align-items:center;justify-content:center;
        font-size:22px;font-weight:900;color:#fff;flex-shrink:0;border:2.5px solid rgba(255,255,255,.25);}
 .pl-name{font-size:21px;font-weight:900;color:#fff;line-height:1.05;text-transform:uppercase;}
