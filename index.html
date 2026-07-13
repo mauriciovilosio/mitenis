@@ -313,7 +313,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .asist-vline{width:1px;align-self:stretch;background:var(--border);flex-shrink:0;}
 .asist-right{flex:1 1 auto;min-width:0;}
 .asist-right-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px;}
-.asist-bars-svg{width:100%;height:auto;display:block;}
+.asist-bars-svg{width:100%;height:150px;display:block;}
 .kpi-info{margin-left:auto;width:18px;height:18px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.15);color:#fff;font-size:11px;font-weight:800;font-style:italic;font-family:Georgia,serif;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
 .kpi-info:hover{background:rgba(255,255,255,.28);}
 /* Modo Profe: Foco del mes + ranking accionable */
@@ -3193,8 +3193,12 @@ function donutSVG(pct,color){
 }
 function attBarsSVG(series,color){
   if(!series||!series.length) return '';
-  const n=series.length, H=90, padB=20, padT=14, gap=12;
-  const bw=Math.min(34,Math.max(14,190/n));
+  // El viewBox se genera angosto/alto a propósito (relación ancho:alto baja) para que,
+  // combinado con preserveAspectRatio="meet", la altura sea siempre la dimensión que
+  // manda el escalado — así el gráfico llena el alto disponible de la card tanto en
+  // mobile (cards angostas) como en desktop (cards anchas), sin distorsionar barras ni texto.
+  const n=series.length, H=150, padB=26, padT=16, gap=8;
+  const bw=Math.min(18,Math.max(9,60/n));
   const W=gap+n*(bw+gap);
   const maxV=Math.max(1,...series.map(s=>Math.max(s.val||0,s.obj||0)));
   const chartH=H-padB-padT;
@@ -3202,12 +3206,12 @@ function attBarsSVG(series,color){
   series.forEach((s,i)=>{
     const x=gap+i*(bw+gap);
     const objH=s.obj?(s.obj/maxV)*chartH:0, valH=(s.val/maxV)*chartH;
-    if(s.obj) out+='<rect x="'+x+'" y="'+(padT+chartH-objH)+'" width="'+bw+'" height="'+objH+'" rx="4" fill="'+color+'" opacity="0.13"/>';
-    out+='<rect x="'+x+'" y="'+(padT+chartH-valH)+'" width="'+bw+'" height="'+Math.max(0,valH)+'" rx="4" fill="'+color+'"/>';
-    out+='<text x="'+(x+bw/2)+'" y="'+(padT+chartH-valH-4)+'" text-anchor="middle" font-size="10" font-weight="800" fill="'+color+'">'+s.val+'</text>';
-    out+='<text x="'+(x+bw/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="9" fill="#9aaa9a">'+s.m+'</text>';
+    if(s.obj) out+='<rect x="'+x+'" y="'+(padT+chartH-objH)+'" width="'+bw+'" height="'+objH+'" rx="3" fill="'+color+'" opacity="0.13"/>';
+    out+='<rect x="'+x+'" y="'+(padT+chartH-valH)+'" width="'+bw+'" height="'+Math.max(0,valH)+'" rx="3" fill="'+color+'"/>';
+    out+='<text x="'+(x+bw/2)+'" y="'+(padT+chartH-valH-4)+'" text-anchor="middle" font-size="11" font-weight="800" fill="'+color+'">'+s.val+'</text>';
+    out+='<text x="'+(x+bw/2)+'" y="'+(H-6)+'" text-anchor="middle" font-size="10" fill="#9aaa9a">'+s.m+'</text>';
   });
-  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet" style="aspect-ratio:'+W+'/'+H+';" class="asist-bars-svg">'+out+'</svg>';
+  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet" class="asist-bars-svg">'+out+'</svg>';
 }
 function idealText(hex){
   if(!hex||hex[0]!=='#'||hex.length<7) return '#fff';
