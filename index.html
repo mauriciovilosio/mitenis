@@ -3207,7 +3207,7 @@ function attBarsSVG(series,color){
     out+='<text x="'+(x+bw/2)+'" y="'+(padT+chartH-valH-3)+'" text-anchor="middle" font-size="9" font-weight="800" fill="'+color+'">'+s.val+'</text>';
     out+='<text x="'+(x+bw/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="8.5" fill="#9aaa9a">'+s.m+'</text>';
   });
-  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="xMidYMid meet" class="asist-bars-svg">'+out+'</svg>';
+  return '<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" class="asist-bars-svg">'+out+'</svg>';
 }
 function idealText(hex){
   if(!hex||hex[0]!=='#'||hex.length<7) return '#fff';
@@ -3410,7 +3410,6 @@ function buildResumen(){
         <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">Mi asistencia por mes</span><span class="acc-chevron">▾</span></div>
         <div class="acc-body"><div class="acc-body-inner">
         ${attBarsSVG(_barSeries,'#0a513a')}
-        ${_rachaHTML}
         </div></div>
       </div>
     </div>
@@ -3423,7 +3422,7 @@ function buildResumen(){
     <div class="pf-kpi">
       <div class="pf-kpi-lbl">Fortaleza</div>
       <div class="pf-kpi-body">
-        <div class="pf-kpi-val pf-kpi-skill" style="color:${_topSkill?'var(--text)':'var(--muted)'};">${_topSkill?_topSkill.nombre:'—'}</div>
+        <div class="pf-kpi-val pf-kpi-skill" style="color:${_topSkill?'var(--text)':'var(--muted)'};">${_topSkill?`💪 ${_topSkill.nombre}`:'—'}</div>
       </div>
     </div>
   </div>`;
@@ -4093,7 +4092,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
 .foco-o-t{font-size:11.5px;color:#33493b;font-weight:600;line-height:1.4;}
 
 /* COACH + LAST SESSION */
-.coach-q{font-size:12px;color:#33493b;line-height:1.55;font-style:italic;}
+.coach-q{font-size:12px;color:#33493b;line-height:1.55;}
 .coach-q:before{content:'“';color:#bcd3c2;font-size:26px;font-weight:900;line-height:0;vertical-align:-8px;margin-right:2px;}
 .coach-sig{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:11px;border-top:1px solid #f0f4ec;}
 .coach-av{width:34px;height:34px;border-radius:50%;background:#2b2b2b;color:#ffde59;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0;}
@@ -4156,7 +4155,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
   <div class="hd">
     <div class="hd-brand">
       <div class="hd-mark"><span>MT</span></div>
-      <div><div class="hd-bn">Mi Tenis</div><div class="hd-bt">Observamos. Acompañamos. Potenciamos.</div></div>
+      <div><div class="hd-bn">Mi Tenis</div></div>
     </div>
     <div class="hd-rep">
       <div class="hd-rep-m">${esc(monthNameOnly)}</div>
@@ -4264,7 +4263,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
 
   <!-- FOOTER -->
   <div class="ft">
-    <div class="ft-l">Cada entrenamiento cuenta</div>
+    <div class="ft-l">Cada entrenamiento cuenta.</div>
     <div class="ft-r">¡Seguimos juntos!</div>
   </div>
 
