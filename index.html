@@ -934,12 +934,25 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .cz-rank-scroll{scrollbar-width:thin;scrollbar-color:rgba(10,81,58,.35) transparent;}
 .cz-rank-scroll .cz-row:first-child{padding-top:0;}
 .cz-rank-card{display:flex;flex-direction:column;}
-.cz-ind{margin-left:auto;display:flex;flex-direction:column;gap:4px;}
-.cz-ind-row{display:flex;align-items:baseline;justify-content:flex-end;gap:8px;}
+.cz-ind{margin-left:auto;display:flex;flex-direction:column;gap:4px;flex-shrink:0;}
+.cz-ind-row{display:flex;align-items:baseline;justify-content:flex-end;gap:8px;white-space:nowrap;}
 .cz-ind-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
-.cz-ind-val{font-size:18px;font-weight:800;color:var(--text);line-height:1;}
+.cz-ind-val{font-size:18px;font-weight:800;color:var(--text);line-height:1;white-space:nowrap;}
 .cz-ind-val span{font-size:10px;color:var(--hint);font-weight:600;}
 .cz-ind-val.ok{color:var(--lv3);} .cz-ind-val.low{color:var(--lv2);}
+@media(max-width:480px){
+  .cz-row{gap:8px;padding:10px 0;}
+  .cz-av{width:28px;height:28px;}
+  .cz-rank{width:16px;font-size:13px;}
+  .cz-name{font-size:12.5px;gap:4px;}
+  .cz-trend{font-size:9.5px;}
+  .cz-att-chip{font-size:8px;padding:1px 5px;}
+  .cz-ind{gap:2px;}
+  .cz-ind-row{gap:5px;}
+  .cz-ind-lbl{font-size:9px;}
+  .cz-ind-val{font-size:14.5px;}
+  .cz-ind-val-sm{font-size:11px;}
+}
 
 /* === v22: pregunta-guía por variable === */
 .ball-q{font-size:11px;color:var(--muted);margin-top:3px;font-style:italic;}
@@ -2921,13 +2934,13 @@ function buildCoach(){
   const cAvg={}; areas.forEach(a=>{ const v=data.map(d=>d.av[a]).filter(x=>x>0); cAvg[a]=v.length?v.reduce((x,y)=>x+y,0)/v.length:0; });
   const ctv=areas.map(a=>cAvg[a]).filter(v=>v>0); const cTot=ctv.length?ctv.reduce((x,y)=>x+y,0)/ctv.length:0;
   const _areaNom={tecnica:'Técnica',tactica:'Táctica',fisico:'Físico',mental:'Mental'};
-  const droppedOf=d=>(prevMonth && d.overall>0 && d.prevOverall>0 && Math.round(d.overall)<Math.round(d.prevOverall));
-  // La asistencia solo se evalúa en "Atención" a partir del día 15 del mes en curso real
+  const droppedOf=d=>(prevMonth && d.overall>0 && d.prevOverall>0 && (d.prevOverall-d.overall)>0.5);
+  // La asistencia solo se evalúa en "Atención" a partir del día 25 del mes en curso real
   // (antes de esa fecha el mes recién empieza y la asistencia todavía no es representativa).
   // En meses ya cerrados/pasados esta restricción no aplica: se evalúa completo.
   const _nowReal=new Date();
   const _todayMkReal=_nowReal.getFullYear()+'-'+String(_nowReal.getMonth()+1).padStart(2,'0');
-  const _evalAsistencia = !(curMonth===_todayMkReal && _nowReal.getDate()<15);
+  const _evalAsistencia = !(curMonth===_todayMkReal && _nowReal.getDate()<25);
   const atRiskOf=d=>((_evalAsistencia && d.at && d.at.pct<50) || droppedOf(d) || (d.actLvl===1));
   let _weakArea='', _weakVal=99; areas.forEach(a=>{ if(cAvg[a]>0 && cAvg[a]<_weakVal){ _weakVal=cAvg[a]; _weakArea=a; } });
   const _lowAttN=data.filter(d=>d.at && d.at.pct<50).length;
