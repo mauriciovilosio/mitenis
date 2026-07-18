@@ -2329,7 +2329,7 @@ function openLigaInfo(){
     <p style="margin:0 0 6px;font-weight:600;">Cómo se suman los puntos:</p>
     <ul style="margin:0 0 0 18px;padding:0;">
       <li style="margin-bottom:5px;"><strong>+${LG.ATTEND}</strong> por cada clase a la que asistís 📅</li>
-      <li style="margin-bottom:5px;"><strong>+${LG.ACTITUD}</strong> si tu Actitud del mes es <strong>Excelente</strong> 💪</li>
+      <li style="margin-bottom:5px;">Sumás el <strong>promedio de Actitud</strong> que te puso el profe ese mes (1, 2 o 3) 💪</li>
       <li><strong>+${LG.TORNEO}</strong> por cada torneo que jugaste en el mes 🏆</li>
     </ul>
     <p style="margin:12px 0 0;padding-top:10px;border-top:1px solid var(--border);">🏷️ Competís en el ranking de tu categoría: <strong>${myCat}</strong>.</p>`;
@@ -4383,10 +4383,10 @@ function buildCoachPlanHTML(mk, cat){
 // ══════════════════════════════════════
 // LIGA — puntaje:
 // +1 por cada clase a la que asistió en el mes (columna 'Clases cumplidas' de la hoja asistencia)
-// +3 si la Actitud del mes es Excelente
+// Actitud: suma el promedio mensual que asignó el profe en cada clase (1, 2 o 3), mes a mes
 // +1 por cada torneo jugado en el mes (columna 'Torneos jugados' de la hoja asistencia)
 // ══════════════════════════════════════
-const LG = { ATTEND:1, ACTITUD:3, TORNEO:1 };
+const LG = { ATTEND:1, TORNEO:1 };
 function sessionsOf(name){
   return allRows.filter(r=>r[COL.alumno]===name)
     .sort((a,b)=>new Date(parseDate(a[COL.fecha]))-new Date(parseDate(b[COL.fecha])));
@@ -4412,6 +4412,13 @@ function actitudExcelente(name, period){
   if(!vals.length) return false;
   return Math.round(vals.reduce((a,b)=>a+b,0)/vals.length)===3;
 }
+// Promedio de Actitud del período, redondeado a 1/2/3 (0 si no hay datos) — puntaje mensual de Mi Ranking
+function actitudMensual(name, period){
+  const ss=sessionsOf(name).filter(s=> period==='all'?true:monthKey(s)===period);
+  const vals=ss.map(s=>toLvl(s[COL.Actitud])).filter(v=>v>0);
+  if(!vals.length) return 0;
+  return Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+}
 function scorePlayer(name, period){
   const inYear = period && period.slice(0,5)==='year:';
   const yr = inYear ? period.slice(5) : null;
@@ -4424,10 +4431,10 @@ function scorePlayer(name, period){
   // +1 por cada torneo jugado en los meses del período
   let torneos=0;
   aMonths.forEach(mk=>{ torneos+=tournamentsForMonth(name,mk)*LG.TORNEO; });
-  // +3 por CADA mes (con sesiones) cuya Actitud sea Excelente — acumulativo en el anual
+  // Actitud: suma el promedio mensual (1, 2 o 3) de cada mes con sesiones — acumulativo en el anual
   const sessMonths=[...new Set(sessScope.map(monthKey).filter(Boolean))];
   let actitud=0;
-  sessMonths.forEach(mk=>{ if(actitudExcelente(name, mk)) actitud+=LG.ACTITUD; });
+  sessMonths.forEach(mk=>{ actitud+=actitudMensual(name, mk); });
   return {name, asistencia, actitud, torneos, sesiones:sessScope.length, total:asistencia+actitud+torneos};
 }
 
