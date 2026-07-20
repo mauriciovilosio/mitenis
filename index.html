@@ -582,7 +582,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 /* Modo Profe: KPIs de la card negra (Índice general / Alumnos activos / Clases registradas / Asistencia general) */
 .coach-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;}
 .coach-kpi{background:rgba(255,255,255,.10);border-radius:10px;padding:12px 13px;min-width:0;}
-.coach-kpi-lbl{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:6px;}
+.coach-kpi-lbl{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:6px;display:flex;align-items:center;gap:4px;}
+.coach-kpi-lbl .kpi-info{width:14px;height:14px;font-size:9px;flex-shrink:0;margin-left:0;}
 .coach-kpi-val{font-size:22px;font-weight:900;color:#fff;line-height:1;}
 .coach-kpi-val .coach-kpi-max{font-size:13px;font-weight:700;color:rgba(255,255,255,.55);margin-left:1px;}
 .coach-kpi-val .ph-d{font-size:9px;}
@@ -1125,10 +1126,12 @@ button.cal-cell{cursor:pointer;font-family:'Inter',sans-serif;transition:transfo
 button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,81,58,.22);}
 .cal-cell.cal-has{background:var(--blue);color:#fff;border-color:var(--blue-d);}
 .cal-cell.cal-has .cal-dot{width:4px;height:4px;border-radius:50%;background:#fff;margin-top:2px;}
+.cal-cell.cal-has.cal-torneo{background:var(--lv1);border-color:#b91c1c;}
 .cal-badge{position:absolute;top:1px;right:1px;font-size:8px;font-weight:800;background:var(--ball);color:#5b5400;border-radius:99px;padding:0 3px;line-height:11px;min-width:11px;text-align:center;}
 .cal-cell.cal-dl{background:var(--ball);color:#5b5400;border-color:#e8c23e;}
 .cal-cell.cal-dl .cal-dlico{font-size:8px;line-height:1;margin-top:1px;}
 .cal-cell.cal-dl.has{box-shadow:inset 0 0 0 2px var(--blue);}
+.cal-cell.cal-dl.has.cal-torneo{box-shadow:inset 0 0 0 2px var(--lv1);}
 .cal-cell.cal-dl-lock{background:var(--surf2);color:var(--hint);border:1px dashed var(--border);cursor:default;}
 .cal-cell.cal-dl-lock .cal-dlico{font-size:8px;opacity:.7;}
 /* === Informes: calendarios en 2 columnas (mobile) === */
@@ -1405,6 +1408,16 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
       <p style="margin:0;">Escala <strong>1 a 3</strong> · promedio de las 4 áreas (Técnica, Táctica, Física y Mental).</p>
     </div>
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeIndiceInfo()">Entendido</button></div>
+  </div>
+</div>
+<div class="pin-overlay" id="coach-indice-info-overlay" onclick="if(event.target===this)closeCoachIndiceInfo()">
+  <div class="pin-modal" style="max-width:340px;">
+    <div class="pin-title">¿Cómo se mide el índice?</div>
+    <div style="font-size:14px;color:var(--text);line-height:1.6;text-align:left;margin-top:4px;">
+      <p style="margin:0 0 10px;">Es el promedio de las cuatro áreas: <strong>Técnica, Táctica, Físico y Mental</strong>.</p>
+      <p style="margin:0;">📝 Escala del <strong>1 al 3</strong> (1 - bien, 2 - muy bien, 3 - excelente).</p>
+    </div>
+    <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeCoachIndiceInfo()">Entendido</button></div>
   </div>
 </div>
 <div class="pin-overlay" id="racha-info-overlay" onclick="if(event.target===this)closeRachaInfo()">
@@ -2317,6 +2330,8 @@ function openFocoAlumnos(){ const o=document.getElementById('foco-alum-overlay')
 function closeFocoAlumnos(){ const o=document.getElementById('foco-alum-overlay'); if(o) o.classList.remove('show'); }
 function openIndiceInfo(){ const o=document.getElementById('indice-info-overlay'); if(o) o.classList.add('show'); }
 function closeIndiceInfo(){ const o=document.getElementById('indice-info-overlay'); if(o) o.classList.remove('show'); }
+function openCoachIndiceInfo(){ const o=document.getElementById('coach-indice-info-overlay'); if(o) o.classList.add('show'); }
+function closeCoachIndiceInfo(){ const o=document.getElementById('coach-indice-info-overlay'); if(o) o.classList.remove('show'); }
 function openRachaInfo(){ const o=document.getElementById('racha-info-overlay'); if(o) o.classList.add('show'); }
 function closeRachaInfo(){ const o=document.getElementById('racha-info-overlay'); if(o) o.classList.remove('show'); }
 function openRendInfo(){ const ov=document.getElementById('rendimiento-info-overlay'); if(ov) ov.classList.add('show'); }
@@ -3111,7 +3126,7 @@ function buildCoach(){
     </div>
     <div class="coach-kpi-row">
       <div class="coach-kpi">
-        <div class="coach-kpi-lbl">Índice general</div>
+        <div class="coach-kpi-lbl">Índice general <button class="kpi-info" onclick="openCoachIndiceInfo()" aria-label="Cómo se mide el índice general">i</button></div>
         <div class="coach-kpi-val">${cTot>0?cTot.toFixed(1):'—'}<span class="coach-kpi-max">/3</span>${deltaBadgeDec((prevMonth&&cTot>0&&cPrevTot>0)?(cTot-cPrevTot):null)}</div>
       </div>
       <div class="coach-kpi">
@@ -3191,6 +3206,8 @@ function areaAvgForSessions(list, areaId){
 }
 
 const AREA_COL={tecnica:'#0a513a',tactica:'#e0a200',fisico:'#16a34a',mental:'#d6336c'};
+// Color de área según su nivel actual (no según identidad de área): amarillo=Bien, verde claro=Muy bien, verde oscuro=Excelente
+function areaLvlColor(v){ return v<1.5?'#ffde59':v<=2.5?'#a0b834':'#148f67'; }
 // Desempeño general — umbrales: BIEN <1.7 · MUY BIEN 1.7-2.3 · EXCELENTE >2.3
 function desempenoNivel(o){
   if(o>2.5) return {lbl:'EXCELENTE', msg:'Gran mes de trabajo. ¡A sostenerlo!', bg:'#148f67', txt:'#161616', col:'#148f67', colLight:'#148f67', thumbs:3};
@@ -3592,10 +3609,11 @@ function buildRubrica(){
       else {cls='st-dn';ar='↘';lbl='EN AJUSTE';val=d.toFixed(1);}
       st=`<div class="ac-st ${cls}">${ar} ${lbl}</div><div class="ac-dl">${val}${_prevShort?' vs '+_prevShort:''}</div>`;
     }
+    const lc=v>0?areaLvlColor(v):'#9aaa9a';
     return `<div class="ac">
-      <div class="ac-h"><div class="ac-ic" style="background:${a.col};">${a.emoji}</div><div class="ac-nm">${a.nombre}</div></div>
-      <div class="ac-val" style="color:${v>0?a.col:'#9aaa9a'};">${v>0?v.toFixed(1):'—'}<span> / 3</span></div>
-      <div class="ac-bar"><i style="width:${w}%;background:${a.col};"></i></div>
+      <div class="ac-h"><div class="ac-ic" style="background:${lc};">${a.emoji}</div><div class="ac-nm">${a.nombre}</div></div>
+      <div class="ac-val" style="color:${lc};">${v>0?v.toFixed(1):'—'}<span> / 3</span></div>
+      <div class="ac-bar"><i style="width:${w}%;background:${lc};"></i></div>
       ${st}
       ${skillsCard(a)}
     </div>`;
@@ -3782,8 +3800,8 @@ function buildMonthCalendar(mk, monthSessions, pl){
   let startDow=new Date(y, m-1, 1).getDay();   // 0=Dom..6=Sáb
   startDow=(startDow+6)%7;                       // semana arranca en Lunes
   const ended=monthEnded(mk);                    // reporte disponible solo si terminó el mes
-  const dayCount={};
-  monthSessions.forEach(s=>{ const d=parseDate(s[COL.fecha]); if(!d) return; const dd=Number(d.slice(8,10)); dayCount[dd]=(dayCount[dd]||0)+1; });
+  const dayCount={}, dayTorneo={};
+  monthSessions.forEach(s=>{ const d=parseDate(s[COL.fecha]); if(!d) return; const dd=Number(d.slice(8,10)); dayCount[dd]=(dayCount[dd]||0)+1; if((s[COL.tipo]||'').toLowerCase().includes('torneo')) dayTorneo[dd]=true; });
   const dows=['Lu','Ma','Mi','Ju','Vi','Sá','Do'];
   let cells='';
   for(let i=0;i<startDow;i++) cells+='<div class="cal-cell empty"></div>';
@@ -3792,12 +3810,12 @@ function buildMonthCalendar(mk, monthSessions, pl){
     const isLast=day===lastDay;
     if(isLast && ended){
       // El mes terminó: el último día permite descargar el reporte
-      cells+=`<button class="cal-cell cal-dl${has?' has':''}" onclick="downloadMonthReport('${pl}','${mk}')" title="Descargar el reporte completo de ${monthLabel(mk)}">
+      cells+=`<button class="cal-cell cal-dl${has?' has':''}${dayTorneo[day]?' cal-torneo':''}" onclick="downloadMonthReport('${pl}','${mk}')" title="Descargar el reporte completo de ${monthLabel(mk)}">
         <span class="cal-num">${day}</span><span class="cal-dlico">📄</span>
         ${dayCount[day]>1?`<span class="cal-badge">${dayCount[day]}</span>`:''}
       </button>`;
     } else if(has){
-      cells+=`<button class="cal-cell cal-has" onclick="openHistDay('${pl}','${mk}',${day})" title="Ver sesión">
+      cells+=`<button class="cal-cell cal-has${dayTorneo[day]?' cal-torneo':''}" onclick="openHistDay('${pl}','${mk}',${day})" title="Ver sesión">
         <span class="cal-num">${day}</span><span class="cal-dot"></span>
         ${dayCount[day]>1?`<span class="cal-badge">${dayCount[day]}</span>`:''}
       </button>`;
@@ -4240,10 +4258,11 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
       const v=areaAvg[a.id]; const lv=Math.round(v)||0;
       const d=deltaOf(a.id); const st=statusOf(d);
       const w=Math.max(4,Math.min(100,(v/3)*100));
+      const lc=v>0?areaLvlColor(v):'#9aaa9a';
       return `<div class="ac">
-        <div class="ac-h"><div class="ac-ic" style="background:${a.col};">${a.emoji}</div><div class="ac-nm">${esc(a.nombre)}</div></div>
-        <div class="ac-val" style="color:${v>0?a.col:'#9aaa9a'};">${v>0?v.toFixed(1):'—'}<span> / 3</span></div>
-        <div class="ac-bar"><i style="width:${w}%;background:${a.col};"></i></div>
+        <div class="ac-h"><div class="ac-ic" style="background:${lc};">${a.emoji}</div><div class="ac-nm">${esc(a.nombre)}</div></div>
+        <div class="ac-val" style="color:${lc};">${v>0?v.toFixed(1):'—'}<span> / 3</span></div>
+        <div class="ac-bar"><i style="width:${w}%;background:${lc};"></i></div>
         ${d===null?'':`<div class="ac-st ${st.cls}">${st.ar} ${st.lbl}</div>${st.val!==''?`<div class="ac-dl">${st.val}${prevShort?' vs '+prevShort:''}</div>`:''}`}
       </div>`;
     }).join('')}
@@ -4266,7 +4285,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
         <div class="pb">
         ${aspItems.length
           ? aspItems.map(t=>`<div class="str"><div class="str-ic">🎯</div><div><div class="str-t">${esc(t)}</div></div></div>`).join('')
-          : (foco?`<div class="foco-t">${esc(foco.nombre)} <span style="font-size:11px;font-weight:700;color:${foco.area.col};">· ${esc(foco.area.nombre)}</span></div>
+          : (foco?`<div class="foco-t">${esc(foco.nombre)} <span style="font-size:11px;font-weight:700;color:${areaLvlColor(foco.curLv)};">· ${esc(foco.area.nombre)}</span></div>
           <div class="foco-d">${esc(foco.desc||'Foco de trabajo para el próximo período.')}</div>`:'<div class="foco-d">Aún sin datos suficientes este mes.</div>')}
         </div>
       </div>
