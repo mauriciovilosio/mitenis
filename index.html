@@ -3207,7 +3207,8 @@ function areaAvgForSessions(list, areaId){
 
 const AREA_COL={tecnica:'#0a513a',tactica:'#e0a200',fisico:'#16a34a',mental:'#d6336c'};
 // Color de área según su nivel actual (no según identidad de área): amarillo=Bien, verde claro=Muy bien, verde oscuro=Excelente
-function areaLvlColor(v){ return v<1.5?'#ffde59':v<=2.5?'#a0b834':'#148f67'; }
+// Redondea igual que las habilidades (Math.round) para que área y habilidades nunca queden en niveles distintos.
+function areaLvlColor(v){ const lv=Math.round(v); return lv>=3?'#148f67':lv===2?'#a0b834':'#ffde59'; }
 // Desempeño general — umbrales: BIEN <1.7 · MUY BIEN 1.7-2.3 · EXCELENTE >2.3
 function desempenoNivel(o){
   if(o>2.5) return {lbl:'EXCELENTE', msg:'Gran mes de trabajo. ¡A sostenerlo!', bg:'#148f67', txt:'#161616', col:'#148f67', colLight:'#148f67', thumbs:3};
