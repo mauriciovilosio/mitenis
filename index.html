@@ -3586,7 +3586,6 @@ function buildRubrica(){
   const _prevMk=_months.indexOf(_curMk)>0?_months[_months.indexOf(_curMk)-1]:null;
   const _prevShort=_prevMk?monthLabel(_prevMk).split(' ')[0]:'';
   const prevSessList = _prevMk?playerSessions.filter(s=>monthKey(s)===_prevMk):[];
-  const latestIn=(list,key)=>{ for(let i=list.length-1;i>=0;i--){ const lv=toLvl(list[i][COL[key]]); if(lv>0) return lv; } return 0; };
   const RAREAS=[
     {id:'tecnica',nombre:'Técnica',  emoji:'🎾',col:'#0d5230'},
     {id:'tactica',nombre:'Táctica',  emoji:'♟️',col:'#b97800'},
@@ -3622,10 +3621,10 @@ function buildRubrica(){
   const skillsCard=(a)=>{
     const grupos=RESUMEN_GROUPS[a.id];
     const rows=grupos.map(g=>{
-      const arr=g.keys.map(k=>latestIn(fsess,k)).filter(v=>v>0);
+      const arr=fsess.map(s=>avgLvlKeys(s,g.keys)).filter(v=>v>0);
       if(!arr.length) return '';
       const lv=Math.round(arr.reduce((x,y)=>x+y,0)/arr.length);
-      let prevLv=0; { const pa=g.keys.map(k=>latestIn(prevSessList,k)).filter(v=>v>0); if(pa.length) prevLv=Math.round(pa.reduce((x,y)=>x+y,0)/pa.length); }
+      let prevLv=0; { const pa=prevSessList.map(s=>avgLvlKeys(s,g.keys)).filter(v=>v>0); if(pa.length) prevLv=Math.round(pa.reduce((x,y)=>x+y,0)/pa.length); }
       const rise = prevLv>0 && lv>prevLv;
       const q=PERF_Q[g.nombre]||'';
       return `<div class="ball-item">
