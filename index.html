@@ -341,7 +341,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .foco2-lbl{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#6b6f8a;}
 .foco2-val{font-size:15px;font-weight:900;color:#0a513a;}
 .foco2-chev{font-size:22px;color:#9aaa9a;flex-shrink:0;line-height:1;}
-.cz-areas{margin-bottom:12px;}
+.acc.evo-acc.cz-areas .acc-body-inner{padding:12px 16px 14px;}
 .ag-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #eef3e8;}
 .cz-areas .ag-row:last-child{border-bottom:none;}
 .ag-name{width:74px;font-size:12px;font-weight:800;color:#1a3325;flex-shrink:0;}
@@ -539,6 +539,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* Filtro por mes */
 .month-filter{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.filter-acc .month-filter{flex-direction:column;flex-wrap:nowrap;align-items:stretch;}
 .mf-chip{font-size:13px;font-weight:500;padding:8px 16px;border-radius:999px;border:1px solid var(--border);background:var(--surf);color:var(--muted);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;}
 .mf-chip:hover{border-color:var(--court-l);color:var(--text);}
 .mf-chip.active{background:#2b2b2b;color:#fff;border-color:#2b2b2b;}
@@ -581,8 +582,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 /* Modo Profe: KPIs de la card negra (Índice general / Alumnos activos / Clases registradas / Asistencia general) */
 .coach-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;}
 .coach-kpi{background:rgba(255,255,255,.10);border-radius:10px;padding:12px 13px;min-width:0;}
-.coach-kpi-lbl{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:6px;}
+.coach-kpi-lbl{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:6px;}
 .coach-kpi-val{font-size:22px;font-weight:900;color:#fff;line-height:1;}
+.coach-kpi-val .coach-kpi-max{font-size:13px;font-weight:700;color:rgba(255,255,255,.55);margin-left:1px;}
+.coach-kpi-val .ph-d{font-size:9px;}
 @media(max-width:560px){ .coach-kpi-row{grid-template-columns:repeat(2,1fr);} .coach-kpi-val{font-size:19px;} }
 
 @media(max-width:560px){
@@ -1102,7 +1105,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .filter-acc.open .acc-body{max-height:min(60vh,360px);overflow-y:auto;border-color:var(--border);}
 .filter-acc .acc-body-inner{padding:12px 14px;display:flex;flex-wrap:wrap;gap:8px;}
 /* chips: fuente blanca; el seleccionado queda con fondo blanco */
-.filter-acc .mf-chip{background:var(--surf);border:1.5px solid var(--border);color:var(--muted);border-radius:12px;font-weight:700;}
+.filter-acc .mf-chip{background:var(--surf);border:1.5px solid var(--border);color:var(--muted);border-radius:12px;font-weight:700;width:100%;text-align:left;}
 .filter-acc .mf-chip:hover{background:var(--surf2);border-color:var(--blue);color:var(--blue);}
 .filter-acc .mf-chip.active{background:#2b2b2b;border-color:#2b2b2b;color:#fff;font-weight:700;}
 
@@ -2908,7 +2911,7 @@ function buildCoach(){
   if(!players.length){ el.innerHTML='<div class="empty">No hay jugadores cargados.</div>'; return; }
   const _MES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']; const mLabelFull=(key)=>{ if(!key) return ''; const a=key.split('-'); const nm=_MES[Number(a[1])-1]||''; return (nm.charAt(0).toUpperCase()+nm.slice(1))+' '+a[0]; };
   const catOf=p=>{ const i=getInfo(p); return i?(i[INFO.categoria]||'').trim():''; };
-  const cats=[...new Set(players.map(catOf).filter(Boolean))].sort();
+  const cats=[...new Set(players.map(catOf).filter(Boolean))].sort((a,b)=>{ const ra=catRank(a),rb=catRank(b); if(ra!==rb) return ra-rb; return a.localeCompare(b,'es',{sensitivity:'base',numeric:true}); });
   const allPlayersList=players.slice();
   if(coachCat.length) players=players.filter(p=>coachCat.includes(catOf(p)));
   const allMonths=[...new Set(allRows.map(monthKey).filter(Boolean))].sort();
@@ -2979,7 +2982,7 @@ function buildCoach(){
     const tA=dd===null?'':(dd>=0.05?'↑':dd<=-0.05?'↓':'='); const tC=dd===null?'#9aaa9a':(dd>=0.05?'#16a34a':dd<=-0.05?'#dc2626':'#6b8a76');
     return `<div class="ag-row"><span class="ag-name">${_areaNom[a]}</span><div class="ag-bar"><i style="width:${w}%;background:${_lvlBar(v)};"></i></div><span class="ag-val">${v>0?v.toFixed(1):'—'}</span><span class="ag-trend" style="color:${tC};">${tA}${dd!==null?(dd>=0?'+':'')+dd.toFixed(1):''}</span></div>`;
   }).join('');
-  const areasCard=`<div class="card cz-areas"><div class="card-title">Áreas del grupo</div>${_areaRows}</div>`;
+  const areasCard=`<div class="acc evo-acc cz-areas" style="margin-top:14px;"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📈 Áreas del grupo${curMonth?' · '+mLabelFull(curMonth):''}</span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner">${_areaRows}</div></div></div>`;
   const _focoAreaBody = _weakArea
     ? `<p style="margin:0 0 10px;color:var(--muted);font-size:12px;">El área más floja del grupo es <strong style="color:#0a513a;">${_areaNom[_weakArea]}</strong> (${_weakVal.toFixed(1)}/3). Habilidades a mejorar:</p>`+(_weakGroups.length?_weakGroups.map(g=>{const lv=Math.round(g.avg)||1;return `<div class="fk-row"><span>${g.nombre}</span><span class="fk-lvl lb${lv}">${lvlLabel(lv)} · ${g.avg.toFixed(1)}</span></div>`;}).join(''):'<div class="empty" style="color:var(--muted);">Sin datos de habilidades este mes.</div>')
     : '<div class="empty" style="color:var(--muted);">Sin datos suficientes este mes.</div>';
@@ -3109,7 +3112,7 @@ function buildCoach(){
     <div class="coach-kpi-row">
       <div class="coach-kpi">
         <div class="coach-kpi-lbl">Índice general</div>
-        <div class="coach-kpi-val">${cTot>0?cTot.toFixed(1):'—'}${deltaBadgeDec((prevMonth&&cTot>0&&cPrevTot>0)?(cTot-cPrevTot):null)}</div>
+        <div class="coach-kpi-val">${cTot>0?cTot.toFixed(1):'—'}<span class="coach-kpi-max">/3</span>${deltaBadgeDec((prevMonth&&cTot>0&&cPrevTot>0)?(cTot-cPrevTot):null)}</div>
       </div>
       <div class="coach-kpi">
         <div class="coach-kpi-lbl">Alumnos activos</div>
