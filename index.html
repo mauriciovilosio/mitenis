@@ -4068,9 +4068,9 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
 .hd-rep-m{font-size:13px;font-weight:800;color:#1a1a1a;background:#e7e7e7;padding:6px 16px;border-radius:99px;display:inline-block;text-transform:capitalize;}
 .hd-rep-s{font-size:9.5px;color:rgba(255,255,255,.6);margin-top:2px;}
 
-/* PLAYER / INDEX / PERF ROW */
-.top{display:grid;grid-template-columns:1.15fr 1fr 1fr;grid-template-areas:"pl ix pf";gap:14px;padding:18px 26px 22px;align-items:stretch;border-top:1px solid rgba(255,255,255,.12);}
-.pl{grid-area:pl;}.ix{grid-area:ix;}.pf{grid-area:pf;}
+/* PLAYER / PERF ROW */
+.top{display:grid;grid-template-columns:1.15fr 1fr;grid-template-areas:"pl pf";gap:14px;padding:18px 26px 22px;align-items:stretch;border-top:1px solid rgba(255,255,255,.12);}
+.pl{grid-area:pl;}.pf{grid-area:pf;}
 .pl{display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;}
 .pl-av{width:62px;height:62px;border-radius:14px;display:flex;align-items:center;justify-content:center;
        font-size:22px;font-weight:900;color:#fff;flex-shrink:0;border:2.5px solid rgba(255,255,255,.25);}
@@ -4079,12 +4079,8 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
 .pl-meta{margin-top:9px;display:flex;flex-direction:column;gap:3px;}
 .pl-meta div{font-size:10.5px;color:rgba(255,255,255,.8);}
 .pl-meta b{color:#fff;font-weight:800;}
-.ix{text-align:center;border-left:1px solid rgba(255,255,255,.12);border-right:1px solid rgba(255,255,255,.12);}
-.ix{display:flex;flex-direction:column;}.ix-body,.pf-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;}.pf{display:flex;flex-direction:column;}
-.ix-lbl{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:6px;}
-.ix-n{font-size:34px;font-weight:900;color:#fff;line-height:1;}
-.ix-n .ix-d{font-size:13px;color:rgba(255,255,255,.5);font-weight:700;margin-left:3px;}
-.pf{text-align:center;}
+.pf-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.pf{display:flex;flex-direction:column;text-align:center;border-left:1px solid rgba(255,255,255,.12);}
 .pf-lbl{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:8px;}
 .pf-th{display:flex;gap:5px;justify-content:center;margin-bottom:8px;}
 .pf-st{font-size:20px;font-weight:900;color:#e9d541;line-height:1;}
@@ -4174,12 +4170,11 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
   .ft{flex-direction:column;align-items:flex-start;gap:10px;padding:16px 18px;}
   .ft-l{font-size:11px;line-height:1.45;}
   .ft-r{font-size:11px;}
-  .top{grid-template-columns:1fr 1fr;grid-template-areas:"pl pl" "ix pf";gap:16px 12px;align-items:stretch;}
+  .top{grid-template-columns:1fr;grid-template-areas:"pl" "pf";gap:16px;align-items:stretch;}
   .pl{padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.14);}
-  .ix{border-left:none;border-right:1px solid rgba(255,255,255,.14);}
-  .ix-lbl,.pf-lbl{font-size:9px;}
-  .ix-g{width:104px;height:104px;}
-  .ix-n,.pf-st{font-size:24px;}
+  .pf{border-left:none;}
+  .pf-lbl{font-size:9px;}
+  .pf-st{font-size:24px;}
   .pf-th svg{width:32px;height:32px;}
   .pf-msg{font-size:12px;max-width:300px;margin-left:auto;margin-right:auto;}
   .cards3{grid-template-columns:1fr 1fr;} .cols{grid-template-columns:1fr;}
@@ -4202,7 +4197,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
     </div>
   </div>
 
-  <!-- PLAYER / INDEX / PERF -->
+  <!-- PLAYER / PERF -->
   <div class="top">
     <div class="pl">
       <div>
@@ -4213,12 +4208,6 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
           ${info&&info[INFO.edad]?`<div>🏷️ Edad: <b>${esc(String(info[INFO.edad]))} años</b></div>`:''}
           ${info&&info[INFO.objetivo]?`<div>🎯 Objetivo: <b>${esc(info[INFO.objetivo])}</b></div>`:''}
         </div>
-      </div>
-    </div>
-    <div class="ix">
-      <div class="ix-lbl">Índice general del mes</div>
-      <div class="ix-body">
-        <div class="ix-n" style="color:${_dn.colLight};">${overall>0?overall.toFixed(1):'—'}<span class="ix-d">/ 3</span></div>
       </div>
     </div>
     <div class="pf">
