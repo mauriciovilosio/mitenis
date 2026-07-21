@@ -41,10 +41,10 @@
   --lv2:        #e0a200; --lv2-bg:#fef3c7;
   --lv3:        #16a34a; --lv3-bg:#dcfce7;
   /* Rendimiento — foco (amarillo) -> fortaleza (azul) */
-  --pf1:        #ffde59; --pf1-bg:#fff4d2;
+  --pf1:        #e9d541; --pf1-bg:#fff4d2;
   --pf2:        #9fe0bf; --pf2-bg:#dcf3e7;
   --pf3:        #0a513a; --pf3-bg:#d6f1e2;
-  --n1:#ffde59; --n2:#a0b834; --n3:#148f67;
+  --n1:#e9d541; --n2:#a0b834; --n3:#148f67;
   --radius:     16px;
   --radius-sm:  10px;
 }
@@ -1151,6 +1151,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
 .cal-dl-btn:hover{transform:translateY(-1px);}
 .cal-dl-note{margin-top:8px;width:100%;min-height:36px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);background:var(--surf2);border:1px dashed var(--border);border-radius:10px;padding:6px 8px;text-align:center;line-height:1.3;}
 .hl-azul{background:#0a513a;color:#fff;padding:1px 7px;border-radius:5px;font-weight:600;}
+.hl-rojo{background:#dc2626;color:#fff;padding:1px 7px;border-radius:5px;font-weight:600;}
 .cal-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted);}
 .cal-legend span{display:inline-flex;align-items:center;gap:6px;}
 .cal-legend .lg-swatch{width:13px;height:13px;border-radius:4px;flex-shrink:0;}
@@ -1448,7 +1449,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
   <div class="pin-modal" style="max-width:380px;">
     <div class="pin-title">Cómo funcionan los Informes</div>
     <div style="font-size:14px;color:var(--text);line-height:1.7;text-align:left;margin-top:4px;">
-      <p style="margin:0;">Los días en <span class="hl-azul">verde</span> tienen una sesión registrada - tocalos para ver el detalle. Al finalizar el mes, podés descargar tu registro completo.</p>
+      <p style="margin:0;">Los días en <span class="hl-azul">oscuro</span> tienen una sesión registrada, y los días en <span class="hl-rojo">rojo</span> tienen un Torneo registrado - tocalos para ver el detalle. Al finalizar el mes, podés descargar tu registro completo.</p>
     </div>
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeRegistroInfo()">Entendido</button></div>
   </div>
@@ -2991,7 +2992,7 @@ function buildCoach(){
     </button>
   </div>`;
   const _pcAvg={}; if(prevMonth){ areas.forEach(a=>{ const v=players.map(p=>areaAvgScope(p,prevMonth,a)).filter(x=>x>0); _pcAvg[a]=v.length?v.reduce((x,y)=>x+y,0)/v.length:0; }); }
-  const _lvlBar=v=> v<1.5?'#ffde59' : v<=2.5?'#a0b834' : '#148f67';
+  const _lvlBar=v=> v<1.5?'#e9d541' : v<=2.5?'#a0b834' : '#148f67';
   const _areaRows=[...areas].sort((x,y)=>(cAvg[y]||0)-(cAvg[x]||0)).map(a=>{
     const v=cAvg[a]||0, pv=_pcAvg[a]||0; const w=Math.max(4,Math.min(100,(v/3)*100));
     const dd=(prevMonth && v>0 && pv>0)?(v-pv):null;
@@ -3209,12 +3210,12 @@ function areaAvgForSessions(list, areaId){
 const AREA_COL={tecnica:'#0a513a',tactica:'#e0a200',fisico:'#16a34a',mental:'#d6336c'};
 // Color de área según su nivel actual (no según identidad de área): amarillo=Bien, verde claro=Muy bien, verde oscuro=Excelente
 // Redondea igual que las habilidades (Math.round) para que área y habilidades nunca queden en niveles distintos.
-function areaLvlColor(v){ const lv=Math.round(v); return lv>=3?'#148f67':lv===2?'#a0b834':'#ffde59'; }
+function areaLvlColor(v){ const lv=Math.round(v); return lv>=3?'#148f67':lv===2?'#a0b834':'#e9d541'; }
 // Desempeño general — umbrales: BIEN <1.7 · MUY BIEN 1.7-2.3 · EXCELENTE >2.3
 function desempenoNivel(o){
   if(o>2.5) return {lbl:'EXCELENTE', msg:'Gran mes de trabajo. ¡A sostenerlo!', bg:'#148f67', txt:'#161616', col:'#148f67', colLight:'#148f67', thumbs:3};
   if(o>=1.5) return {lbl:'MUY BIEN', msg:'Buen mes de trabajo. Vamos por más.', bg:'#a0b834', txt:'#161616', col:'#a0b834', colLight:'#a0b834', thumbs:2};
-  return {lbl:'BIEN', msg:'Seguimos sumando, paso a paso.', bg:'#ffde59', txt:'#161616', col:'#ffde59', colLight:'#ffde59', thumbs:1};
+  return {lbl:'BIEN', msg:'Seguimos sumando, paso a paso.', bg:'#e9d541', txt:'#161616', col:'#e9d541', colLight:'#e9d541', thumbs:1};
 }
 function _smoothPath(pts){
   if(pts.length<2) return '';
@@ -3243,7 +3244,7 @@ function donutSVG(pct,color){
   return '<svg viewBox="0 0 76 76" class="asist-donut"><circle cx="38" cy="38" r="'+R+'" fill="none" stroke="#e4ece0" stroke-width="9"/><circle cx="38" cy="38" r="'+R+'" fill="none" stroke="'+color+'" stroke-width="9" stroke-linecap="round" stroke-dasharray="'+dash.toFixed(1)+' '+C.toFixed(1)+'" transform="rotate(-90 38 38)"/><text x="38" y="43" text-anchor="middle" font-size="17" font-weight="900" fill="'+color+'">'+Math.round(pct)+'%</text></svg>';
 }
 // Color de barra según % de asistencia del mes: verde oscuro 100%, verde claro >=80%, amarillo <80%
-function attPctColor(pct){ if(pct>=100) return '#148f67'; if(pct>=80) return '#a0b834'; return '#ffde59'; }
+function attPctColor(pct){ if(pct>=100) return '#148f67'; if(pct>=80) return '#a0b834'; return '#e9d541'; }
 function attBarsSVG(series){
   if(!series||!series.length) return '';
   // El viewBox se genera angosto/alto a propósito (relación ancho:alto baja) para que,
@@ -4025,7 +4026,7 @@ function buildMonthReportHTML(name, mk){
   const _compromisoLbl = _pctAsist>=100 ? 'excelente' : (_pctAsist>=75 ? 'muy buen' : (_pctAsist>=50 ? 'buen' : 'creciente'));
   let coachStory = 'Hola ' + esc(_fn) + ', te felicito por estos días de trabajo y por tu ' + _compromisoLbl + ' compromiso a clases.';
   if(_topArea) coachStory += ' Durante el último mes tu área de mayor fortaleza fue: <b>' + esc(_topArea.nombre) + '</b> 💪. ¡A mantenerlo!';
-  if(foco) coachStory += ' Con los Profes recomendamos para el próximo mes seguir trabajando tu área de menor nivel.';
+  if(foco) coachStory += ' Con los Profes recomendamos para el próximo mes seguir trabajando tu <b>' + esc(foco.area.nombre) + '</b>.';
   coachStory += ' ¡Vamos por más ' + esc(_fn) + '! 🎾.';
 
 
@@ -4036,7 +4037,6 @@ function buildMonthReportHTML(name, mk){
   const compromiso = (actitudExcelente(name,mk) || (at&&at.met)) ? 'ALTO' : ((at&&at.pct>=60)?'MEDIO':'EN CRECIMIENTO');
   const _torneosMes = tournamentsForMonth(name, mk);
 
-  const overallDelta=(prevOverall>0 && overall>0)?(overall-prevOverall):null;
   const thumbSVG=(filled)=>`<svg viewBox="0 0 24 24" width="26" height="26" fill="${filled?'#ffde59':'none'}" stroke="${filled?'#ffde59':'rgba(243,210,62,.45)'}" stroke-width="1.6"><path d="M7 10v10H4V10h3zm3 10c-.55 0-1-.45-1-1V9.5c0-.3.13-.57.34-.76l5.4-5.18.86.86c.22.22.36.52.36.86v.28L15.6 9h4.9c.83 0 1.5.67 1.5 1.5l-2 7.5c-.17.86-.93 1.5-1.83 1.5H10z"/></svg>`;
 
   return `<!DOCTYPE html><html lang="es"><head>
@@ -4084,11 +4084,10 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
 .ix-lbl{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:6px;}
 .ix-n{font-size:34px;font-weight:900;color:#fff;line-height:1;}
 .ix-n .ix-d{font-size:13px;color:rgba(255,255,255,.5);font-weight:700;margin-left:3px;}
-.ix-delta{font-size:11px;font-weight:800;margin-top:6px;}
 .pf{text-align:center;}
 .pf-lbl{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:8px;}
 .pf-th{display:flex;gap:5px;justify-content:center;margin-bottom:8px;}
-.pf-st{font-size:20px;font-weight:900;color:#ffde59;line-height:1;}
+.pf-st{font-size:20px;font-weight:900;color:#e9d541;line-height:1;}
 .pf-msg{font-size:10px;color:rgba(255,255,255,.72);margin-top:5px;line-height:1.35;}
 
 /* BODY (cream) */
@@ -4221,7 +4220,6 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
       <div class="ix-lbl">Índice general del mes</div>
       <div class="ix-body">
         <div class="ix-n" style="color:${_dn.colLight};">${overall>0?overall.toFixed(1):'—'}<span class="ix-d">/ 3</span></div>
-        ${overallDelta!==null?`<div class="ix-delta" style="color:${overallDelta>=0?'#16a34a':'#dc2626'};">${overallDelta>=0?'↑':'↓'} ${overallDelta>=0?'+':''}${overallDelta.toFixed(1)} vs ${esc(prevShort)}</div>`:''}
       </div>
     </div>
     <div class="pf">
@@ -4269,7 +4267,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
         <div class="pb">
         ${debilidades.length?debilidades.map(g=>`<div class="str">
           <div class="str-ic">🎯</div>
-          <div><div class="str-t">${esc(g.nombre)} · ${lvlLabel(g.curLv)}</div>
+          <div><div class="str-t">${esc(g.nombre)}</div>
           <div class="str-s">${esc(g.desc||lvlSub(g.curLv))}</div></div>
         </div>`).join(''):'<div class="str-s">Aún sin datos suficientes este mes.</div>'}
         </div>
