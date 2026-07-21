@@ -4174,17 +4174,16 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
   .ft{flex-direction:column;align-items:flex-start;gap:10px;padding:16px 18px;}
   .ft-l{font-size:11px;line-height:1.45;}
   .ft-r{font-size:11px;}
-  .top{grid-template-columns:1fr 1fr;grid-template-areas:"pl ix" "pf pf";gap:16px 12px;align-items:center;}
-  .ix{border-left:none;border-right:none;}
-  .ix-lbl{font-size:8px;}
+  .top{grid-template-columns:1fr 1fr;grid-template-areas:"pl pl" "ix pf";gap:16px 12px;align-items:stretch;}
+  .pl{padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.14);}
+  .ix{border-left:none;border-right:1px solid rgba(255,255,255,.14);}
+  .ix-lbl,.pf-lbl{font-size:9px;}
   .ix-g{width:104px;height:104px;}
-  .ix-n{font-size:26px;}
-  .pf{border-top:1px solid rgba(255,255,255,.14);padding-top:14px;}
-  .pf-lbl{font-size:10px;}
+  .ix-n,.pf-st{font-size:24px;}
   .pf-th svg{width:32px;height:32px;}
-  .pf-st{font-size:22px;}
   .pf-msg{font-size:12px;max-width:300px;margin-left:auto;margin-right:auto;}
   .cards3{grid-template-columns:1fr 1fr;} .cols{grid-template-columns:1fr;}
+  .panel-ao{order:-1;}
   .evo-grid{grid-template-columns:1fr 1fr;} .evo-c:nth-child(2){border-right:none;}
 }
 </style></head><body>
@@ -4276,7 +4275,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
 
     <!-- COACH + ÚLTIMA SESIÓN -->
     <div class="cols">
-      <div class="panel">
+      <div class="panel panel-coach">
         <div class="ph"><span class="ph-ic">💬</span><span class="ph-tx">Comentario del Profe</span></div>
         <div class="pb">
           <div class="coach-q">${coachStory}</div>
@@ -4286,7 +4285,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
           </div>
         </div>
       </div>
-      <div class="panel">
+      <div class="panel panel-ao">
         <div class="ph"><span class="ph-ic">🤝</span><span class="ph-tx">Asistencia y Observación</span></div>
         <div class="pb">
           <div class="ao-row">📈 Asistencia: <b>${at?at.pct+'%':'—'}</b></div>
