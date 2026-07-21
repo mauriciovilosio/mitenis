@@ -1709,7 +1709,7 @@ const RUBRICAS = {
     { key:'Velocidad', nombre:'Velocidad',
       desc:['No llega a bolas que debería alcanzar','Llega pero sin tiempo para preparar el golpe','Llega con equilibrio y tiempo de preparación cómodo']},
     { key:'Resistencia', nombre:'Resistencia',
-      desc:['Errores no forzados aumentan cuando el punto o set es largo','Mantiene buena energia durante los puntos','Saca un plus de energia cuando define los puntos']}
+      desc:['Errores no forzados aumentan cuando el punto o set es largo','Mantiene buena energia durante los puntos, baja un poco al final','Saca un plus de energia cuando define los puntos']}
   ],
   mental: [
     { key:'Error', nombre:'Tolerancia al error',
@@ -3462,7 +3462,7 @@ function buildResumen(){
     <div class="pf-kpi">
       <div class="pf-kpi-lbl">Asistencia</div>
       <div class="pf-kpi-body">
-        <div class="pf-kpi-val" style="color:${at&&at.met?'#0a513a':'#e0a200'};">${at?`${_aDone}<small>/${_aObj}</small>`:'—'}</div>
+        <div class="pf-kpi-val" style="color:var(--muted);">${at?`${_aDone}<small>/${_aObj}</small>`:'—'}</div>
         <div class="pf-kpi-month">${monthLabel(curMonth)}</div>
       </div>
       <div class="acc skills-acc">
@@ -3475,13 +3475,13 @@ function buildResumen(){
     <div class="pf-kpi">
       <div class="pf-kpi-lbl">Racha <button class="kpi-info" onclick="openRachaInfo()" aria-label="Cómo se mide la racha">i</button></div>
       <div class="pf-kpi-body">
-        <div class="pf-kpi-val" style="color:${_streak>=1?'#e0a200':'var(--muted)'};">${_streak>=1?`🔥 ${_streak} ${_streak===1?'mes':'meses'}`:'—'}</div>
+        <div class="pf-kpi-val" style="color:var(--muted);">${_streak>=1?`🔥 ${_streak} ${_streak===1?'mes':'meses'}`:'—'}</div>
       </div>
     </div>
     <div class="pf-kpi">
       <div class="pf-kpi-lbl">Fortaleza</div>
       <div class="pf-kpi-body">
-        <div class="pf-kpi-val pf-kpi-skill" style="color:${_topSkill?'var(--text)':'var(--muted)'};">${_topSkill?`💪 ${_topSkill.nombre}`:'—'}</div>
+        <div class="pf-kpi-val pf-kpi-skill" style="color:var(--muted);">${_topSkill?`💪 ${_topSkill.nombre}`:'—'}</div>
       </div>
     </div>
   </div>`;
@@ -3990,16 +3990,13 @@ function buildMonthReportHTML(name, mk){
 
   // FORTALEZAS DEL MES (top 3 por nivel; prioriza las que subieron)
   const fortalezas=[...allGroups].sort((x,y)=> (y.curLv-x.curLv) || (y.cur-x.cur) || (y.improved-x.improved)).slice(0,3);
-  // ASPECTO PRINCIPAL A TRABAJAR (grupo más bajo)
-  const foco=[...allGroups].sort((x,y)=> (x.curLv-y.curLv) || (x.cur-y.cur))[0]||null;
-  const focoNext=foco?Math.min(3,foco.curLv+1):0;
+  // DEBILIDADES DEL MES (top 3 grupos de menor nivel; misma lógica que Fortalezas pero ascendente)
+  const debilidades=[...allGroups].sort((x,y)=> (x.curLv-y.curLv) || (x.cur-y.cur)).slice(0,3);
+  const foco=debilidades[0]||null;
   // Fortalezas / Aspecto a trabajar — desde columnas de la hoja 'Registro-rubrica'
   const splitItems=(t)=> String(t||'').split(/\r?\n|·|•|;|,|\u2022/).map(x=>x.replace(/^[\s\-–*0-9.\)]+/,'').trim()).filter(Boolean);
   const fortCol=ms.filter(s=>(s[COL.fortalezas]||'').trim()!=='');
   const fortItems=fortCol.length?splitItems(fortCol[fortCol.length-1][COL.fortalezas]):[];
-  const aspCol=ms.filter(s=>(s[COL.aspecto]||'').trim()!=='');
-  const aspText=aspCol.length?(aspCol[aspCol.length-1][COL.aspecto]||'').trim():'';
-  const aspItems=aspText?splitItems(aspText):[];
 
   // OBSERVACIÓN DEL PROFE (más reciente con texto)
   // Observaciones del Profe del mes, en orden cronológico, conectadas como un texto corrido
@@ -4026,12 +4023,9 @@ function buildMonthReportHTML(name, mk){
   const _topArea = [...areas].filter(a=>areaAvg[a.id]>0).sort((x,y)=>areaAvg[y.id]-areaAvg[x.id])[0] || null;
   const _pctAsist = at ? at.pct : 0;
   const _compromisoLbl = _pctAsist>=100 ? 'excelente' : (_pctAsist>=75 ? 'muy buen' : (_pctAsist>=50 ? 'buen' : 'creciente'));
-  const _joinES = (arr)=> arr.length<=1 ? (arr[0]||'') : (arr.slice(0,-1).join(', ') + ' y ' + arr[arr.length-1]);
-  const _aspList = aspItems.length ? aspItems : (foco ? [foco.nombre] : []);
-  const _aspTxt = _joinES(_aspList);
   let coachStory = 'Hola ' + esc(_fn) + ', te felicito por estos días de trabajo y por tu ' + _compromisoLbl + ' compromiso a clases.';
   if(_topArea) coachStory += ' Durante el último mes tu área de mayor fortaleza fue: <b>' + esc(_topArea.nombre) + '</b> 💪. ¡A mantenerlo!';
-  if(_aspTxt) coachStory += ' Con los Profes recomendamos para el próximo mes seguir trabajando ' + esc(_aspTxt) + '.';
+  if(foco) coachStory += ' Con los Profes recomendamos para el próximo mes seguir trabajando tu área de menor nivel.';
   coachStory += ' ¡Vamos por más ' + esc(_fn) + '! 🎾.';
 
 
@@ -4084,7 +4078,7 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
 .pl-cat{display:inline-block;margin-top:5px;padding:2px 11px;border-radius:99px;font-size:10px;font-weight:800;color:#13261a;}
 .pl-meta{margin-top:9px;display:flex;flex-direction:column;gap:3px;}
 .pl-meta div{font-size:10.5px;color:rgba(255,255,255,.8);}
-.pl-meta b{color:#ffde59;font-weight:800;}
+.pl-meta b{color:#fff;font-weight:800;}
 .ix{text-align:center;border-left:1px solid rgba(255,255,255,.12);border-right:1px solid rgba(255,255,255,.12);}
 .ix{display:flex;flex-direction:column;}.ix-body,.pf-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;}.pf{display:flex;flex-direction:column;}
 .ix-lbl{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:6px;}
@@ -4219,7 +4213,6 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
         <div class="pl-meta">
           ${info&&info[INFO.brazo]?`<div>✋ Mano hábil: <b>${esc(info[INFO.brazo])}</b></div>`:''}
           ${info&&info[INFO.edad]?`<div>🏷️ Edad: <b>${esc(String(info[INFO.edad]))} años</b></div>`:''}
-          ${info&&info[INFO.altura]?`<div>📌 Altura: <b>${esc(String(info[INFO.altura]))}</b></div>`:''}
           ${info&&info[INFO.objetivo]?`<div>🎯 Objetivo: <b>${esc(info[INFO.objetivo])}</b></div>`:''}
         </div>
       </div>
@@ -4274,10 +4267,11 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
       <div class="panel">
         <div class="ph"><span class="ph-ic">🎯</span><span class="ph-tx">Aspecto principal a trabajar</span></div>
         <div class="pb">
-        ${aspItems.length
-          ? aspItems.map(t=>`<div class="str"><div class="str-ic">🎯</div><div><div class="str-t">${esc(t)}</div></div></div>`).join('')
-          : (foco?`<div class="foco-t">${esc(foco.nombre)} <span style="font-size:11px;font-weight:700;color:${areaLvlColor(foco.curLv)};">· ${esc(foco.area.nombre)}</span></div>
-          <div class="foco-d">${esc(foco.desc||'Foco de trabajo para el próximo período.')}</div>`:'<div class="foco-d">Aún sin datos suficientes este mes.</div>')}
+        ${debilidades.length?debilidades.map(g=>`<div class="str">
+          <div class="str-ic">🎯</div>
+          <div><div class="str-t">${esc(g.nombre)} · ${lvlLabel(g.curLv)}</div>
+          <div class="str-s">${esc(g.desc||lvlSub(g.curLv))}</div></div>
+        </div>`).join(''):'<div class="str-s">Aún sin datos suficientes este mes.</div>'}
         </div>
       </div>
     </div>
