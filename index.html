@@ -80,7 +80,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .start-btn:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 12px 28px rgba(10,81,58,.16);}
 .dev-badge{margin-top:22px;text-align:center;font-size:11px;color:var(--muted);font-style:italic;line-height:1.5;animation:introMenuIn .5s ease 1.15s both;}
 .start-ico{flex-shrink:0;width:44px;height:44px;border-radius:12px;background:var(--surf2);display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;}
-.start-txt{flex:1;color:var(--blue);}
+.start-txt{flex:1;color:var(--blue);display:flex;flex-direction:column;gap:2px;min-width:0;}
+.start-desc{font-size:11px;font-weight:500;color:var(--muted);font-style:normal;letter-spacing:0;}
 .start-info{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:rgba(10,81,58,.10);color:var(--blue);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;font-style:italic;font-family:Georgia,serif;cursor:pointer;transition:transform .15s,background .15s;}
 .start-info:hover{transform:scale(1.15);background:rgba(10,81,58,.20);}
 .start-info:focus-visible{outline:2px solid var(--blue);outline-offset:1px;}
@@ -1209,21 +1210,20 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
     <div class="start-menu" id="start-menu">
       <button class="start-btn" id="start-escuela" onclick="chooseMode('escuela')">
         <span class="start-ico">🎾</span>
-        <span class="start-txt">Escuela de Tenis</span>
+        <span class="start-txt">Escuela de Tenis<span class="start-desc">Exclusivo para alumnos.</span></span>
         <span class="start-info" role="button" tabindex="0" aria-label="Qué incluye Escuela de Tenis" onclick="event.stopPropagation();openAppInfo()">i</span>
       </button>
       <button class="start-btn" id="start-torneos" onclick="openCircuito()">
         <span class="start-ico">🏆</span>
-        <span class="start-txt">Circuito interno</span>
+        <span class="start-txt">Circuito interno<span class="start-desc">Exclusivo para jugadores +18.</span></span>
         <span class="start-info" role="button" tabindex="0" aria-label="Qué incluye Circuito interno" onclick="event.stopPropagation();openTorneosInfo()">i</span>
       </button>
       <button class="start-btn" id="start-profe" onclick="openProfe()">
         <span class="start-ico">🧢</span>
-        <span class="start-txt">Modo Profe</span>
-        <span class="start-info" role="button" tabindex="0" aria-label="Qué es Modo Profe" onclick="event.stopPropagation();openCoachInfo()">i</span>
+        <span class="start-txt">Portal del Profe<span class="start-desc">Exclusivo para profesores.</span></span>
+        <span class="start-info" role="button" tabindex="0" aria-label="Qué es Portal del Profe" onclick="event.stopPropagation();openCoachInfo()">i</span>
       </button>
     </div>
-    <div class="dev-badge">⚙️ Proyecto en desarrollo · creado por Profe Mauri.</div>
     <div class="select-card" id="select-card" style="display:none;">
       <button class="select-back" onclick="closeSelect()">← Volver</button>
       <div class="select-label" id="select-label">Seleccioná un jugador por categoría</div>
@@ -1232,6 +1232,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
       </div>
       <div class="last-update" id="last-update"></div>
     </div>
+    <div class="dev-badge">⚙️ Proyecto en desarrollo · creado por Profe Mauri.</div>
   </div>
 </div>
 
@@ -1297,7 +1298,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
   <header class="app-header coach-header">
     <div class="header-top">
       <button class="header-back" onclick="closeCoach()">← Volver</button>
-      <div class="header-player"><div class="header-name">Modo Profe</div></div>
+      <div class="header-player"><div class="header-name">Portal del Profe</div></div>
       <div style="width:60px;"></div>
     </div>
     <nav class="app-tabs" id="tabs-coach">
@@ -1350,7 +1351,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
 
 <div class="pin-overlay" id="coach-info-overlay">
   <div class="pin-modal" style="max-width:380px;">
-    <div class="pin-title">🧢 Modo Profe</div>
+    <div class="pin-title">🧢 Portal del Profe</div>
     <div id="coach-info-body" style="font-size:13px;color:var(--text);line-height:1.6;text-align:left;"></div>
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeCoachInfo()">Entendido</button></div>
   </div>
@@ -1424,7 +1425,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
   <div class="pin-modal" style="max-width:340px;">
     <div class="pin-title">¿Cómo se mide la racha?</div>
     <div style="font-size:14px;color:var(--text);line-height:1.6;text-align:left;margin-top:4px;">
-      <p style="margin:0;">Meses <strong>consecutivos</strong> con más del <strong>85%</strong> de asistencia. Si el mes en curso todavía no llegó a ese porcentaje, no corta la racha — solo espera a que cierre.</p>
+      <p style="margin:0;">Meses <strong>consecutivos</strong> con <strong>80% o más</strong> de asistencia. Si el mes en curso todavía no llegó a ese porcentaje, no corta la racha — solo espera a que cierre.</p>
     </div>
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeRachaInfo()">Entendido</button></div>
   </div>
@@ -2549,7 +2550,7 @@ function openCoachView(){
   document.getElementById('landing').style.display='none';
   document.getElementById('app').classList.remove('visible');
   document.getElementById('coach').classList.add('visible');
-  try{ buildCoach(); }catch(e){ const el=document.getElementById('coach-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir Modo Profe.</strong>'+(e&&e.message?e.message:e)+'</div>'; }
+  try{ buildCoach(); }catch(e){ const el=document.getElementById('coach-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir Portal del Profe.</strong>'+(e&&e.message?e.message:e)+'</div>'; }
   saveNav();
 }
 function closeCoach(){ document.getElementById('coach').classList.remove('visible'); document.getElementById('landing').style.display=''; resetLanding(); saveNav(); }
@@ -3241,7 +3242,9 @@ function donutSVG(pct,color){
   const R=30, C=2*Math.PI*R, dash=(pct/100*C);
   return '<svg viewBox="0 0 76 76" class="asist-donut"><circle cx="38" cy="38" r="'+R+'" fill="none" stroke="#e4ece0" stroke-width="9"/><circle cx="38" cy="38" r="'+R+'" fill="none" stroke="'+color+'" stroke-width="9" stroke-linecap="round" stroke-dasharray="'+dash.toFixed(1)+' '+C.toFixed(1)+'" transform="rotate(-90 38 38)"/><text x="38" y="43" text-anchor="middle" font-size="17" font-weight="900" fill="'+color+'">'+Math.round(pct)+'%</text></svg>';
 }
-function attBarsSVG(series,color){
+// Color de barra según % de asistencia del mes: verde oscuro 100%, verde claro >=80%, amarillo <80%
+function attPctColor(pct){ if(pct>=100) return '#148f67'; if(pct>=80) return '#a0b834'; return '#ffde59'; }
+function attBarsSVG(series){
   if(!series||!series.length) return '';
   // El viewBox se genera angosto/alto a propósito (relación ancho:alto baja) para que,
   // combinado con preserveAspectRatio="meet", la altura sea siempre la dimensión que
@@ -3256,6 +3259,8 @@ function attBarsSVG(series,color){
   series.forEach((s,i)=>{
     const x=gap+i*(bw+gap);
     const objH=s.obj?(s.obj/maxV)*chartH:0, valH=(s.val/maxV)*chartH;
+    const pct=s.pct!=null?s.pct:(s.obj?Math.round(s.val/s.obj*100):0);
+    const color=attPctColor(pct);
     if(s.obj) out+='<rect x="'+x+'" y="'+(padT+chartH-objH)+'" width="'+bw+'" height="'+objH+'" rx="3" fill="'+color+'" opacity="0.13"/>';
     out+='<rect x="'+x+'" y="'+(padT+chartH-valH)+'" width="'+bw+'" height="'+Math.max(0,valH)+'" rx="3" fill="'+color+'"/>';
     out+='<text x="'+(x+bw/2)+'" y="'+(padT+chartH-valH-4)+'" text-anchor="middle" font-size="11" font-weight="800" fill="'+color+'">'+s.val+'</text>';
@@ -3402,7 +3407,7 @@ function buildResumen(){
   const _allMk=[...new Set(playerSessions.map(monthKey).filter(Boolean))].sort();
   const _desSeries=_allMk.map(mk=>{ const vv=areas.map(a=>areaAvgScope(currentPlayer,mk,a.id)).filter(x=>x>0); return vv.length?vv.reduce((x,y)=>x+y,0)/vv.length:0; }).filter(x=>x>0).slice(-12);
   const _desSpark=areaSparkline(_desSeries, _dn.colLight, 'sgdes', 3);
-  const _barSeries=attMonths(currentPlayer).map(mk=>{ const a=attendanceFor(currentPlayer,mk); return a?{m:monthLabel(mk).slice(0,3),val:Math.min(a.objetivo|0,a.cumplidas|0),obj:a.objetivo|0}:null; }).filter(Boolean).slice(-6);
+  const _barSeries=attMonths(currentPlayer).map(mk=>{ const a=attendanceFor(currentPlayer,mk); return a?{m:monthLabel(mk).slice(0,3),val:Math.min(a.objetivo|0,a.cumplidas|0),obj:a.objetivo|0,pct:a.pct}:null; }).filter(Boolean).slice(-6);
   const _ini=currentPlayer.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   const _avc=avatarColor(currentPlayer);
   const _metaParts=[ (info&&info[INFO.brazo])||'', (info&&info[INFO.altura])?(String(info[INFO.altura]).replace(/\s*m\.?\s*$/i,'').trim()+' m'):'', (info&&info[INFO.edad])?info[INFO.edad]+' años':'' ].filter(Boolean).join(' · ');
@@ -3418,7 +3423,7 @@ function buildResumen(){
     else if(tot<=2.5){ const pw=Math.max(4,Math.min(100,(tot/2.6)*100)); _progHTML='<div class="pk2-prog"><div class="pk2-prog-lbl"><span>Camino a Excelente</span><span>'+tot.toFixed(1)+' / 2.6</span></div><div class="pk2-bar"><i style="width:'+pw.toFixed(0)+'%;background:'+_dn.bg+';"></i></div></div>'; }
     else { _progHTML='<div class="pk2-prog"><div class="pk2-prog-lbl" style="color:'+_dn.bg+';"><span>¡Nivel Excelente!</span></div><div class="pk2-bar"><i style="width:100%;background:'+_dn.bg+';"></i></div></div>'; }
   }
-  const _mesCumplido=a=>!!(a && a.pct>85);
+  const _mesCumplido=a=>!!(a && a.pct>=80);
   const _attM=attMonths(currentPlayer); let _streak=0;
   let _stStart=_attM.length-1;
   if(_attM.length){ const _la=attendanceFor(currentPlayer,_attM[_attM.length-1]); if(!_mesCumplido(_la)) _stStart--; }
@@ -3463,14 +3468,14 @@ function buildResumen(){
       <div class="acc skills-acc">
         <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">Mi asistencia por mes</span><span class="acc-chevron">▾</span></div>
         <div class="acc-body"><div class="acc-body-inner">
-        ${attBarsSVG(_barSeries,'#0a513a')}
+        ${attBarsSVG(_barSeries)}
         </div></div>
       </div>
     </div>
     <div class="pf-kpi">
       <div class="pf-kpi-lbl">Racha <button class="kpi-info" onclick="openRachaInfo()" aria-label="Cómo se mide la racha">i</button></div>
       <div class="pf-kpi-body">
-        <div class="pf-kpi-val" style="color:${_streak>=1?'#e0a200':'var(--muted)'};">${_streak>=1?`🔥${_streak} ${_streak===1?'mes':'meses'}`:'—'}</div>
+        <div class="pf-kpi-val" style="color:${_streak>=1?'#e0a200':'var(--muted)'};">${_streak>=1?`🔥 ${_streak} ${_streak===1?'mes':'meses'}`:'—'}</div>
       </div>
     </div>
     <div class="pf-kpi">
@@ -4029,25 +4034,13 @@ function buildMonthReportHTML(name, mk){
   if(_aspTxt) coachStory += ' Con los Profes recomendamos para el próximo mes seguir trabajando ' + esc(_aspTxt) + '.';
   coachStory += ' ¡Vamos por más ' + esc(_fn) + '! 🎾.';
 
-  // ÚLTIMA SESIÓN
-  const last=ms.length?ms[ms.length-1]:null;
-  let lastFecha='', lastDesc='', lastTipo='';
-  if(last){
-    const d=new Date(parseDate(last[COL.fecha])+'T12:00:00');
-    lastFecha=isNaN(d)?fmtDate(last[COL.fecha]):d.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
-    lastDesc=(last[COL.descripcion]||'').trim();
-    lastTipo=(last[COL.tipo]||'').trim();
-  }
 
-  // ÍNDICE GENERAL — gauge
-  const ovLv=Math.round(overall)||0;
-  const pct=Math.max(0,Math.min(1,overall/3));
-  const R=52, C=2*Math.PI*R, dash=(pct*C).toFixed(1);
   // DESEMPEÑO GENERAL — pulgares
   const _dn=desempenoNivel(overall);
   let thumbs=_dn.thumbs, perfLbl=_dn.lbl, perfMsg=_dn.msg, perfCol=_dn.col;
   // COMPROMISO
   const compromiso = (actitudExcelente(name,mk) || (at&&at.met)) ? 'ALTO' : ((at&&at.pct>=60)?'MEDIO':'EN CRECIMIENTO');
+  const _torneosMes = tournamentsForMonth(name, mk);
 
   const overallDelta=(prevOverall>0 && overall>0)?(overall-prevOverall):null;
   const thumbSVG=(filled)=>`<svg viewBox="0 0 24 24" width="26" height="26" fill="${filled?'#ffde59':'none'}" stroke="${filled?'#ffde59':'rgba(243,210,62,.45)'}" stroke-width="1.6"><path d="M7 10v10H4V10h3zm3 10c-.55 0-1-.45-1-1V9.5c0-.3.13-.57.34-.76l5.4-5.18.86.86c.22.22.36.52.36.86v.28L15.6 9h4.9c.83 0 1.5.67 1.5 1.5l-2 7.5c-.17.86-.93 1.5-1.83 1.5H10z"/></svg>`;
@@ -4095,11 +4088,9 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
 .ix{text-align:center;border-left:1px solid rgba(255,255,255,.12);border-right:1px solid rgba(255,255,255,.12);}
 .ix{display:flex;flex-direction:column;}.ix-body,.pf-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;}.pf{display:flex;flex-direction:column;}
 .ix-lbl{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:6px;}
-.ix-g{position:relative;width:128px;height:128px;margin:0 auto;}
-.ix-g svg{transform:rotate(-90deg);width:100%;height:100%;}
-.ix-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .ix-n{font-size:34px;font-weight:900;color:#fff;line-height:1;}
-.ix-d{font-size:11px;color:rgba(255,255,255,.5);font-weight:700;margin-top:2px;}
+.ix-n .ix-d{font-size:13px;color:rgba(255,255,255,.5);font-weight:700;margin-left:3px;}
+.ix-delta{font-size:11px;font-weight:800;margin-top:6px;}
 .pf{text-align:center;}
 .pf-lbl{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:8px;}
 .pf-th{display:flex;gap:5px;justify-content:center;margin-bottom:8px;}
@@ -4160,6 +4151,9 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
 .ls-chips{display:flex;flex-wrap:wrap;gap:5px;}
 .ls-chip{background:#eaf6ee;color:#0d5230;font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;}
 .ls-desc{font-size:11px;color:#4a5f50;line-height:1.45;background:#f6faf3;border-radius:9px;padding:8px 10px;}
+.ao-row{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#163024;padding:8px 0;border-bottom:1px solid #eef3e8;}
+.ao-row:last-child{border-bottom:none;}
+.ao-row b{color:#0a513a;font-weight:900;}
 
 /* RESUMEN EVOLUCIÓN */
 .evo{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(10,61,42,.06);margin-bottom:14px;}
@@ -4223,22 +4217,19 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
         <div class="pl-name">${esc(name)}</div>
         ${cat?`<span class="pl-cat" style="background:${catCol};color:${idealText(catCol)};">${esc(cat)}</span>`:''}
         <div class="pl-meta">
-          <div>📋 <b>${ms.length}</b> ${ms.length===1?'sesión registrada':'sesiones registradas'}</div>
-          <div>📈 Asistencia: <b>${at?at.pct+'%':'—'}</b></div>
-          <div>⭐ Compromiso: <b>${compromiso}</b></div>
+          ${info&&info[INFO.brazo]?`<div>✋ Mano hábil: <b>${esc(info[INFO.brazo])}</b></div>`:''}
+          ${info&&info[INFO.edad]?`<div>🏷️ Edad: <b>${esc(String(info[INFO.edad]))} años</b></div>`:''}
+          ${info&&info[INFO.altura]?`<div>📌 Altura: <b>${esc(String(info[INFO.altura]))}</b></div>`:''}
+          ${info&&info[INFO.objetivo]?`<div>🎯 Objetivo: <b>${esc(info[INFO.objetivo])}</b></div>`:''}
         </div>
       </div>
     </div>
     <div class="ix">
       <div class="ix-lbl">Índice general del mes</div>
-      <div class="ix-body"><div class="ix-g">
-        <svg width="128" height="128" viewBox="0 0 128 128">
-          <circle cx="64" cy="64" r="${R}" fill="none" stroke="rgba(255,255,255,.13)" stroke-width="12"/>
-          <circle cx="64" cy="64" r="${R}" fill="none" stroke="${_dn.bg}" stroke-width="12" stroke-linecap="round"
-                  stroke-dasharray="${dash} ${C.toFixed(1)}"/>
-        </svg>
-        <div class="ix-c"><div class="ix-n">${overall>0?overall.toFixed(1):'—'}</div><div class="ix-d">/ 3</div></div>
-      </div></div>
+      <div class="ix-body">
+        <div class="ix-n" style="color:${_dn.colLight};">${overall>0?overall.toFixed(1):'—'}<span class="ix-d">/ 3</span></div>
+        ${overallDelta!==null?`<div class="ix-delta" style="color:${overallDelta>=0?'#16a34a':'#dc2626'};">${overallDelta>=0?'↑':'↓'} ${overallDelta>=0?'+':''}${overallDelta.toFixed(1)} vs ${esc(prevShort)}</div>`:''}
+      </div>
     </div>
     <div class="pf">
       <div class="pf-lbl">Desempeño general</div>
@@ -4304,12 +4295,12 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#1a1a1a;color:#1326
         </div>
       </div>
       <div class="panel">
-        <div class="ph"><span class="ph-ic">📅</span><span class="ph-tx">Última sesión registrada</span></div>
+        <div class="ph"><span class="ph-ic">🤝</span><span class="ph-tx">Asistencia y Observación</span></div>
         <div class="pb">
-        ${last?`<div class="ls-row"><span class="ls-cal">📌</span>${esc(lastFecha)}</div>
-          ${lastTipo?`<div class="ls-sec"><div class="ls-l">Tipo de sesión</div><div class="ls-chips"><span class="ls-chip">${esc(lastTipo)}</span></div></div>`:''}
-          ${lastDesc?`<div class="ls-sec"><div class="ls-l">Descripción de la sesión</div><div class="ls-desc">${esc(lastDesc)}</div></div>`:''}`
-          :'<div class="ls-desc">Sin sesiones registradas este mes.</div>'}
+          <div class="ao-row">📈 Asistencia: <b>${at?at.pct+'%':'—'}</b></div>
+          <div class="ao-row">⭐ Compromiso: <b>${compromiso}</b></div>
+          <div class="ao-row">📋 <b>${ms.length}</b> ${ms.length===1?'sesión registrada':'sesiones registradas'}</div>
+          <div class="ao-row">🏆 <b>${_torneosMes}</b> ${_torneosMes===1?'torneo jugado':'torneos jugados'}</div>
         </div>
       </div>
     </div>
@@ -4411,7 +4402,7 @@ function buildCoachPlanHTML(mk, cat){
 +'.printbtn{display:block;width:100%;max-width:760px;margin:18px auto 30px;background:#2b2b2b;color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;}'
 +'@media print{body{background:#fff;padding:0;}.printbtn{display:none;}.hero{box-shadow:none;}.area,.intro{box-shadow:none;border:1px solid #eef0f7;}}'
 +'</style></head><body><div class="page">'
-+'<div class="hero"><div class="brand">🧢 mi tenis · Modo Profe</div><div class="hero-title">Resumen para planificar</div><div class="hero-sub">'+esc(monthName)+'</div><div class="hero-meta">'+esc(catLbl)+' · '+players.length+' jugador'+(players.length!==1?'es':'')+'</div></div>'
++'<div class="hero"><div class="brand">🧢 mi tenis · Portal del Profe</div><div class="hero-title">Resumen para planificar</div><div class="hero-sub">'+esc(monthName)+'</div><div class="hero-meta">'+esc(catLbl)+' · '+players.length+' jugador'+(players.length!==1?'es':'')+'</div></div>'
 +'<div class="intro">Cada rúbrica muestra los jugadores que la tienen en <span class="legend">Bien</span> durante '+esc(monthName)+'. Usalo como guía para armar el foco de las clases del próximo mes. En total hay <b>'+totalFlags+'</b> punto'+(totalFlags!==1?'s':'')+' a reforzar.</div>'
 + sections
 +'<div class="footer">Generado el '+esc(hoy)+' · mi tenis · sistema de seguimiento y desarrollo para jugadores de tenis</div>'
