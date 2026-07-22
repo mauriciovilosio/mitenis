@@ -2072,6 +2072,56 @@ function restoreNav(){
   }catch(e){}
   __restoringNav=false;
 }
+// ── Botón "atrás" del celular: navegar dentro de la app en vez de salir ──
+// Idea: cada pantalla (selección de alumno, perfil, Portal del Profe, Circuito) y cada ventana
+// emergente (.pin-overlay) agrega una entrada de historial al abrirse. Al presionar "atrás" en el
+// celular, en vez de salir de la app, deshacemos esa entrada: cerramos el overlay abierto o
+// retrocedemos un nivel de pantalla (lo mismo que hace el botón visible "← Volver").
+let __navPopping=false;
+function __navPushScreen(name){ if(__navPopping) return; try{ history.pushState({navScreen:name}, '', location.href); }catch(e){} }
+function __navSyncBack(){ if(__navPopping) return; try{ if(history.state && history.state.navScreen) history.back(); }catch(e){} }
+function __navCurrentScreen(){
+  if(document.getElementById('app')?.classList.contains('visible')) return 'app';
+  if(document.getElementById('coach')?.classList.contains('visible')) return 'coach';
+  if(document.getElementById('circuito')?.classList.contains('visible')) return 'circuito';
+  const sc=document.getElementById('select-card');
+  if(sc && sc.style.display==='block') return 'select';
+  return 'landing';
+}
+(function(){
+  // Overlays: todas las ventanas emergentes de la app comparten la clase .pin-overlay + .show
+  const _ovObserver=new MutationObserver(muts=>{
+    if(__navPopping) return;
+    muts.forEach(m=>{
+      const el=m.target;
+      if(!(el instanceof Element) || !el.classList.contains('pin-overlay')) return;
+      const isShown=el.classList.contains('show');
+      const wasShown=(m.oldValue||'').split(/\s+/).includes('show');
+      if(isShown && !wasShown){ try{ history.pushState({navOv:el.id}, '', location.href); }catch(e){} }
+      else if(!isShown && wasShown){ if(history.state && history.state.navOv===el.id){ try{ history.back(); }catch(e){} } }
+    });
+  });
+  const _armOverlays=()=>document.querySelectorAll('.pin-overlay').forEach(el=>{
+    _ovObserver.observe(el, {attributes:true, attributeFilter:['class'], attributeOldValue:true});
+  });
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', _armOverlays); else _armOverlays();
+
+  window.addEventListener('popstate', function(){
+    // Prioridad 1: si hay una ventana emergente abierta, cerrarla
+    const openOv=document.querySelector('.pin-overlay.show');
+    if(openOv){ __navPopping=true; openOv.classList.remove('show'); __navPopping=false; return; }
+    // Prioridad 2: retroceder un nivel de pantalla (igual que el botón "← Volver" de cada sección)
+    __navPopping=true;
+    try{
+      const scr=__navCurrentScreen();
+      if(scr==='app') goBack();
+      else if(scr==='coach') closeCoach();
+      else if(scr==='circuito') closeCircuito();
+      else if(scr==='select') closeSelect();
+    }catch(e){}
+    __navPopping=false;
+  });
+})();
 function fmtUpdated(ts){ const d=new Date(ts); return isNaN(d)?'':d.toLocaleString('es-AR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }
 function setUpdated(ts){ const e=document.getElementById('last-update'); if(e) e.textContent = ts ? ('Última actualización: '+fmtUpdated(ts)) : ''; }
 function applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix){
@@ -2311,12 +2361,14 @@ function openPlayer(name){
   setupTabsForMode();
   rebuildAll();
   saveNav();
+  __navPushScreen('app');
 }
 function goBack(){
   document.getElementById('landing').style.display='';
   resetLanding();
   document.getElementById('app').classList.remove('visible');
   saveNav();
+  __navSyncBack();
 }
 function playerCurrentMonth(){
   const ms=[...new Set(allRows.filter(r=>r[COL.alumno]===currentPlayer).map(monthKey).filter(Boolean))].sort();
@@ -2575,10 +2627,12 @@ function chooseMode(m){
   const sc=document.getElementById('select-card'); if(sc) sc.style.display='block';
   const lbl=document.getElementById('select-label');
   if(lbl) lbl.textContent = (m==='torneos'?'Torneos internos · seleccioná un jugador':'Escuela de Tenis · seleccioná un jugador');
+  __navPushScreen('select');
 }
 function closeSelect(){
   const sc=document.getElementById('select-card'); if(sc) sc.style.display='none';
   const sm=document.getElementById('start-menu'); if(sm) sm.style.display='flex';
+  __navSyncBack();
 }
 function openProfe(){ openCoach(); }
 function resetLanding(){
@@ -2606,8 +2660,9 @@ function openCoachView(){
   document.getElementById('coach').classList.add('visible');
   try{ buildCoach(); }catch(e){ const el=document.getElementById('coach-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir Portal del Profe.</strong>'+(e&&e.message?e.message:e)+'</div>'; }
   saveNav();
+  __navPushScreen('coach');
 }
-function closeCoach(){ document.getElementById('coach').classList.remove('visible'); document.getElementById('landing').style.display=''; resetLanding(); saveNav(); }
+function closeCoach(){ document.getElementById('coach').classList.remove('visible'); document.getElementById('landing').style.display=''; resetLanding(); saveNav(); __navSyncBack(); }
 function setMonthCoach(m){ selectedMonth=m; buildCoach(); saveNav(); }
 function setCoachSort(s){ coachSort=s; try{buildCoach();}catch(e){} saveNav(); }
 function setCatCoach(c){
@@ -2891,8 +2946,9 @@ function openCircuito(){
   document.getElementById('circuito').classList.add('visible');
   try{ buildCircuito(); }catch(e){ const el=document.getElementById('circuito-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir Circuito interno.</strong>'+(e&&e.message?e.message:e)+'</div>'; }
   saveNav();
+  __navPushScreen('circuito');
 }
-function closeCircuito(){ document.getElementById('circuito').classList.remove('visible'); document.getElementById('landing').style.display=''; resetLanding(); saveNav(); }
+function closeCircuito(){ document.getElementById('circuito').classList.remove('visible'); document.getElementById('landing').style.display=''; resetLanding(); saveNav(); __navSyncBack(); }
 function setCatCircuito(c){ circuitoCat=c; buildCircuito(); }
 function buildCircuito(){
   const order=['torneos','jugadores'];
