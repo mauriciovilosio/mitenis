@@ -1322,14 +1322,14 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
     </div>
     <nav class="app-tabs" id="tabs-coach">
       <button class="tab-btn active" onclick="switchCoachTab('resumen',this)">Resumen</button>
-      <button class="tab-btn" onclick="switchCoachTab('planificacion',this)">Planificación</button>
       <button class="tab-btn" onclick="switchCoachTab('historial',this)">Historial</button>
+      <button class="tab-btn" onclick="switchCoachTab('planificacion',this)">Planificación</button>
     </nav>
   </header>
   <main class="app-content">
     <div class="coach-view active" id="coach-view-resumen"><div id="coach-content"></div></div>
-    <div class="coach-view" id="coach-view-planificacion"><div id="coach-plan-content"></div></div>
     <div class="coach-view" id="coach-view-historial"><div id="coach-hist-content"></div></div>
+    <div class="coach-view" id="coach-view-planificacion"><div id="coach-plan-content"></div></div>
   </main>
 </div>
 
@@ -2699,14 +2699,12 @@ function buildCoachPlanificacion(){
 // ── Modo Profe: Historial de clases (hoja 'historial', grilla semanal: Mes | Grupo | Nivel | Semana 1..5 x2 días) ──
 // Navegación pensada para acceso rápido: Mes → Semana → Grupo/día, con filtros de Grupo y Nivel para ir directo a lo buscado.
 function setHistCat(c){
-  if(c==='all'){ histCat=[]; }
-  else { const i=histCat.indexOf(c); if(i>=0) histCat.splice(i,1); else histCat.push(c); }
+  histCat = c==='all' ? [] : [c]; // selección única
   buildCoachHistorial();
   const cf=document.getElementById('hist-cat-filter'); if(cf) cf.classList.add('open');
 }
 function setHistGrupo(g){
-  if(g==='all'){ histGrupo=[]; }
-  else { const i=histGrupo.indexOf(g); if(i>=0) histGrupo.splice(i,1); else histGrupo.push(g); }
+  histGrupo = g==='all' ? [] : [g]; // selección única
   buildCoachHistorial();
   const gf=document.getElementById('hist-grupo-filter'); if(gf) gf.classList.add('open');
 }
