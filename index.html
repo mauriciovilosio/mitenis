@@ -78,7 +78,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .start-menu{display:flex;flex-direction:column;gap:12px;width:100%;max-width:420px;margin:0 auto;}
 .start-btn{display:flex;align-items:center;gap:13px;width:100%;background:var(--surf);border:1.5px solid var(--border);border-radius:16px;padding:15px 16px;cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;color:var(--blue);font-size:16px;font-weight:700;text-align:left;box-shadow:0 6px 20px rgba(10,81,58,.08);}
 .start-btn:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 12px 28px rgba(10,81,58,.16);}
-.dev-badge{margin-top:22px;text-align:center;font-size:11px;color:var(--muted);font-style:italic;line-height:1.5;animation:introMenuIn .5s ease 1.15s both;}
+.dev-badge{margin-top:22px;text-align:center;font-size:11px;color:var(--muted);font-style:normal;line-height:1.5;animation:introMenuIn .5s ease 1.15s both;}
 .start-ico{flex-shrink:0;width:44px;height:44px;border-radius:12px;background:var(--surf2);display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1;}
 .start-txt{flex:1;color:var(--blue);display:flex;flex-direction:column;gap:2px;min-width:0;}
 .start-desc{font-size:11px;font-weight:500;color:var(--muted);font-style:normal;letter-spacing:0;}
@@ -335,11 +335,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .cz-sort-btn.active{background:#ffde59;color:#0a513a;font-weight:800;}
 /* Modo Profe v2: foco 2 cards + áreas compactas + modales */
 .foco2{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
-.foco2-card{flex:1;min-width:150px;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:11px 14px;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s;}
+.foco2-card{flex:1;min-width:150px;display:flex;flex-direction:column;background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;padding:0;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s;}
 .foco2-card:hover{border-color:var(--blue);transform:translateY(-1px);box-shadow:0 6px 16px rgba(10,81,58,.1);}
+.foco2-title{background:#2b2b2b;color:#fefefe;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:8px 12px;}
+.foco2-body{display:flex;align-items:center;gap:10px;padding:11px 14px;}
 .foco2-ic{font-size:22px;flex-shrink:0;line-height:1;}
 .foco2-tx{flex:1;min-width:0;display:flex;flex-direction:column;}
-.foco2-lbl{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#fefefe;background:#2b2b2b;padding:3px 8px;border-radius:6px;display:inline-block;width:fit-content;margin-bottom:4px;}
 .foco2-val{font-size:15px;font-weight:900;color:#0a513a;}
 .foco2-chev{font-size:22px;color:#9aaa9a;flex-shrink:0;line-height:1;}
 .acc.evo-acc.cz-areas .acc-body-inner{padding:12px 16px 14px;}
@@ -1193,6 +1194,20 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
   .plan-extra{gap:3px;padding-top:7px;}
   .plan-extra-row{font-size:10.5px;}
 }
+/* Historial de clases (Portal del Profe) */
+.hist-acc .acc-body-inner{padding:12px 14px 14px;display:flex;flex-direction:column;gap:16px;}
+.hist-slot{display:flex;flex-direction:column;gap:8px;}
+.hist-slot-h{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:5px;}
+.hist-card{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;}
+.hist-card-h{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.hist-fecha{font-size:12px;font-weight:800;color:var(--blue);text-transform:capitalize;}
+.hist-row{font-size:12.5px;color:var(--text);line-height:1.5;}
+.hist-row b{color:var(--muted);font-weight:700;}
+@media(max-width:600px){
+  .hist-card{padding:10px 12px;}
+  .hist-fecha{font-size:11px;}
+  .hist-row{font-size:11.5px;}
+}
 </style>
 </head>
 <body>
@@ -1233,7 +1248,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
       </div>
       <div class="last-update" id="last-update"></div>
     </div>
-    <div class="dev-badge">⚙️ Proyecto en desarrollo · creado por Profe Mauri.</div>
+    <div class="dev-badge">© 2026 Mi Tenis - Proyecto en desarrollo.</div>
   </div>
 </div>
 
@@ -1305,11 +1320,13 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
     <nav class="app-tabs" id="tabs-coach">
       <button class="tab-btn active" onclick="switchCoachTab('resumen',this)">Resumen</button>
       <button class="tab-btn" onclick="switchCoachTab('planificacion',this)">Planificación</button>
+      <button class="tab-btn" onclick="switchCoachTab('historial',this)">Historial</button>
     </nav>
   </header>
   <main class="app-content">
     <div class="coach-view active" id="coach-view-resumen"><div id="coach-content"></div></div>
     <div class="coach-view" id="coach-view-planificacion"><div id="coach-plan-content"></div></div>
+    <div class="coach-view" id="coach-view-historial"><div id="coach-hist-content"></div></div>
   </main>
 </div>
 
@@ -1501,6 +1518,7 @@ const ADULTS_SHEET = 'informacion adultos'; // alumno | categoria | edad | brazo
 const MATCHES_SHEET = 'Partidos Torneos';   // torneo | categoria | fecha | jugadorA | jugadorB | resultado | ganador
 const EVENTS_SHEET = 'Torneos';  // (opcional) torneo | categoria | fecha | estado
 const PLAN_SHEET = 'Planificacion'; // golpe | actividad | categoria | descripcion | (opcionales: objetivo | material | duracion | nivel)
+const HIST_SHEET = 'historial'; // fecha | categoria | nivel | objetivo | ejercicios | descripcion
 const MATCH_WIN_PTS = 10;        // puntaje por victoria para el ranking interno
 
 // ══════════════════════════════════════
@@ -1569,6 +1587,25 @@ const PLAN_ALIASES = {
   duracion:['duracion','duración','tiempo','minutos'],
   nivel:['nivel','dificultad','intensidad']
 };
+// Historial de clases (Portal del Profe): la hoja es una grilla semanal —
+// Mes | Grupo (dia y horario, ej. "Lun y mie - 14hs") | Nivel | Semana 1 | (2da col, sin encabezado) | Semana 2 | ... | Semana 5
+// Cada grupo va 2 días por semana => cada "Semana N" ocupa 2 columnas (una por día de clase de esa semana).
+// índices resueltos por encabezado. -1 = ausente. weekCols = pares de columnas por semana detectadas.
+let HIST = { mes:-1, grupo:-1, nivel:-1, weekCols:[] };
+const HIST_ALIASES = {
+  mes:['mes'],
+  grupo:['grupo','horario','grupo horario','dia y horario','día y horario'],
+  nivel:['nivel','categoria','categoría','categoria/nivel','categorianivel']
+};
+function isHistWeekHeader(h){ return /^semana\s*\d+/i.test((h||'').toString().trim()); }
+// A partir de "Lun y mie - 14hs" devuelve ['Lun','Mie'] (los 2 días de clase del grupo)
+function histDayLabels(grupo){
+  const g=((grupo||'').split(' - ')[0]||'').trim();
+  const parts=g.split(/\s+y\s+/i).map(x=>x.trim()).filter(Boolean);
+  if(parts.length>=2) return [parts[0], parts[1]];
+  if(parts.length===1) return [parts[0], parts[0]];
+  return ['Clase 1','Clase 2'];
+}
 const AVATAR_COLORS = ['#22b16c','#178a54','#52c98c','#15734a','#22b16c','#178a54','#52c98c','#15734a'];
 const BALL_COLORS=['#c8d42b','#22b16c','#ff5d5d','#ff9f43','#8e5cff','#17b890','#ff6fb5'];
 const COACH_PIN_FALLBACK='';
@@ -1768,6 +1805,7 @@ let circuitoTab='torneos', circuitoPlayer=null, circuitoPlayerQ='';
 let coachSort='rendimiento';
 let __pendingCircuito=null, __circuitoUnlocked=new Set();
 let planRows=[], planHeader=[], planFilters={golpe:'all', categoria:'all', nivel:'all', q:''};
+let histRows=[], histHeader=[], histCat=[];
 
 // ══════════════════════════════════════
 // FETCH CSV DESDE GOOGLE SHEETS
@@ -2032,7 +2070,7 @@ function restoreNav(){
 }
 function fmtUpdated(ts){ const d=new Date(ts); return isNaN(d)?'':d.toLocaleString('es-AR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }
 function setUpdated(ts){ const e=document.getElementById('last-update'); if(e) e.textContent = ts ? ('Última actualización: '+fmtUpdated(ts)) : ''; }
-function applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix){
+function applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix){
   if(dataMatrix.length) COL  = buildColMap(dataMatrix[0], COL_DEFAULT,  HEADER_ALIASES);
   if(infoMatrix && infoMatrix.length){
     INFO = buildColMap(infoMatrix[0], INFO_DEFAULT, INFO_ALIASES);
@@ -2062,6 +2100,16 @@ function applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatr
     PLAN={ golpe:_resolve(PLAN_ALIASES.golpe), actividad:_resolve(PLAN_ALIASES.actividad), categoria:_resolve(PLAN_ALIASES.categoria), descripcion:_resolve(PLAN_ALIASES.descripcion), objetivo:_resolve(PLAN_ALIASES.objetivo), material:_resolve(PLAN_ALIASES.material), duracion:_resolve(PLAN_ALIASES.duracion), nivel:_resolve(PLAN_ALIASES.nivel) };
     planRows=planMatrix.slice(1).filter(r=>r.some(c=>(c||'').trim().length>0));
   } else { planHeader=[]; planRows=[]; }
+  // Historial de clases: grilla semanal — resolver columnas fijas + detectar pares de columnas por semana
+  if(histMatrix && histMatrix.length){
+    histHeader=histMatrix[0]||[];
+    const _nhh=histHeader.map(normHeader);
+    const _resolveH=(aliases)=>{ for(const a of aliases){ const i=_nhh.indexOf(normHeader(a)); if(i>=0) return i; } return -1; };
+    const _weekCols=[];
+    histHeader.forEach((h,i)=>{ if(isHistWeekHeader(h)) _weekCols.push({label:(h||'').toString().trim(), i1:i, i2:i+1}); });
+    HIST={ mes:_resolveH(HIST_ALIASES.mes), grupo:_resolveH(HIST_ALIASES.grupo), nivel:_resolveH(HIST_ALIASES.nivel), weekCols:_weekCols };
+    histRows=histMatrix.slice(1).filter(r=>r.some(c=>(c||'').trim().length>0));
+  } else { histHeader=[]; histRows=[]; HIST.weekCols=[]; }
 }
 function getAdultInfo(name){ return adultRows.find(r=>r[ADULT.alumno]?.trim()===name.trim())||null; }
 function renderPlayers(){
@@ -2138,12 +2186,12 @@ async function init(){
   // 1) Cache para pintado instantáneo
   try{
     const raw=localStorage.getItem(CACHE_KEY);
-    if(raw){ const cc=JSON.parse(raw); if(cc && cc.data){ applyData(cc.data, cc.info||[], cc.asist||[], cc.videos||[], cc.adults||[], cc.matches||[], cc.events||[], cc.plan||[]); renderPlayers(); setUpdated(cc.ts); } }
+    if(raw){ const cc=JSON.parse(raw); if(cc && cc.data){ applyData(cc.data, cc.info||[], cc.asist||[], cc.videos||[], cc.adults||[], cc.matches||[], cc.events||[], cc.plan||[], cc.hist||[]); renderPlayers(); setUpdated(cc.ts); } }
   }catch(e){}
   try{ restoreNav(); }catch(e){}
   // 2) Refresco en vivo desde el Sheet
   try{
-    const [dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix] = await Promise.all([
+    const [dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix] = await Promise.all([
       fetchSheet(DATA_SHEET),
       fetchSheet(INFO_SHEET).catch(()=>[]),
       fetchSheet(ASIST_SHEET).catch(()=>[]),
@@ -2151,13 +2199,14 @@ async function init(){
       fetchByNames([ADULTS_SHEET,'informacion adultos','Informacion Adultos','información adultos']).catch(()=>[]),
       fetchByNames([MATCHES_SHEET,'Partidos Torneos','partidos torneos','Partidos','partidos']).catch(()=>[]),
       fetchByNames([EVENTS_SHEET,'Torneos','torneos']).catch(()=>[]),
-      fetchByNames([PLAN_SHEET,'Planificacion','Planificación','planificacion','planificación']).catch(()=>[])
+      fetchByNames([PLAN_SHEET,'Planificacion','Planificación','planificacion','planificación']).catch(()=>[]),
+      fetchByNames([HIST_SHEET,'historial','Historial','Historial de clases','historial de clases']).catch(()=>[])
     ]);
-    applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix);
+    applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix);
     renderPlayers();
     try{ restoreNav(); }catch(e){}
     const ts=Date.now(); setUpdated(ts);
-    try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ts, data:dataMatrix, info:infoMatrix, asist:asistMatrix, videos:videosMatrix, adults:adultsMatrix, matches:matchesMatrix, events:eventsMatrix, plan:planMatrix})); }catch(e){}
+    try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ts, data:dataMatrix, info:infoMatrix, asist:asistMatrix, videos:videosMatrix, adults:adultsMatrix, matches:matchesMatrix, events:eventsMatrix, plan:planMatrix, hist:histMatrix})); }catch(e){}
   }catch(e){
     if(!allRows.length){
       const g=document.getElementById('player-grid');
@@ -2571,6 +2620,7 @@ function switchCoachTab(id, btn){
   if(btn) btn.classList.add('active');
   const v=document.getElementById('coach-view-'+id); if(v) v.classList.add('active');
   if(id==='planificacion'){ try{ buildCoachPlanificacion(); }catch(e){ const el=document.getElementById('coach-plan-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir la planificación.</strong>'+(e&&e.message?e.message:e)+'</div>'; } }
+  if(id==='historial'){ try{ buildCoachHistorial(); }catch(e){ const el=document.getElementById('coach-hist-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir el historial.</strong>'+(e&&e.message?e.message:e)+'</div>'; } }
   saveNav();
 }
 
@@ -2642,6 +2692,80 @@ function buildCoachPlanificacion(){
   el.innerHTML=`${filters}<div class="plan-count" id="plan-count"></div><div id="plan-list-wrap"></div>`;
   renderPlanList();
 }
+
+// ── Modo Profe: Historial de clases (hoja 'historial', grilla semanal: Mes | Grupo | Nivel | Semana 1..5 x2 días) ──
+function setHistCat(c){
+  if(c==='all'){ histCat=[]; }
+  else { const i=histCat.indexOf(c); if(i>=0) histCat.splice(i,1); else histCat.push(c); }
+  buildCoachHistorial();
+  const cf=document.getElementById('hist-cat-filter'); if(cf) cf.classList.add('open');
+}
+function histCatChips(){
+  const nivs=[...new Set(histRows.map(r=>((HIST.nivel>=0?r[HIST.nivel]:'')||'').trim()).filter(Boolean))]
+    .sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base',numeric:true}));
+  if(!nivs.length) return '';
+  return `<div class="acc filter-acc" id="hist-cat-filter"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">🏷️ Nivel <span class="acc-sub">· ${histCat.length?(histCat.length===1?histCat[0]:histCat.length+' seleccionados'):'Todos'}</span></span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
+    <button class="mf-chip ${!histCat.length?'active':''}" onclick="setHistCat('all')">Todos</button>
+    ${nivs.map(c=>`<button class="mf-chip ${histCat.includes(c)?'active':''}" onclick="setHistCat('${c.replace(/'/g,"\\'")}')">${c}</button>`).join('')}
+  </div></div></div></div>`;
+}
+// Arma los "slots" (una fila de la grilla = un grupo/horario fijo) con sus clases de la semana
+function histSlots(){
+  return histRows.map(r=>{
+    const grupo=((HIST.grupo>=0?r[HIST.grupo]:'')||'').trim();
+    const nivel=((HIST.nivel>=0?r[HIST.nivel]:'')||'').trim()||'Sin nivel';
+    const mes=((HIST.mes>=0?r[HIST.mes]:'')||'').trim();
+    const [diaA,diaB]=histDayLabels(grupo);
+    const entries=[];
+    (HIST.weekCols||[]).forEach(wc=>{
+      const vA=(r[wc.i1]||'').trim(), vB=(r[wc.i2]||'').trim();
+      if(vA) entries.push({semana:wc.label, dia:diaA, contenido:vA});
+      if(vB) entries.push({semana:wc.label, dia:diaB, contenido:vB});
+    });
+    entries.reverse(); // más reciente primero (mayor semana, y dentro de la semana el 2º día antes que el 1º)
+    return {grupo, nivel, mes, entries};
+  }).filter(s=>s.entries.length);
+}
+function buildCoachHistorial(){
+  const el=document.getElementById('coach-hist-content'); if(!el) return;
+  if(!histRows.length || !HIST.weekCols || !HIST.weekCols.length){
+    el.innerHTML=`<div class="card"><div class="card-title">📚 Historial</div>
+      <div class="nota" style="margin:8px 0 0;line-height:1.6;">Todavía no hay clases cargadas, o no se encontraron columnas de semana.<br>
+      La hoja <b>«historial»</b> debe tener las columnas <b>Mes</b>, <b>Grupo</b> (ej: «Lun y mie - 14hs») y <b>Nivel</b>, seguidas de las columnas <b>Semana 1</b> a <b>Semana 5</b> (cada una ocupando 2 columnas, una por día de clase de esa semana).</div></div>`;
+    return;
+  }
+  const esc=(s)=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  let slots=histSlots();
+  if(histCat.length) slots=slots.filter(s=>histCat.includes(s.nivel));
+  const filters=`<div class="plan-filters">${histCatChips()}</div>`;
+  if(!slots.length){
+    el.innerHTML=`${filters}<div class="empty" style="color:var(--muted);margin-top:12px;">No hay clases cargadas todavía para estos filtros.</div>`;
+    return;
+  }
+  const groups={};
+  slots.forEach(s=>{ (groups[s.nivel]=groups[s.nivel]||[]).push(s); });
+  const nivs=Object.keys(groups).sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base',numeric:true}));
+  const slotBlock=(s)=>{
+    const slotLbl=[s.grupo,s.mes].filter(Boolean).join(' · ');
+    return `<div class="hist-slot">
+      ${slotLbl?`<div class="hist-slot-h">${esc(slotLbl)}</div>`:''}
+      ${s.entries.map(en=>`<div class="hist-card">
+        <div class="hist-card-h"><span class="hist-fecha">📅 ${esc(en.semana)} · ${esc(en.dia)}</span></div>
+        <div class="hist-row">${esc(en.contenido)}</div>
+      </div>`).join('')}
+    </div>`;
+  };
+  const sections=nivs.map(c=>{
+    const list=groups[c];
+    const totalClases=list.reduce((n,s)=>n+s.entries.length,0);
+    return `<div class="acc evo-acc hist-acc" style="margin-top:14px;">
+      <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">${esc(c)} <span class="acc-sub">· ${totalClases} clase${totalClases!==1?'s':''}</span></span><span class="acc-chevron">▾</span></div>
+      <div class="acc-body"><div class="acc-body-inner">${list.map(slotBlock).join('')}</div></div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`${filters}${sections}`;
+}
+
 // ══════════════════════════════════════
 // TORNEOS INTERNOS — partidos, ranking, calendario, circuito
 // ══════════════════════════════════════
@@ -2981,14 +3105,20 @@ function buildCoach(){
   const _atendN=_riskList.length;
   const foco2=`<div class="foco2">
     <button class="foco2-card" onclick="openFocoArea()">
-      <span class="foco2-ic" style="color:#0d5230;">🎯</span>
-      <span class="foco2-tx"><span class="foco2-lbl">Área a reforzar</span><span class="foco2-val">${_weakArea?_areaNom[_weakArea]+' · '+_weakVal.toFixed(1):'—'}</span></span>
-      <span class="foco2-chev">›</span>
+      <div class="foco2-title">Área a reforzar</div>
+      <div class="foco2-body">
+        <span class="foco2-ic" style="color:#0d5230;">🎯</span>
+        <span class="foco2-tx"><span class="foco2-val">${_weakArea?_areaNom[_weakArea]+' · '+_weakVal.toFixed(1):'—'}</span></span>
+        <span class="foco2-chev">›</span>
+      </div>
     </button>
     <button class="foco2-card" onclick="openFocoAlumnos()">
-      <span class="foco2-ic" style="color:#dc2626;">⚠️</span>
-      <span class="foco2-tx"><span class="foco2-lbl">Atención</span><span class="foco2-val" style="color:${_atendN?'#dc2626':'#16a34a'};">${_atendN} ${_atendN===1?'alumno':'alumnos'}</span></span>
-      <span class="foco2-chev">›</span>
+      <div class="foco2-title">Atención</div>
+      <div class="foco2-body">
+        <span class="foco2-ic" style="color:#dc2626;">⚠️</span>
+        <span class="foco2-tx"><span class="foco2-val" style="color:${_atendN?'#dc2626':'#16a34a'};">${_atendN} ${_atendN===1?'alumno':'alumnos'}</span></span>
+        <span class="foco2-chev">›</span>
+      </div>
     </button>
   </div>`;
   const _pcAvg={}; if(prevMonth){ areas.forEach(a=>{ const v=players.map(p=>areaAvgScope(p,prevMonth,a)).filter(x=>x>0); _pcAvg[a]=v.length?v.reduce((x,y)=>x+y,0)/v.length:0; }); }
