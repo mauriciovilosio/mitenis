@@ -1195,17 +1195,20 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
   .plan-extra-row{font-size:10.5px;}
 }
 /* Historial de clases (Portal del Profe) */
-.hist-acc .acc-body-inner{padding:12px 14px 14px;display:flex;flex-direction:column;gap:16px;}
+.hist-acc .acc-body-inner{padding:12px 14px 14px;display:flex;flex-direction:column;gap:18px;}
 .hist-slot{display:flex;flex-direction:column;gap:8px;}
-.hist-slot-h{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:5px;}
+.hist-slot-h{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:5px;display:flex;align-items:center;gap:6px;}
+.hist-semana{display:flex;flex-direction:column;gap:8px;}
+.hist-semana-cards{display:flex;flex-direction:column;gap:8px;}
 .hist-card{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;}
 .hist-card-h{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
-.hist-fecha{font-size:12px;font-weight:800;color:var(--blue);text-transform:capitalize;}
+.hist-fecha,.hist-grupo-lbl{font-size:12px;font-weight:800;color:var(--blue);text-transform:capitalize;}
+.hist-dia{font-size:11px;font-weight:700;color:var(--muted);text-transform:capitalize;}
 .hist-row{font-size:12.5px;color:var(--text);line-height:1.5;}
 .hist-row b{color:var(--muted);font-weight:700;}
 @media(max-width:600px){
   .hist-card{padding:10px 12px;}
-  .hist-fecha{font-size:11px;}
+  .hist-fecha,.hist-grupo-lbl{font-size:11px;}
   .hist-row{font-size:11.5px;}
 }
 </style>
@@ -1805,7 +1808,7 @@ let circuitoTab='torneos', circuitoPlayer=null, circuitoPlayerQ='';
 let coachSort='rendimiento';
 let __pendingCircuito=null, __circuitoUnlocked=new Set();
 let planRows=[], planHeader=[], planFilters={golpe:'all', categoria:'all', nivel:'all', q:''};
-let histRows=[], histHeader=[], histCat=[];
+let histRows=[], histHeader=[], histCat=[], histGrupo=[];
 
 // ══════════════════════════════════════
 // FETCH CSV DESDE GOOGLE SHEETS
@@ -2694,11 +2697,18 @@ function buildCoachPlanificacion(){
 }
 
 // ── Modo Profe: Historial de clases (hoja 'historial', grilla semanal: Mes | Grupo | Nivel | Semana 1..5 x2 días) ──
+// Navegación pensada para acceso rápido: Mes → Semana → Grupo/día, con filtros de Grupo y Nivel para ir directo a lo buscado.
 function setHistCat(c){
   if(c==='all'){ histCat=[]; }
   else { const i=histCat.indexOf(c); if(i>=0) histCat.splice(i,1); else histCat.push(c); }
   buildCoachHistorial();
   const cf=document.getElementById('hist-cat-filter'); if(cf) cf.classList.add('open');
+}
+function setHistGrupo(g){
+  if(g==='all'){ histGrupo=[]; }
+  else { const i=histGrupo.indexOf(g); if(i>=0) histGrupo.splice(i,1); else histGrupo.push(g); }
+  buildCoachHistorial();
+  const gf=document.getElementById('hist-grupo-filter'); if(gf) gf.classList.add('open');
 }
 function histCatChips(){
   const nivs=[...new Set(histRows.map(r=>((HIST.nivel>=0?r[HIST.nivel]:'')||'').trim()).filter(Boolean))]
@@ -2709,22 +2719,31 @@ function histCatChips(){
     ${nivs.map(c=>`<button class="mf-chip ${histCat.includes(c)?'active':''}" onclick="setHistCat('${c.replace(/'/g,"\\'")}')">${c}</button>`).join('')}
   </div></div></div></div>`;
 }
-// Arma los "slots" (una fila de la grilla = un grupo/horario fijo) con sus clases de la semana
-function histSlots(){
-  return histRows.map(r=>{
+function histGrupoChips(){
+  const grupos=[...new Set(histRows.map(r=>((HIST.grupo>=0?r[HIST.grupo]:'')||'').trim()).filter(Boolean))]
+    .sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base',numeric:true}));
+  if(!grupos.length) return '';
+  return `<div class="acc filter-acc" id="hist-grupo-filter"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">👥 Grupo <span class="acc-sub">· ${histGrupo.length?(histGrupo.length===1?histGrupo[0]:histGrupo.length+' seleccionados'):'Todos'}</span></span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
+    <button class="mf-chip ${!histGrupo.length?'active':''}" onclick="setHistGrupo('all')">Todos</button>
+    ${grupos.map(g=>`<button class="mf-chip ${histGrupo.includes(g)?'active':''}" onclick="setHistGrupo('${g.replace(/'/g,"\\'")}')">${g}</button>`).join('')}
+  </div></div></div></div>`;
+}
+// Aplana la grilla en entradas individuales (mes, semana, grupo, día, contenido) — una por cada columna con datos
+function histEntries(){
+  const out=[];
+  histRows.forEach(r=>{
     const grupo=((HIST.grupo>=0?r[HIST.grupo]:'')||'').trim();
     const nivel=((HIST.nivel>=0?r[HIST.nivel]:'')||'').trim()||'Sin nivel';
-    const mes=((HIST.mes>=0?r[HIST.mes]:'')||'').trim();
+    const mes=((HIST.mes>=0?r[HIST.mes]:'')||'').trim()||'Sin mes';
     const [diaA,diaB]=histDayLabels(grupo);
-    const entries=[];
     (HIST.weekCols||[]).forEach(wc=>{
+      const num=parseInt((wc.label.match(/\d+/)||[0])[0],10)||0;
       const vA=(r[wc.i1]||'').trim(), vB=(r[wc.i2]||'').trim();
-      if(vA) entries.push({semana:wc.label, dia:diaA, contenido:vA});
-      if(vB) entries.push({semana:wc.label, dia:diaB, contenido:vB});
+      if(vA) out.push({mes, semana:wc.label, semanaNum:num, grupo, nivel, dia:diaA, contenido:vA});
+      if(vB) out.push({mes, semana:wc.label, semanaNum:num, grupo, nivel, dia:diaB, contenido:vB});
     });
-    entries.reverse(); // más reciente primero (mayor semana, y dentro de la semana el 2º día antes que el 1º)
-    return {grupo, nivel, mes, entries};
-  }).filter(s=>s.entries.length);
+  });
+  return out;
 }
 function buildCoachHistorial(){
   const el=document.getElementById('coach-hist-content'); if(!el) return;
@@ -2735,35 +2754,38 @@ function buildCoachHistorial(){
     return;
   }
   const esc=(s)=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  let slots=histSlots();
-  if(histCat.length) slots=slots.filter(s=>histCat.includes(s.nivel));
-  const filters=`<div class="plan-filters">${histCatChips()}</div>`;
-  if(!slots.length){
+  let entries=histEntries();
+  if(histCat.length) entries=entries.filter(e=>histCat.includes(e.nivel));
+  if(histGrupo.length) entries=entries.filter(e=>histGrupo.includes(e.grupo));
+  const filters=`<div class="plan-filters">${histGrupoChips()}${histCatChips()}</div>`;
+  if(!entries.length){
     el.innerHTML=`${filters}<div class="empty" style="color:var(--muted);margin-top:12px;">No hay clases cargadas todavía para estos filtros.</div>`;
     return;
   }
-  const groups={};
-  slots.forEach(s=>{ (groups[s.nivel]=groups[s.nivel]||[]).push(s); });
-  const nivs=Object.keys(groups).sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base',numeric:true}));
-  const slotBlock=(s)=>{
-    const slotLbl=[s.grupo,s.mes].filter(Boolean).join(' · ');
-    return `<div class="hist-slot">
-      ${slotLbl?`<div class="hist-slot-h">${esc(slotLbl)}</div>`:''}
-      ${s.entries.map(en=>`<div class="hist-card">
-        <div class="hist-card-h"><span class="hist-fecha">📅 ${esc(en.semana)} · ${esc(en.dia)}</span></div>
-        <div class="hist-row">${esc(en.contenido)}</div>
-      </div>`).join('')}
-    </div>`;
-  };
-  const sections=nivs.map(c=>{
-    const list=groups[c];
-    const totalClases=list.reduce((n,s)=>n+s.entries.length,0);
-    return `<div class="acc evo-acc hist-acc" style="margin-top:14px;">
-      <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">${esc(c)} <span class="acc-sub">· ${totalClases} clase${totalClases!==1?'s':''}</span></span><span class="acc-chevron">▾</span></div>
-      <div class="acc-body"><div class="acc-body-inner">${list.map(slotBlock).join('')}</div></div>
+  // Mes → Semana → tarjetas por grupo/día
+  const byMes={};
+  entries.forEach(e=>{ (byMes[e.mes]=byMes[e.mes]||{}); (byMes[e.mes][e.semana]=byMes[e.mes][e.semana]||{num:e.semanaNum,list:[]}).list.push(e); });
+  const meses=Object.keys(byMes);
+  const entryCard=(e)=>`<div class="hist-card">
+    <div class="hist-card-h"><span class="hist-grupo-lbl">👥 ${esc(e.grupo)}</span><span class="hist-dia">${esc(e.dia)}</span></div>
+    <div class="hist-row">${esc(e.contenido)}</div>
+  </div>`;
+  const mesSections=meses.map((mes,mi)=>{
+    const semanas=Object.keys(byMes[mes]).sort((a,b)=>byMes[mes][b].num-byMes[mes][a].num); // semana más reciente primero
+    const totalClases=semanas.reduce((n,s)=>n+byMes[mes][s].list.length,0);
+    const semanaBlocks=semanas.map(s=>{
+      const list=byMes[mes][s].list;
+      return `<div class="hist-semana">
+        <div class="hist-slot-h">🗓️ ${esc(s)} <span class="acc-sub">· ${list.length} clase${list.length!==1?'s':''}</span></div>
+        <div class="hist-semana-cards">${list.map(entryCard).join('')}</div>
+      </div>`;
+    }).join('');
+    return `<div class="acc evo-acc hist-acc ${mi===0?'open':''}" style="margin-top:14px;">
+      <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">${esc(mes)} <span class="acc-sub">· ${totalClases} clase${totalClases!==1?'s':''}</span></span><span class="acc-chevron">▾</span></div>
+      <div class="acc-body"><div class="acc-body-inner">${semanaBlocks}</div></div>
     </div>`;
   }).join('');
-  el.innerHTML=`${filters}${sections}`;
+  el.innerHTML=`${filters}${mesSections}`;
 }
 
 // ══════════════════════════════════════
@@ -3262,12 +3284,12 @@ function buildCoach(){
         <div class="coach-kpi-val">${cTot>0?cTot.toFixed(1):'—'}<span class="coach-kpi-max">/3</span>${deltaBadgeDec((prevMonth&&cTot>0&&cPrevTot>0)?(cTot-cPrevTot):null)}</div>
       </div>
       <div class="coach-kpi">
-        <div class="coach-kpi-lbl">Alumnos activos</div>
-        <div class="coach-kpi-val">${_alCur}${deltaBadge(prevMonth?_alCur-_alPrev:null)}</div>
-      </div>
-      <div class="coach-kpi">
         <div class="coach-kpi-lbl">Clases registradas</div>
         <div class="coach-kpi-val">${_clasesCur}${deltaBadge(prevMonth?_clasesCur-_clasesPrev:null)}</div>
+      </div>
+      <div class="coach-kpi">
+        <div class="coach-kpi-lbl">Alumnos activos</div>
+        <div class="coach-kpi-val">${_alCur}${deltaBadge(prevMonth?_alCur-_alPrev:null)}</div>
       </div>
       <div class="coach-kpi">
         <div class="coach-kpi-lbl">Asistencia general</div>
