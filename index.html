@@ -335,6 +335,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .cz-sort-btn.active{background:#ffde59;color:#0a513a;font-weight:800;}
 /* Modo Profe v2: foco 2 cards + áreas compactas + modales */
 .foco2{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.cz-divider{height:1px;background:var(--border);margin:14px 2px;}
 .foco2-card{flex:1;min-width:150px;display:flex;flex-direction:column;background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;padding:0;cursor:pointer;font-family:inherit;text-align:left;transition:all .15s;}
 .foco2-card:hover{border-color:var(--blue);transform:translateY(-1px);box-shadow:0 6px 16px rgba(10,81,58,.1);}
 .foco2-title{background:#2b2b2b;color:#fefefe;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:8px 12px;}
@@ -3303,6 +3304,7 @@ function buildCoach(){
   el.innerHTML = `<div class="cz-filters">${monthChips}${catChips}</div>`
     + coachHero
     + foco2
+    + '<div class="cz-divider"></div>'
     + areasCard
     + _rankCard
     + _radarAcc;
