@@ -343,7 +343,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .foco2-ic{font-size:22px;flex-shrink:0;line-height:1;}
 .foco2-tx{flex:1;min-width:0;display:flex;flex-direction:column;}
 .foco2-val{font-size:15px;font-weight:900;color:#0a513a;}
+.foco2-sub{font-size:10.5px;font-weight:600;color:var(--muted);margin-top:2px;text-transform:capitalize;}
 .foco2-chev{font-size:22px;color:#9aaa9a;flex-shrink:0;line-height:1;}
+.foco2-card.foco2-static{cursor:default;}
+.foco2-card.foco2-static:hover{border-color:var(--border);transform:none;box-shadow:none;}
 .acc.evo-acc.cz-areas .acc-body-inner{padding:12px 16px 14px;}
 .ag-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #eef3e8;}
 .cz-areas .ag-row:last-child{border-bottom:none;}
@@ -2816,6 +2819,30 @@ function buildCoachHistorial(){
     el.innerHTML=`${filters}<div class="empty" style="color:var(--muted);margin-top:12px;">No hay clases cargadas todavía para estos filtros.</div>`;
     return;
   }
+  // KPIs rápidos (mismo alcance que los filtros activos): clases registradas y objetivo más trabajado
+  const _kpiMeses=[...new Set(entries.map(e=>e.mes))];
+  const _kpiMesLbl=_kpiMeses.length<=1?(_kpiMeses[0]||''):_kpiMeses.join(' / ');
+  const _kpiTotal=entries.length;
+  const _objCount={};
+  entries.forEach(e=>{ const k=(e.contenido||'').trim(); if(k) _objCount[k]=(_objCount[k]||0)+1; });
+  let _topObjCount=0;
+  Object.values(_objCount).forEach(c=>{ if(c>_topObjCount) _topObjCount=c; });
+  const kpis=`<div class="foco2" style="margin-bottom:14px;">
+    <div class="foco2-card foco2-static">
+      <div class="foco2-title">Clases registradas</div>
+      <div class="foco2-body">
+        <span class="foco2-ic" style="color:#0d5230;">📋</span>
+        <span class="foco2-tx"><span class="foco2-val">${_kpiTotal}</span><span class="foco2-sub">${esc(_kpiMesLbl)}</span></span>
+      </div>
+    </div>
+    <div class="foco2-card foco2-static">
+      <div class="foco2-title">Objetivo más trabajado</div>
+      <div class="foco2-body">
+        <span class="foco2-ic" style="color:#0d5230;">🎯</span>
+        <span class="foco2-tx"><span class="foco2-val">${_topObjCount}</span><span class="foco2-sub">${esc(_kpiMesLbl)}</span></span>
+      </div>
+    </div>
+  </div>`;
   // Mes → Semana → tarjetas por grupo/día
   const byMes={};
   entries.forEach(e=>{ (byMes[e.mes]=byMes[e.mes]||{}); (byMes[e.mes][e.semana]=byMes[e.mes][e.semana]||{num:e.semanaNum,list:[]}).list.push(e); });
@@ -2824,7 +2851,7 @@ function buildCoachHistorial(){
     <div class="hist-card-h"><span class="hist-grupo-lbl">👥 ${esc(e.grupo)}</span><span class="hist-dia">${esc(e.dia)}</span></div>
     <div class="hist-row">${esc(e.contenido)}</div>
   </div>`;
-  const mesSections=meses.map((mes,mi)=>{
+  const mesSections=meses.map((mes)=>{
     const semanas=Object.keys(byMes[mes]).sort((a,b)=>byMes[mes][b].num-byMes[mes][a].num); // semana más reciente primero
     const totalClases=semanas.reduce((n,s)=>n+byMes[mes][s].list.length,0);
     const semanaBlocks=semanas.map(s=>{
@@ -2834,12 +2861,12 @@ function buildCoachHistorial(){
         <div class="hist-semana-cards">${list.map(entryCard).join('')}</div>
       </div>`;
     }).join('');
-    return `<div class="acc evo-acc hist-acc ${mi===0?'open':''}" style="margin-top:14px;">
-      <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">${esc(mes)} <span class="acc-sub">· ${totalClases} clase${totalClases!==1?'s':''}</span></span><span class="acc-chevron">▾</span></div>
+    return `<div class="acc evo-acc hist-acc" style="margin-top:14px;">
+      <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📋 Registro de clases - ${esc(mes)} <span class="acc-sub">· ${totalClases} clase${totalClases!==1?'s':''}</span></span><span class="acc-chevron">▾</span></div>
       <div class="acc-body"><div class="acc-body-inner">${semanaBlocks}</div></div>
     </div>`;
   }).join('');
-  el.innerHTML=`${filters}${mesSections}`;
+  el.innerHTML=`${filters}${kpis}${mesSections}`;
 }
 
 // ══════════════════════════════════════
