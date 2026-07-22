@@ -1814,7 +1814,7 @@ let circuitoTab='torneos', circuitoPlayer=null, circuitoPlayerQ='';
 let coachSort='rendimiento';
 let __pendingCircuito=null, __circuitoUnlocked=new Set();
 let planRows=[], planHeader=[], planFilters={golpe:'all', categoria:'all', nivel:'all', q:''};
-let histRows=[], histHeader=[], histCat=[], histGrupo=[];
+let histRows=[], histHeader=[], histCat=[], histGrupo=[], histMes=[];
 
 // ══════════════════════════════════════
 // FETCH CSV DESDE GOOGLE SHEETS
@@ -2769,6 +2769,23 @@ function setHistGrupo(g){
   buildCoachHistorial();
   const gf=document.getElementById('hist-grupo-filter'); if(gf) gf.classList.add('open');
 }
+function setHistMes(m){
+  histMes = m==='all' ? [] : [m]; // selección única
+  buildCoachHistorial();
+  const mf=document.getElementById('hist-mes-filter'); if(mf) mf.classList.add('open');
+}
+// Orden cronológico de meses (no alfabético)
+const HIST_MES_ORDER=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'].map(normHeader);
+function histMesRank(v){ const i=HIST_MES_ORDER.indexOf(normHeader(v)); return i>=0?i:999; }
+function histMesChips(){
+  const meses=[...new Set(histRows.map(r=>((HIST.mes>=0?r[HIST.mes]:'')||'').trim()).filter(Boolean))]
+    .sort((a,b)=>{ const d=histMesRank(a)-histMesRank(b); return d!==0?d:a.localeCompare(b,'es',{sensitivity:'base',numeric:true}); });
+  if(!meses.length) return '';
+  return `<div class="acc filter-acc" id="hist-mes-filter"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📅 Mes <span class="acc-sub">· ${histMes.length?histMes[0]:'Todos'}</span></span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
+    <button class="mf-chip ${!histMes.length?'active':''}" onclick="setHistMes('all')">Todos</button>
+    ${meses.map(m=>`<button class="mf-chip ${histMes.includes(m)?'active':''}" onclick="setHistMes('${m.replace(/'/g,"\\'")}')">${m}</button>`).join('')}
+  </div></div></div></div>`;
+}
 // Orden fijo de niveles (no alfabético): de menor a mayor exigencia/edad de grupo
 const HIST_NIVEL_ORDER=['pre competencia','adolescentes','adultos - iniciantes','adultos - intermedio','adultos - avanzado'].map(normHeader);
 function histNivelRank(v){ const i=HIST_NIVEL_ORDER.indexOf(normHeader(v)); return i>=0?i:999; }
@@ -2817,9 +2834,10 @@ function buildCoachHistorial(){
   }
   const esc=(s)=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   let entries=histEntries();
+  if(histMes.length) entries=entries.filter(e=>histMes.includes(e.mes));
   if(histCat.length) entries=entries.filter(e=>histCat.includes(e.nivel));
   if(histGrupo.length) entries=entries.filter(e=>histGrupo.includes(e.grupo));
-  const filters=`<div class="plan-filters hist-filters-row">${histGrupoChips()}${histCatChips()}</div>`;
+  const filters=`<div class="plan-filters hist-filters-row">${histMesChips()}${histGrupoChips()}${histCatChips()}</div>`;
   if(!entries.length){
     el.innerHTML=`${filters}<div class="empty" style="color:var(--muted);margin-top:12px;">No hay clases cargadas todavía para estos filtros.</div>`;
     return;
@@ -2859,7 +2877,6 @@ function buildCoachHistorial(){
   </div>`;
   const mesSections=meses.map((mes)=>{
     const semanas=Object.keys(byMes[mes]).sort((a,b)=>byMes[mes][b].num-byMes[mes][a].num); // semana más reciente primero
-    const totalClases=semanas.reduce((n,s)=>n+byMes[mes][s].list.length,0);
     const semanaBlocks=semanas.map(s=>{
       const list=byMes[mes][s].list;
       return `<div class="hist-semana">
@@ -2868,7 +2885,7 @@ function buildCoachHistorial(){
       </div>`;
     }).join('');
     return `<div class="acc evo-acc hist-acc" style="margin-top:14px;">
-      <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📋 Registro de clases - ${esc(mes)} <span class="acc-sub">· ${totalClases} clase${totalClases!==1?'s':''}</span></span><span class="acc-chevron">▾</span></div>
+      <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📋 Registro de clases - ${esc(mes)}</span><span class="acc-chevron">▾</span></div>
       <div class="acc-body"><div class="acc-body-inner">${semanaBlocks}</div></div>
     </div>`;
   }).join('');
