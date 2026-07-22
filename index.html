@@ -344,6 +344,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .foco2-tx{flex:1;min-width:0;display:flex;flex-direction:column;}
 .foco2-val{font-size:15px;font-weight:900;color:#0a513a;}
 .foco2-sub{font-size:10.5px;font-weight:600;color:var(--muted);margin-top:2px;text-transform:capitalize;}
+.foco2-val-txt{font-size:13px;line-height:1.25;white-space:normal;}
 .foco2-chev{font-size:22px;color:#9aaa9a;flex-shrink:0;line-height:1;}
 .foco2-card.foco2-static{cursor:default;}
 .foco2-card.foco2-static:hover{border-color:var(--border);transform:none;box-shadow:none;}
@@ -1174,6 +1175,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
 .coach-view{display:none;}
 .coach-view.active{display:block;}
 .plan-filters{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+.plan-filters.hist-filters-row{flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:20px;}
 .plan-search{width:100%;box-sizing:border-box;background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:11px 14px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text);}
 .plan-search:focus{outline:none;border-color:var(--blue);}
 .plan-count{font-size:12px;color:var(--muted);margin:2px 0 12px;}
@@ -2767,9 +2769,12 @@ function setHistGrupo(g){
   buildCoachHistorial();
   const gf=document.getElementById('hist-grupo-filter'); if(gf) gf.classList.add('open');
 }
+// Orden fijo de niveles (no alfabético): de menor a mayor exigencia/edad de grupo
+const HIST_NIVEL_ORDER=['pre competencia','adolescentes','adultos - iniciantes','adultos - intermedio','adultos - avanzado'].map(normHeader);
+function histNivelRank(v){ const i=HIST_NIVEL_ORDER.indexOf(normHeader(v)); return i>=0?i:999; }
 function histCatChips(){
   const nivs=[...new Set(histRows.map(r=>((HIST.nivel>=0?r[HIST.nivel]:'')||'').trim()).filter(Boolean))]
-    .sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base',numeric:true}));
+    .sort((a,b)=>{ const d=histNivelRank(a)-histNivelRank(b); return d!==0?d:a.localeCompare(b,'es',{sensitivity:'base',numeric:true}); });
   if(!nivs.length) return '';
   return `<div class="acc filter-acc" id="hist-cat-filter"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">🏷️ Nivel <span class="acc-sub">· ${histCat.length?(histCat.length===1?histCat[0]:histCat.length+' seleccionados'):'Todos'}</span></span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
     <button class="mf-chip ${!histCat.length?'active':''}" onclick="setHistCat('all')">Todos</button>
@@ -2814,7 +2819,7 @@ function buildCoachHistorial(){
   let entries=histEntries();
   if(histCat.length) entries=entries.filter(e=>histCat.includes(e.nivel));
   if(histGrupo.length) entries=entries.filter(e=>histGrupo.includes(e.grupo));
-  const filters=`<div class="plan-filters">${histGrupoChips()}${histCatChips()}</div>`;
+  const filters=`<div class="plan-filters hist-filters-row">${histGrupoChips()}${histCatChips()}</div>`;
   if(!entries.length){
     el.innerHTML=`${filters}<div class="empty" style="color:var(--muted);margin-top:12px;">No hay clases cargadas todavía para estos filtros.</div>`;
     return;
@@ -2825,8 +2830,9 @@ function buildCoachHistorial(){
   const _kpiTotal=entries.length;
   const _objCount={};
   entries.forEach(e=>{ const k=(e.contenido||'').trim(); if(k) _objCount[k]=(_objCount[k]||0)+1; });
-  let _topObjCount=0;
-  Object.values(_objCount).forEach(c=>{ if(c>_topObjCount) _topObjCount=c; });
+  let _topObj='—', _topObjCount=0;
+  Object.entries(_objCount).forEach(([k,c])=>{ if(c>_topObjCount){ _topObjCount=c; _topObj=k; } });
+  const _topObjSub=_topObjCount?`${_kpiMesLbl} · ${_topObjCount} ${_topObjCount===1?'vez':'veces'}`:_kpiMesLbl;
   const kpis=`<div class="foco2" style="margin-bottom:14px;">
     <div class="foco2-card foco2-static">
       <div class="foco2-title">Clases registradas</div>
@@ -2839,7 +2845,7 @@ function buildCoachHistorial(){
       <div class="foco2-title">Objetivo más trabajado</div>
       <div class="foco2-body">
         <span class="foco2-ic" style="color:#0d5230;">🎯</span>
-        <span class="foco2-tx"><span class="foco2-val">${_topObjCount}</span><span class="foco2-sub">${esc(_kpiMesLbl)}</span></span>
+        <span class="foco2-tx"><span class="foco2-val foco2-val-txt">${esc(_topObj)}</span><span class="foco2-sub">${esc(_topObjSub)}</span></span>
       </div>
     </div>
   </div>`;
