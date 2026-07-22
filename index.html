@@ -2841,23 +2841,15 @@ function buildCoachHistorial(){
     el.innerHTML=`${filters}<div class="empty" style="color:var(--muted);margin-top:12px;">No hay clases cargadas todavía para estos filtros.</div>`;
     return;
   }
-  // KPIs rápidos (mismo alcance que los filtros activos): clases registradas y objetivo más trabajado
+  // KPI rápido (mismo alcance que los filtros activos): objetivo más trabajado
   const _kpiMeses=[...new Set(entries.map(e=>e.mes))];
   const _kpiMesLbl=_kpiMeses.length<=1?(_kpiMeses[0]||''):_kpiMeses.join(' / ');
-  const _kpiTotal=entries.length;
   const _objCount={};
   entries.forEach(e=>{ const k=(e.contenido||'').trim(); if(k) _objCount[k]=(_objCount[k]||0)+1; });
   let _topObj='—', _topObjCount=0;
   Object.entries(_objCount).forEach(([k,c])=>{ if(c>_topObjCount){ _topObjCount=c; _topObj=k; } });
   const _topObjSub=_topObjCount?`${_kpiMesLbl} · ${_topObjCount} ${_topObjCount===1?'vez':'veces'}`:_kpiMesLbl;
   const kpis=`<div class="foco2" style="margin-bottom:14px;">
-    <div class="foco2-card foco2-static">
-      <div class="foco2-title">Clases registradas</div>
-      <div class="foco2-body">
-        <span class="foco2-ic" style="color:#0d5230;">📋</span>
-        <span class="foco2-tx"><span class="foco2-val">${_kpiTotal}</span><span class="foco2-sub">${esc(_kpiMesLbl)}</span></span>
-      </div>
-    </div>
     <div class="foco2-card foco2-static">
       <div class="foco2-title">Objetivo más trabajado</div>
       <div class="foco2-body">
