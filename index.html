@@ -1175,7 +1175,6 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
 .coach-view{display:none;}
 .coach-view.active{display:block;}
 .plan-filters{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
-.plan-filters.hist-filters-row{flex-direction:row;flex-wrap:wrap;align-items:flex-start;column-gap:20px;}
 .plan-search{width:100%;box-sizing:border-box;background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:11px 14px;font-size:14px;font-family:'Inter',sans-serif;color:var(--text);}
 .plan-search:focus{outline:none;border-color:var(--blue);}
 .plan-count{font-size:12px;color:var(--muted);margin:2px 0 12px;}
@@ -1328,7 +1327,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
     </div>
     <nav class="app-tabs" id="tabs-coach">
       <button class="tab-btn active" onclick="switchCoachTab('resumen',this)">Resumen</button>
-      <button class="tab-btn" onclick="switchCoachTab('historial',this)">Historial</button>
+      <button class="tab-btn" onclick="switchCoachTab('historial',this)">Historial de clases</button>
       <button class="tab-btn" onclick="switchCoachTab('planificacion',this)">Planificación</button>
     </nav>
   </header>
@@ -2827,7 +2826,7 @@ function histEntries(){
 function buildCoachHistorial(){
   const el=document.getElementById('coach-hist-content'); if(!el) return;
   if(!histRows.length || !HIST.weekCols || !HIST.weekCols.length){
-    el.innerHTML=`<div class="card"><div class="card-title">📚 Historial</div>
+    el.innerHTML=`<div class="card"><div class="card-title">📚 Historial de clases</div>
       <div class="nota" style="margin:8px 0 0;line-height:1.6;">Todavía no hay clases cargadas, o no se encontraron columnas de semana.<br>
       La hoja <b>«historial»</b> debe tener las columnas <b>Mes</b>, <b>Grupo</b> (ej: «Lun y mie - 14hs») y <b>Nivel</b>, seguidas de las columnas <b>Semana 1</b> a <b>Semana 5</b> (cada una ocupando 2 columnas, una por día de clase de esa semana).</div></div>`;
     return;
@@ -2837,7 +2836,7 @@ function buildCoachHistorial(){
   if(histMes.length) entries=entries.filter(e=>histMes.includes(e.mes));
   if(histCat.length) entries=entries.filter(e=>histCat.includes(e.nivel));
   if(histGrupo.length) entries=entries.filter(e=>histGrupo.includes(e.grupo));
-  const filters=`<div class="plan-filters hist-filters-row">${histMesChips()}${histGrupoChips()}${histCatChips()}</div>`;
+  const filters=`<div class="cz-filters">${histMesChips()}${histGrupoChips()}</div>`;
   if(!entries.length){
     el.innerHTML=`${filters}<div class="empty" style="color:var(--muted);margin-top:12px;">No hay clases cargadas todavía para estos filtros.</div>`;
     return;
