@@ -526,7 +526,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .evo-acc .acc-head{padding:13px 16px;background:#2b2b2b;}
 .evo-acc .acc-head:hover{background:#3a3a3a;}
 .evo-acc .acc-title{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;}
-.evo-acc .acc-chevron{color:#ffde59;}
+.evo-acc .acc-chevron{color:#ffde59;font-size:20px;}
 .evo-acc .acc-body-inner{padding:0 18px 16px;}
 /* Modo Profe: mismo tamaño de fuente para los títulos de Áreas del grupo, Ranking de alumnos y Comparación por categoría */
 #coach-content .cz-areas .card-title, #coach-content .cz-rank-acc .acc-title, #coach-content .evo-acc .acc-title{font-size:11px !important;}
@@ -1048,7 +1048,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .cz-rank-acc .acc-head{background:#2b2b2b;padding:13px 16px;}
 .cz-rank-acc .acc-head:hover{background:#3a3a3a;}
 .cz-rank-acc .acc-title{color:#fff;}
-.cz-rank-acc .acc-chevron{color:#ffde59;}
+.cz-rank-acc .acc-chevron{color:#ffde59;font-size:20px;}
 .cz-cat{border:1.5px solid var(--border);background:var(--surf);color:var(--muted);font-weight:700;font-size:12px;padding:8px 14px;border-radius:12px;cursor:pointer;transition:all .15s;}
 .cz-cat:hover{background:var(--surf2);border-color:var(--blue);color:var(--blue);}
 .cz-cat.active{background:#2b2b2b;color:#fff;border-color:#2b2b2b;font-weight:700;}
@@ -1441,8 +1441,14 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
   <div class="pin-modal" style="max-width:340px;">
     <div class="pin-title">¿Cómo se mide el índice?</div>
     <div style="font-size:14px;color:var(--text);line-height:1.6;text-align:left;margin-top:4px;">
-      <p style="margin:0 0 10px;">Es el promedio de las cuatro áreas: <strong>Técnica, Táctica, Físico y Mental</strong>.</p>
-      <p style="margin:0;">📝 Escala del <strong>1 al 3</strong> (1 - bien, 2 - muy bien, 3 - excelente).</p>
+      <p style="margin:0 0 8px;">Es el promedio del valor de cada área de trabajo:</p>
+      <ul style="margin:0 0 10px;padding-left:20px;">
+        <li>Técnica</li>
+        <li>Táctica</li>
+        <li>Físico</li>
+        <li>Mental</li>
+      </ul>
+      <p style="margin:0;">📝 Cada área se evalúa con la escala del <strong>1 (bien) al 3 (excelente)</strong>.</p>
     </div>
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeCoachIndiceInfo()">Entendido</button></div>
   </div>
@@ -2082,8 +2088,14 @@ function restoreNav(){
 // celular, en vez de salir de la app, deshacemos esa entrada: cerramos el overlay abierto o
 // retrocedemos un nivel de pantalla (lo mismo que hace el botón visible "← Volver").
 let __navPopping=false;
+// __navSelfBack: true mientras un history.back() fue disparado por NOSOTROS (para sincronizar el historial
+// tras un cierre manual, ej. botón "Entendido" o "← Volver"), no por una pulsación real del botón atrás.
+// Sin esto, el popstate asíncrono que ese back() dispara llega más tarde y el handler de abajo no puede
+// distinguirlo de una pulsación real, así que termina "retrocediendo de más" (ej. sale a Inicio al cerrar
+// una ventana emergente). Con la bandera, ese popstate se ignora por completo: el cierre visual ya ocurrió.
+let __navSelfBack=false;
 function __navPushScreen(name){ if(__navPopping) return; try{ history.pushState({navScreen:name}, '', location.href); }catch(e){} }
-function __navSyncBack(){ if(__navPopping) return; try{ if(history.state && history.state.navScreen) history.back(); }catch(e){} }
+function __navSyncBack(){ if(__navPopping) return; try{ if(history.state && history.state.navScreen){ __navSelfBack=true; history.back(); } }catch(e){} }
 function __navCurrentScreen(){
   if(document.getElementById('app')?.classList.contains('visible')) return 'app';
   if(document.getElementById('coach')?.classList.contains('visible')) return 'coach';
@@ -2102,7 +2114,7 @@ function __navCurrentScreen(){
       const isShown=el.classList.contains('show');
       const wasShown=(m.oldValue||'').split(/\s+/).includes('show');
       if(isShown && !wasShown){ try{ history.pushState({navOv:el.id}, '', location.href); }catch(e){} }
-      else if(!isShown && wasShown){ if(history.state && history.state.navOv===el.id){ try{ history.back(); }catch(e){} } }
+      else if(!isShown && wasShown){ if(history.state && history.state.navOv===el.id){ try{ __navSelfBack=true; history.back(); }catch(e){} } }
     });
   });
   const _armOverlays=()=>document.querySelectorAll('.pin-overlay').forEach(el=>{
@@ -2111,6 +2123,8 @@ function __navCurrentScreen(){
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', _armOverlays); else _armOverlays();
 
   window.addEventListener('popstate', function(){
+    // Si este back() lo disparamos nosotros mismos (sync tras un cierre manual), no hay nada más que deshacer.
+    if(__navSelfBack){ __navSelfBack=false; return; }
     // Prioridad 1: si hay una ventana emergente abierta, cerrarla
     const openOv=document.querySelector('.pin-overlay.show');
     if(openOv){ __navPopping=true; openOv.classList.remove('show'); __navPopping=false; return; }
