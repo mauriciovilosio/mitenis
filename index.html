@@ -1337,14 +1337,14 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
       <div style="width:60px;"></div>
     </div>
     <nav class="app-tabs" id="tabs-coach">
-      <button class="tab-btn active" onclick="switchCoachTab('resumen',this)">Resumen</button>
-      <button class="tab-btn" onclick="switchCoachTab('historial',this)">Historial de clases</button>
+      <button class="tab-btn active" onclick="switchCoachTab('resumen',this)">Inicio</button>
+      <button class="tab-btn" onclick="switchCoachTab('alumnos',this)">Alumnos</button>
       <button class="tab-btn" onclick="switchCoachTab('planificacion',this)">Planificación</button>
     </nav>
   </header>
   <main class="app-content">
     <div class="coach-view active" id="coach-view-resumen"><div id="coach-content"></div></div>
-    <div class="coach-view" id="coach-view-historial"><div id="coach-hist-content"></div></div>
+    <div class="coach-view" id="coach-view-alumnos"><div id="coach-alumnos-content"></div></div>
     <div class="coach-view" id="coach-view-planificacion"><div id="coach-plan-content"></div></div>
   </main>
 </div>
@@ -1895,6 +1895,8 @@ function parseCSV(text){
 // HELPERS
 // ══════════════════════════════════════
 function n(v){ return parseFloat((v+'').replace(',','.'))||0; }
+// Convierte un color hex (#rrggbb) a rgba(...) con la opacidad indicada
+function hexA(h,a){ const hx=(h||'').replace('#',''); const r=parseInt(hx.slice(0,2),16)||0, g=parseInt(hx.slice(2,4),16)||0, b=parseInt(hx.slice(4,6),16)||0; return 'rgba('+r+','+g+','+b+','+a+')'; }
 
 // Normaliza encabezados para comparar (sin acentos, sin separadores, minúsculas)
 function normHeader(s){
@@ -2733,13 +2735,14 @@ function openCoachView(){
   __navPushScreen('coach');
 }
 function closeCoach(){ document.getElementById('coach').classList.remove('visible'); document.getElementById('landing').style.display=''; resetLanding(); saveNav(); __navSyncBack(); }
-function setMonthCoach(m){ selectedMonth=m; buildCoach(); saveNav(); }
-function setCoachSort(s){ coachSort=s; try{buildCoach();}catch(e){} saveNav(); }
+function setMonthCoach(m){ selectedMonth=m; rebuildCoachAll(); saveNav(); }
+function setCoachSort(s){ coachSort=s; rebuildCoachAll(); saveNav(); }
 function setCatCoach(c){
   if(c==='all'){ coachCat=[]; }
   else { const i=coachCat.indexOf(c); if(i>=0) coachCat.splice(i,1); else coachCat.push(c); }
-  buildCoach(); saveNav();
-  const cf=document.getElementById('coach-cat-filter'); if(cf) cf.classList.add('open');
+  rebuildCoachAll(); saveNav();
+  // Los 3 subtabs comparten el mismo filtro (mismo id) — reabrimos el acordeón solo en el que está visible.
+  const cf=document.querySelector('.coach-view.active #coach-cat-filter'); if(cf) cf.classList.add('open');
 }
 
 // ── Modo Profe: subpestañas (Mi Resumen / Mi Planificación) ──
@@ -2748,8 +2751,8 @@ function switchCoachTab(id, btn){
   document.querySelectorAll('.coach-view').forEach(v=>v.classList.remove('active'));
   if(btn) btn.classList.add('active');
   const v=document.getElementById('coach-view-'+id); if(v) v.classList.add('active');
-  if(id==='planificacion'){ try{ buildCoachPlanificacion(); }catch(e){ const el=document.getElementById('coach-plan-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir la planificación.</strong>'+(e&&e.message?e.message:e)+'</div>'; } }
-  if(id==='historial'){ try{ buildCoachHistorial(); }catch(e){ const el=document.getElementById('coach-hist-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir el historial.</strong>'+(e&&e.message?e.message:e)+'</div>'; } }
+  if(id==='planificacion'){ try{ buildCoachPlanArea(); }catch(e){ const el=document.getElementById('coach-plan-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir la planificación.</strong>'+(e&&e.message?e.message:e)+'</div>'; } }
+  if(id==='alumnos'){ try{ buildCoachAlumnos(); }catch(e){ const el=document.getElementById('coach-alumnos-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir Alumnos.</strong>'+(e&&e.message?e.message:e)+'</div>'; } }
   saveNav();
 }
 
@@ -3273,10 +3276,11 @@ function buildCircuitoJugadores(){
   el.innerHTML=filter+body;
 }
 
-function buildCoach(){
-  const el=document.getElementById('coach-content');
+// Calcula todos los datos/HTML compartidos por las 3 subpestañas de Portal del Profe
+// (Inicio, Alumnos, Planificación). Devuelve null si no hay jugadores cargados.
+function computeCoachData(){
   let players=[...new Set(allRows.map(r=>r[COL.alumno]))].filter(Boolean).filter(isAlumnoActivo).sort();
-  if(!players.length){ el.innerHTML='<div class="empty">No hay jugadores cargados.</div>'; return; }
+  if(!players.length){ return null; }
   const _MES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']; const mLabelFull=(key)=>{ if(!key) return ''; const a=key.split('-'); const nm=_MES[Number(a[1])-1]||''; return (nm.charAt(0).toUpperCase()+nm.slice(1))+' '+a[0]; };
   const catOf=p=>{ const i=getInfo(p); return i?(i[INFO.categoria]||'').trim():''; };
   const cats=[...new Set(players.map(catOf).filter(Boolean))].sort((a,b)=>{ const ra=catRank(a),rb=catRank(b); if(ra!==rb) return ra-rb; return a.localeCompare(b,'es',{sensitivity:'base',numeric:true}); });
@@ -3330,7 +3334,10 @@ function buildCoach(){
   }).filter(g=>g.avg>0).sort((a,b)=>a.avg-b.avg):[];
   const _riskList=data.filter(atRiskOf).map(d=>{ const rs=[]; if(_evalAsistencia && d.at&&d.at.pct<50) rs.push('Asistencia '+d.at.pct+'%'); if(droppedOf(d)) rs.push('Bajó de nivel'); if(d.actLvl===1) rs.push('Actitud baja'); return {name:d.p, rs:rs.join(' · ')}; });
   const _atendN=_riskList.length;
-  const foco2=`<div class="foco2">
+  // Antes eran 2 mini-cards lado a lado (.foco2 con 2 .foco2-card); ahora cada una vive sola en
+  // su propia pestaña (Atención → Inicio, Área a reforzar → Planificación), así que van cada una
+  // en su propio wrapper .foco2 (flex:1 en .foco2-card la estira a todo el ancho igual).
+  const areaCard=`<div class="foco2">
     <button class="foco2-card" onclick="openFocoArea()">
       <div class="foco2-title">Área a reforzar</div>
       <div class="foco2-body">
@@ -3339,6 +3346,8 @@ function buildCoach(){
         <span class="foco2-chev">›</span>
       </div>
     </button>
+  </div>`;
+  const atencionCard=`<div class="foco2">
     <button class="foco2-card" onclick="openFocoAlumnos()">
       <div class="foco2-title">Atención</div>
       <div class="foco2-body">
@@ -3452,7 +3461,6 @@ function buildCoach(){
   let _sc=0,_so=0; withAt.forEach(d=>{ _sc+=d.at.cumplidas; _so+=d.at.objetivo; }); const genPct=_so>0?Math.round(_sc/_so*100):0;
   const catPalette=['#ffde59','#ff9f43','#ff5d5d','#5eead4','#a78bfa','#ffffff','#86efac'];
   const catColorHex=(ct,i)=>{ const c=catColor(ct); return (c&&c!=='#6b6f8a')?c:catPalette[i%catPalette.length]; };
-  const hexA=(h,a)=>{const n=(h||'').replace('#','');const r=parseInt(n.slice(0,2),16)||0,g=parseInt(n.slice(2,4),16)||0,b=parseInt(n.slice(4,6),16)||0;return 'rgba('+r+','+g+','+b+','+a+')';};
   const catData=cats.map((ct,i)=>{
     const studs=allPlayersList.filter(p=>catOf(p)===ct);
     const dd=areas.map(a=>{ const vals=studs.map(p=>areaAvgScope(p,curMonth,a)).filter(v=>v>0); return vals.length?vals.reduce((x,y)=>x+y,0)/vals.length:0; });
@@ -3507,20 +3515,35 @@ function buildCoach(){
     <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📊 Comparación por categoría${curMonth?' · '+mLabelFull(curMonth):''}</span><span class="acc-chevron">▾</span></div>
     <div class="acc-body"><div class="acc-body-inner"><div class="chart-wrap" style="height:320px;margin-top:6px;"><canvas id="ch-coach-radar"></canvas></div></div></div>
   </div>`;
-  el.innerHTML = `<div class="cz-filters">${monthChips}${catChips}</div>`
-    + coachHero
-    + foco2
-    + '<div class="cz-divider"></div>'
-    + areasCard
-    + _rankCard
-    + _radarAcc;
-  { const _fab=document.getElementById('foco-area-body'); if(_fab) _fab.innerHTML=_focoAreaBody;
-    const _flb=document.getElementById('foco-alum-body'); if(_flb) _flb.innerHTML=_focoAlumBody; }
+  return { monthChips, catChips, coachHero, atencionCard, areaCard, areasCard, _rankCard, _radarAcc, catData, _focoAreaBody, _focoAlumBody };
+}
+
+// ══════════════════════════════════════
+// PORTAL DEL PROFE — 3 subpestañas: Inicio / Alumnos / Planificación
+// ══════════════════════════════════════
+// Inicio: filtros + card negra de KPIs + card "Atención"
+function buildCoach(){
+  const el=document.getElementById('coach-content'); if(!el) return;
+  const cd=computeCoachData();
+  if(!cd){ el.innerHTML='<div class="empty">No hay jugadores cargados.</div>'; return; }
+  el.innerHTML = `<div class="cz-filters">${cd.monthChips}${cd.catChips}</div>`
+    + cd.coachHero
+    + cd.atencionCard;
+  const _flb=document.getElementById('foco-alum-body'); if(_flb) _flb.innerHTML=cd._focoAlumBody;
+}
+// Alumnos: filtros + Ranking de alumnos + Comparación por categoría
+function buildCoachAlumnos(){
+  const el=document.getElementById('coach-alumnos-content'); if(!el) return;
+  const cd=computeCoachData();
+  if(!cd){ el.innerHTML='<div class="empty">No hay jugadores cargados.</div>'; return; }
+  el.innerHTML = `<div class="cz-filters">${cd.monthChips}${cd.catChips}</div>`
+    + cd._rankCard
+    + cd._radarAcc;
   if(charts['coachRadar']){ try{charts['coachRadar'].destroy();}catch(e){} }
   const _cv=document.getElementById('ch-coach-radar');
-  if(_cv && catData.length){
+  if(_cv && cd.catData.length){
     charts['coachRadar']=new Chart(_cv,{type:'radar',
-      data:{labels:['Técnica','Táctica','Físico','Mental'],datasets:catData.map(cd=>({label:cd.label,data:cd.data,borderColor:cd.color,backgroundColor:hexA(cd.color,0.18),fill:true,borderWidth:2,pointRadius:3,pointBackgroundColor:cd.color}))},
+      data:{labels:['Técnica','Táctica','Físico','Mental'],datasets:cd.catData.map(c=>({label:c.label,data:c.data,borderColor:c.color,backgroundColor:hexA(c.color,0.18),fill:true,borderWidth:2,pointRadius:3,pointBackgroundColor:c.color}))},
       options:{responsive:true,maintainAspectRatio:false,
         plugins:{legend:{display:true,position:'bottom',labels:{color:'#2b2b2b',font:{size:11},boxWidth:10,padding:10,usePointStyle:true}}},
         scales:{r:{min:0,max:3,ticks:{stepSize:1,backdropColor:'transparent',color:'rgba(43,43,43,0.55)',font:{size:9},callback:v=>['','Bien','Muy Bien','Excelente'][v]||''},grid:{color:'rgba(10,81,58,0.18)'},angleLines:{color:'rgba(10,81,58,0.18)'},pointLabels:{color:'#2b2b2b',font:{size:12,weight:'700'}}}}
@@ -3536,7 +3559,23 @@ function buildCoach(){
     }
   };
   if(typeof requestAnimationFrame==='function') requestAnimationFrame(_syncRank); else _syncRank();
-  if(!buildCoach._rankResize){ buildCoach._rankResize=true; window.addEventListener('resize', ()=>{ try{ const c=document.getElementById('coach'); if(c&&c.classList.contains('visible')) _syncRank(); }catch(e){} }); }
+  if(!buildCoachAlumnos._rankResize){ buildCoachAlumnos._rankResize=true; window.addEventListener('resize', ()=>{ try{ const c=document.getElementById('coach'); if(c&&c.classList.contains('visible')) _syncRank(); }catch(e){} }); }
+}
+// Planificación: filtros + Área a reforzar + Áreas del grupo
+function buildCoachPlanArea(){
+  const el=document.getElementById('coach-plan-content'); if(!el) return;
+  const cd=computeCoachData();
+  if(!cd){ el.innerHTML='<div class="empty">No hay jugadores cargados.</div>'; return; }
+  el.innerHTML = `<div class="cz-filters">${cd.monthChips}${cd.catChips}</div>`
+    + cd.areaCard
+    + cd.areasCard;
+  const _fab=document.getElementById('foco-area-body'); if(_fab) _fab.innerHTML=cd._focoAreaBody;
+}
+// Rebuild de las 3 subpestañas a la vez (los filtros son compartidos entre las 3)
+function rebuildCoachAll(){
+  try{ buildCoach(); }catch(e){}
+  try{ buildCoachAlumnos(); }catch(e){}
+  try{ buildCoachPlanArea(); }catch(e){}
 }
 
 // ══════════════════════════════════════
