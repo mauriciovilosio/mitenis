@@ -1080,10 +1080,19 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .cz-kpis .metric-card .mc-value.cz-cats-val{font-size:22px;word-break:break-word;}
 .cz-next{display:flex;flex-direction:column;justify-content:flex-start;}
 .cz-next-name{font-size:16px;font-weight:800;color:var(--blue);line-height:1.15;margin-top:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
-.cz-next-date{font-size:12px;font-weight:600;color:var(--muted);margin-top:4px;}
+.cz-next-date{font-size:14px;font-weight:600;color:var(--muted);margin-top:4px;}
 .cz-next-empty{font-size:12px;color:var(--hint);margin-top:6px;line-height:1.3;}
 .cz-next-link{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:10px 16px;border-radius:12px;background:#2b2b2b;color:#fff;font-size:13px;font-weight:700;text-decoration:none;}
 .cz-next-link:hover{background:#3a3a3a;}
+.posc-card{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#1f1f1f;border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;}
+.posc-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.55);}
+.posc-value{font-size:34px;font-weight:800;color:#fff;line-height:1.1;margin-top:6px;letter-spacing:.01em;}
+.posc-right{text-align:right;}
+.posc-delta{font-size:16px;font-weight:800;line-height:1;}
+.posc-delta.up{color:var(--lv3);}
+.posc-delta.down{color:var(--lv1);}
+.posc-delta.flat{color:rgba(255,255,255,.55);}
+.posc-delta-lbl{font-size:11px;font-weight:500;color:rgba(255,255,255,.5);margin-top:6px;}
 .cz-rank-acc .acc-sub{font-size:13px;font-weight:500;color:var(--muted);margin-left:4px;}
 .cz-rank-acc .acc-body-inner{padding:12px 16px 14px;}
 .cz-rank-acc .cz-rank-scroll{max-height:360px;margin-top:0;}
@@ -2992,6 +3001,8 @@ function normCat(c){ return (c||'').toString().trim().toLowerCase().normalize('N
 function catLabel(c){ const t=(c||'').toString().trim(); if(!t) return t; return /^(cat\.?|sub)\b/i.test(t) ? t : 'Cat. '+t; }
 // Solo la letra/valor corto de la categoría (sin el prefijo "Cat."/"Categoría"/"Sub"), p.ej. "Cat. A" -> "A"
 function catLetter(c){ const t=(c||'').toString().trim(); if(!t) return t; return t.replace(/^(cat\.?|categor[ií]a|sub)\s*/i,'').trim()||t; }
+// Une una lista en formato español: ["A"]->"A", ["A","B"]->"A y B", ["A","B","C"]->"A, B y C"
+function joinEs(arr){ arr=(arr||[]).filter(Boolean); if(!arr.length) return ''; if(arr.length===1) return arr[0]; return arr.slice(0,-1).join(', ')+' y '+arr[arr.length-1]; }
 // Mes (YYYY-MM) de un partido
 function matchMonthKey(m){ const d=parseDate(m[MATCH.fecha])||''; return d?d.slice(0,7):''; }
 function sameName(a,b){ return (a||'').toString().trim().toLowerCase()===(b||'').toString().trim().toLowerCase(); }
@@ -3050,12 +3061,23 @@ function playerRecord(name,cat){
   });
   return {w,l,p:tot,dec:w+l,pts:w*MATCH_WIN_PTS};
 }
-function rankingForCat(cat){
+// Ranking de una categoría. Si se pasa cutoffIso (fecha 'YYYY-MM-DD'), solo considera partidos jugados
+// hasta esa fecha inclusive — sirve para reconstruir una "foto" del ranking en el pasado (ver posDeltaCard).
+function rankingForCat(cat, cutoffIso){
   const names=new Set();
   adultRows.forEach(r=>{ if(normCat(r[ADULT.categoria])===normCat(cat)) names.add((r[ADULT.alumno]||'').trim()); });
-  matchRows.forEach(m=>{ if(normCat(m[MATCH.categoria])===normCat(cat)){ if(m[MATCH.jugadorA]) names.add(m[MATCH.jugadorA].trim()); if(m[MATCH.jugadorB]) names.add(m[MATCH.jugadorB].trim()); } });
-  const arr=[...names].filter(Boolean).map(n=>({name:n,...playerRecord(n,cat)}));
-  const catMatches=matchRows.filter(m=>normCat(m[MATCH.categoria])===normCat(cat));
+  const catMatches=matchRows.filter(m=>normCat(m[MATCH.categoria])===normCat(cat) && (!cutoffIso || (parseDate(m[MATCH.fecha])||'')<=cutoffIso));
+  catMatches.forEach(m=>{ if(m[MATCH.jugadorA]) names.add(m[MATCH.jugadorA].trim()); if(m[MATCH.jugadorB]) names.add(m[MATCH.jugadorB].trim()); });
+  const arr=[...names].filter(Boolean).map(n=>{
+    let w=0,l=0,tot=0;
+    catMatches.forEach(m=>{
+      if(!sameName(m[MATCH.jugadorA],n) && !sameName(m[MATCH.jugadorB],n)) return;
+      tot++;
+      const win=matchWinner(m);
+      if(win){ if(sameName(win,n)) w++; else l++; }
+    });
+    return {name:n,w,l,p:tot,dec:w+l,pts:w*MATCH_WIN_PTS};
+  });
   arr.sort((x,y)=>compareRanking(x,y,catMatches));
   return arr;
 }
@@ -3177,7 +3199,7 @@ function buildCircuitoTorneos(){
 
   // ── Categorías actualmente en juego (según partidos cargados) ──
   const catsPlaying=[...new Set(matchRows.map(m=>(m[MATCH.categoria]||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
-  const catsTxt = catsPlaying.length ? catsPlaying.map(catLetter).join(', ') : '—';
+  const catsTxt = catsPlaying.length ? 'Adultos '+joinEs(catsPlaying.map(catLetter)) : '—';
 
   const cards = `<div class="metrics-row cz-kpis">
     <div class="metric-card"><div class="mc-label">🏆 Torneos</div><div class="mc-body"><div class="mc-value">${totT}</div></div></div>
@@ -3272,8 +3294,17 @@ function buildCircuitoJugadores(){
     const rec=playerRecord(name);
     const winPct=rec.dec?Math.round(rec.w/rec.dec*100):0;
     const info=getAdultInfo(name); const cat=(info?info[ADULT.categoria]:'')||'';
-    let posTxt='—';
-    if(cat){ const arr=rankingForCat(cat); const idx=arr.findIndex(p=>sameName(p.name,name)); if(idx>=0) posTxt=(idx+1)+'º de '+arr.length; }
+    let posNum=0, posTot=0, posDelta=null;
+    if(cat){
+      const arr=rankingForCat(cat);
+      const idx=arr.findIndex(p=>sameName(p.name,name));
+      if(idx>=0){ posNum=idx+1; posTot=arr.length; }
+      const _cutoff=new Date(); _cutoff.setDate(_cutoff.getDate()-28);
+      const cutoffIso=_cutoff.toISOString().slice(0,10);
+      const arrPrev=rankingForCat(cat,cutoffIso);
+      const idxPrev=arrPrev.findIndex(p=>sameName(p.name,name));
+      if(idx>=0 && idxPrev>=0) posDelta=(idxPrev+1)-(idx+1); // positivo = subió puestos
+    }
     const _pctCol=winPct>=60?'var(--lv3)':winPct>=40?'var(--lv2)':'var(--lv1)';
     const _pctBg=winPct>=60?'var(--lv3-bg)':winPct>=40?'var(--lv2-bg)':'var(--lv1-bg)';
     const summary=`<div class="card"><div class="card-title">Mi resumen en torneos</div>
@@ -3283,8 +3314,15 @@ function buildCircuitoJugadores(){
         <div class="rec-item"><div class="rec-ic" style="background:${_pctBg};">📈</div><div class="rec-val" style="color:${_pctCol};">${winPct}%</div><div class="rec-bar"><i style="width:${winPct}%;background:${_pctCol};"></i></div><div class="rec-lbl">Victorias</div></div>
         <div class="rec-item"><div class="rec-ic" style="background:var(--ball);color:#5b5400;">⭐</div><div class="rec-val">${rec.pts}</div><div class="rec-lbl">Puntos</div></div>
       </div></div>`;
-    const posCard = cat?`<div class="card"><div class="card-title">Posición en el ranking · ${catLabel(cat)}</div>
-      <div class="rec-row"><div class="rec-item"><div class="rec-ic" style="background:var(--ball);color:#5b5400;">🥇</div><div class="rec-val">${posTxt}</div><div class="rec-lbl">Posición</div></div></div></div>`:'';
+    const posDeltaHTML = posDelta===null ? '' : (
+      posDelta>0 ? `<div class="posc-right"><div class="posc-delta up">+${posDelta}</div><div class="posc-delta-lbl">últimas 4 semanas</div></div>`
+      : posDelta<0 ? `<div class="posc-right"><div class="posc-delta down">${posDelta}</div><div class="posc-delta-lbl">últimas 4 semanas</div></div>`
+      : `<div class="posc-right"><div class="posc-delta flat">=</div><div class="posc-delta-lbl">últimas 4 semanas</div></div>`
+    );
+    const posCard = (cat && posNum>0)?`<div class="posc-card">
+      <div class="posc-left"><div class="posc-label">Tu posición</div><div class="posc-value">#${String(posNum).padStart(2,'0')}</div></div>
+      ${posDeltaHTML}
+    </div>`:'';
     const ms=playerMatches(name).slice().sort((a,b)=>(parseDate(b[MATCH.fecha])||'').localeCompare(parseDate(a[MATCH.fecha])||''));
     const rows=ms.map(m=>{
       const opp=sameName(m[MATCH.jugadorA],name)?(m[MATCH.jugadorB]||''):(m[MATCH.jugadorA]||'');
@@ -3301,7 +3339,7 @@ function buildCircuitoJugadores(){
       <div class="acc-body"><div class="acc-body-inner"><div class="match-list">${rows}</div></div></div>
     </div>`
       :'<div class="empty">Todavía no tiene partidos cargados.</div>';
-    body=summary+posCard+matchesCard;
+    body=posCard+summary+matchesCard;
   }
   el.innerHTML=filter+body;
 }
