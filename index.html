@@ -3000,7 +3000,13 @@ function normCat(c){ return (c||'').toString().trim().toLowerCase().normalize('N
 // Etiqueta de categoría para botones: antepone "Cat." salvo que ya empiece con Cat o Sub
 function catLabel(c){ const t=(c||'').toString().trim(); if(!t) return t; return /^(cat\.?|sub)\b/i.test(t) ? t : 'Cat. '+t; }
 // Solo la letra/valor corto de la categoría (sin el prefijo "Cat."/"Categoría"/"Sub"), p.ej. "Cat. A" -> "A"
-function catLetter(c){ const t=(c||'').toString().trim(); if(!t) return t; return t.replace(/^(cat\.?|categor[ií]a|sub)\s*/i,'').trim()||t; }
+function catLetter(c){
+  const t=(c||'').toString().trim(); if(!t) return t;
+  const stripped=t.replace(/^(cat\.?|categor[ií]a|sub)\s*/i,'').trim()||t;
+  // Se queda con la última palabra (la letra/código corto), ej. "Masculino A" -> "A", "Cat. B" -> "B", "Sub 12" -> "12"
+  const parts=stripped.split(/\s+/);
+  return parts[parts.length-1]||stripped;
+}
 // Une una lista en formato español: ["A"]->"A", ["A","B"]->"A y B", ["A","B","C"]->"A, B y C"
 function joinEs(arr){ arr=(arr||[]).filter(Boolean); if(!arr.length) return ''; if(arr.length===1) return arr[0]; return arr.slice(0,-1).join(', ')+' y '+arr[arr.length-1]; }
 // Mes (YYYY-MM) de un partido
@@ -3080,6 +3086,22 @@ function rankingForCat(cat, cutoffIso){
   });
   arr.sort((x,y)=>compareRanking(x,y,catMatches));
   return arr;
+}
+// Categoría de un jugador, tolerante a diferencias de mayúsculas/acentos/espacios entre la hoja de
+// Adultos y los nombres cargados en Partidos Torneos (getAdultInfo() exige coincidencia exacta y puede
+// no encontrar al jugador). Si no aparece en Adultos, usa la categoría más frecuente entre sus partidos.
+function getPlayerCategoryLoose(name){
+  let info = adultRows.find(r=>(r[ADULT.alumno]||'').trim()===name.trim());
+  if(!info) info = adultRows.find(r=>normCat(r[ADULT.alumno])===normCat(name));
+  let cat=(info?info[ADULT.categoria]:'')||'';
+  if(!cat){
+    const freq={};
+    playerMatches(name).forEach(m=>{ const c=(m[MATCH.categoria]||'').trim(); if(c) freq[c]=(freq[c]||0)+1; });
+    let best='', bestN=0;
+    Object.keys(freq).forEach(c=>{ if(freq[c]>bestN){ best=c; bestN=freq[c]; } });
+    cat=best;
+  }
+  return cat;
 }
 function buildPartidos(){
   const el=document.getElementById('content-partidos'), ld=document.getElementById('loading-partidos');
@@ -3293,7 +3315,7 @@ function buildCircuitoJugadores(){
     const name=circuitoPlayer;
     const rec=playerRecord(name);
     const winPct=rec.dec?Math.round(rec.w/rec.dec*100):0;
-    const info=getAdultInfo(name); const cat=(info?info[ADULT.categoria]:'')||'';
+    const cat=getPlayerCategoryLoose(name);
     let posNum=0, posTot=0, posDelta=null;
     if(cat){
       const arr=rankingForCat(cat);
