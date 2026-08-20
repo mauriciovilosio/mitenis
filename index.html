@@ -1077,17 +1077,20 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .cz-kpis .metric-card .mc-label{background:#2b2b2b;color:#fff;margin:0;padding:11px 14px;border-radius:var(--radius) var(--radius) 0 0;}
 .cz-kpis .metric-card .mc-body{padding:14px;}
 .cz-kpis .metric-card .mc-value{margin:0;}
+.cz-kpis .metric-card .mc-value.cz-cats-val{font-size:22px;word-break:break-word;}
 .cz-next{display:flex;flex-direction:column;justify-content:flex-start;}
 .cz-next-name{font-size:16px;font-weight:800;color:var(--blue);line-height:1.15;margin-top:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
 .cz-next-date{font-size:12px;font-weight:600;color:var(--muted);margin-top:4px;}
 .cz-next-empty{font-size:12px;color:var(--hint);margin-top:6px;line-height:1.3;}
+.cz-next-link{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:10px 16px;border-radius:12px;background:#2b2b2b;color:#fff;font-size:13px;font-weight:700;text-decoration:none;}
+.cz-next-link:hover{background:#3a3a3a;}
 .cz-rank-acc .acc-sub{font-size:13px;font-weight:500;color:var(--muted);margin-left:4px;}
 .cz-rank-acc .acc-body-inner{padding:12px 16px 14px;}
 .cz-rank-acc .cz-rank-scroll{max-height:360px;margin-top:0;}
-.cz-rank-acc .acc-head{background:#2b2b2b;padding:13px 16px;}
-.cz-rank-acc .acc-head:hover{background:#3a3a3a;}
-.cz-rank-acc .acc-title{color:#fff;}
-.cz-rank-acc .acc-chevron{color:#ffde59;font-size:20px;}
+.cz-rank-acc .acc-head,.cz-matches-acc .acc-head{background:#2b2b2b;padding:13px 16px;}
+.cz-rank-acc .acc-head:hover,.cz-matches-acc .acc-head:hover{background:#3a3a3a;}
+.cz-rank-acc .acc-title,.cz-matches-acc .acc-title{color:#fff;}
+.cz-rank-acc .acc-chevron,.cz-matches-acc .acc-chevron{color:#ffde59;font-size:20px;}
 .cz-cat{border:1.5px solid var(--border);background:var(--surf);color:var(--muted);font-weight:700;font-size:12px;padding:8px 14px;border-radius:12px;cursor:pointer;transition:all .15s;}
 .cz-cat:hover{background:var(--surf2);border-color:var(--blue);color:var(--blue);}
 .cz-cat.active{background:#2b2b2b;color:#fff;border-color:#2b2b2b;font-weight:700;}
@@ -1630,7 +1633,7 @@ const ADULT_DEFAULT = { alumno:0, categoria:1, edad:2, brazo:3, pin:4 };
 let ADULT = {...ADULT_DEFAULT};
 const MATCH_DEFAULT = { torneo:0, categoria:1, fecha:2, jugadorA:3, jugadorB:4, resultado:5, ganador:6, fase:7 };
 let MATCH = {...MATCH_DEFAULT};
-const EV_DEFAULT = { nombre:0, categoria:1, fecha:2, estado:3 };
+const EV_DEFAULT = { nombre:0, categoria:1, fecha:2, estado:3, link:4 };
 let EV = {...EV_DEFAULT};
 // Planificación: índices resueltos por encabezado (no por posición fija). -1 = ausente.
 let PLAN = { golpe:-1, actividad:-1, categoria:-1, descripcion:-1, objetivo:-1, material:-1, duracion:-1, nivel:-1 };
@@ -1774,7 +1777,8 @@ const EV_ALIASES = {
   nombre:['torneo','nombre','nombre del torneo','evento'],
   categoria:['categoria','categoría','cat','nivel'],
   fecha:['fecha','día','dia','marca temporal'],
-  estado:['estado','status','situación','situacion']
+  estado:['estado','status','situación','situacion'],
+  link:['link de inscripcion','link de inscripción','link inscripcion','link inscripción','link','inscripcion','inscripción','url','url de inscripcion','url de inscripción']
 };
 
 // ══════════════════════════════════════
@@ -2986,6 +2990,8 @@ function buildCoachHistorial(){
 function normCat(c){ return (c||'').toString().trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
 // Etiqueta de categoría para botones: antepone "Cat." salvo que ya empiece con Cat o Sub
 function catLabel(c){ const t=(c||'').toString().trim(); if(!t) return t; return /^(cat\.?|sub)\b/i.test(t) ? t : 'Cat. '+t; }
+// Solo la letra/valor corto de la categoría (sin el prefijo "Cat."/"Categoría"/"Sub"), p.ej. "Cat. A" -> "A"
+function catLetter(c){ const t=(c||'').toString().trim(); if(!t) return t; return t.replace(/^(cat\.?|categor[ií]a|sub)\s*/i,'').trim()||t; }
 // Mes (YYYY-MM) de un partido
 function matchMonthKey(m){ const d=parseDate(m[MATCH.fecha])||''; return d?d.slice(0,7):''; }
 function sameName(a,b){ return (a||'').toString().trim().toLowerCase()===(b||'').toString().trim().toLowerCase(); }
@@ -3169,33 +3175,42 @@ function buildCircuitoTorneos(){
   const totM = sel.length;
   const totP = playersOf(sel).size;
 
-  // ── Próximo torneo (hoja "Torneos") ──
-  const _today=new Date().toISOString().slice(0,10);
-  const _upcoming=eventRows.map(e=>({
-      nombre:(e[EV.nombre]||'').trim(),
-      cat:(e[EV.categoria]||'').trim(),
-      estado:(e[EV.estado]||'').trim(),
-      iso:parseDate(e[EV.fecha])||'',
-      raw:e[EV.fecha]||''
-    }))
-    .filter(e=>e.nombre && e.iso && e.iso>=_today && !/cancel|suspend/i.test(e.estado))
-    .sort((a,b)=>a.iso.localeCompare(b.iso));
-  const _nextEv=_upcoming[0]||null;
-  const nextCard = `<div class="metric-card cz-next">
-    <div class="mc-label">📅 Próximo torneo</div>
-    <div class="mc-body">${_nextEv
-      ? `<div class="cz-next-name" title="${_nextEv.nombre}">${_nextEv.nombre}</div><div class="cz-next-date">${fmtDate(_nextEv.raw)}${_nextEv.cat?' · '+catLabel(_nextEv.cat):''}</div>`
-      : `<div class="cz-next-empty">Sin torneos próximos</div>`}</div>
-  </div>`;
+  // ── Categorías actualmente en juego (según partidos cargados) ──
+  const catsPlaying=[...new Set(matchRows.map(m=>(m[MATCH.categoria]||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
+  const catsTxt = catsPlaying.length ? catsPlaying.map(catLetter).join(', ') : '—';
 
   const cards = `<div class="metrics-row cz-kpis">
     <div class="metric-card"><div class="mc-label">🏆 Torneos</div><div class="mc-body"><div class="mc-value">${totT}</div></div></div>
     <div class="metric-card"><div class="mc-label">🎾 Partidos jugados</div><div class="mc-body"><div class="mc-value">${totM}</div></div></div>
     <div class="metric-card"><div class="mc-label">👥 Jugadores</div><div class="mc-body"><div class="mc-value">${totP}</div></div></div>
-    ${nextCard}
+    <div class="metric-card"><div class="mc-label">🏷️ Categorías</div><div class="mc-body"><div class="mc-value cz-cats-val">${catsTxt}</div></div></div>
   </div>`;
 
-  el.innerHTML = cards;
+  // ── Próximo torneo (hoja "Torneos"), debajo de las 4 cards ──
+  const _today=new Date().toISOString().slice(0,10);
+  const esc=v=>String(v||'').replace(/"/g,'&quot;');
+  const _upcoming=eventRows.map(e=>({
+      nombre:(e[EV.nombre]||'').trim(),
+      cat:(e[EV.categoria]||'').trim(),
+      estado:(e[EV.estado]||'').trim(),
+      iso:parseDate(e[EV.fecha])||'',
+      raw:e[EV.fecha]||'',
+      link:(e[EV.link]||'').trim()
+    }))
+    .filter(e=>e.nombre && e.iso && e.iso>=_today && !/cancel|suspend/i.test(e.estado))
+    .sort((a,b)=>a.iso.localeCompare(b.iso));
+  const _nextEv=_upcoming[0]||null;
+  const _linkOk = _nextEv && /^https?:\/\//i.test(_nextEv.link);
+  const nextSection = `<div class="card cz-next-card">
+    <div class="card-title">📅 Próximo torneo</div>
+    ${_nextEv
+      ? `<div class="cz-next-name">${_nextEv.nombre}</div>
+         <div class="cz-next-date">${fmtDate(_nextEv.raw)}${_nextEv.cat?' · '+catLabel(_nextEv.cat):''}</div>
+         ${_linkOk?`<a class="cz-next-link" href="${esc(_nextEv.link)}" target="_blank" rel="noopener">Inscribirme →</a>`:''}`
+      : `<div class="cz-next-empty">Sin torneos próximos</div>`}
+  </div>`;
+
+  el.innerHTML = cards + nextSection;
 }
 function buildCircuitoRanking(){
   const el=document.getElementById('circuito-content');
@@ -3281,7 +3296,7 @@ function buildCircuitoJugadores(){
         <div class="match-mid"><div class="match-opp">vs ${opp||'—'}</div><div class="match-meta">${meta}</div></div>
         <div class="match-res">${res||'—'}</div></div>`;
     }).join('');
-    const matchesCard = ms.length?`<div class="acc open cz-matches-acc">
+    const matchesCard = ms.length?`<div class="acc cz-matches-acc">
       <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">Partidos</span><span class="acc-chevron">▾</span></div>
       <div class="acc-body"><div class="acc-body-inner"><div class="match-list">${rows}</div></div></div>
     </div>`
