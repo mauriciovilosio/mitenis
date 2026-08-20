@@ -140,23 +140,28 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
    Portal del Profe) pasan de tabs arriba del header a una barra fija abajo, ícono + texto,
    como en la mayoría de las apps. En desktop/web se mantiene el diseño de tabs original arriba. */
 @media(max-width:760px){
+  /* El header pierde el "colchón" inferior que antes le daba .app-tabs (ahora fija abajo,
+     fuera del flujo), así que se le da una altura mínima + padding propios para que no
+     cambie de tamaño según haya o no avatar/meta de alumno, y el back/nombre queden
+     siempre centrados con el mismo margen arriba y abajo. */
+  .header-top{ min-height:70px; padding-bottom:14px; box-sizing:border-box; }
   .app-tabs{
     position:fixed; left:0; right:0; bottom:0; z-index:200;
-    display:flex; padding:6px 2px calc(6px + env(safe-area-inset-bottom));
+    display:flex; padding:8px 2px max(10px, env(safe-area-inset-bottom));
     background:#1f1f1f; box-shadow:0 -4px 16px rgba(0,0,0,.32);
-    overflow-x:visible;
+    overflow-x:visible; box-sizing:border-box; min-height:64px;
   }
   .tab-btn{
     flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:3px; padding:5px 2px; font-size:10px; line-height:1.2; letter-spacing:0;
-    color:rgba(255,255,255,.55); border-bottom:none; white-space:nowrap; overflow:hidden;
+    gap:4px; padding:4px 2px; font-size:clamp(9.5px,2.6vw,11px); line-height:1.15; letter-spacing:0;
+    color:rgba(255,255,255,.68); border-bottom:none; white-space:nowrap;
   }
   .tab-btn.active{ color:#fff; border-bottom:none; font-weight:800; }
-  .tab-btn:hover:not(.active){ color:rgba(255,255,255,.55); }
-  .tb-ico{ display:flex; opacity:.7; }
+  .tab-btn:hover:not(.active){ color:rgba(255,255,255,.68); }
+  .tb-ico{ display:flex; flex-shrink:0; opacity:.8; }
   .tab-btn.active .tb-ico{ opacity:1; }
   .tb-lbl{ overflow:hidden; text-overflow:ellipsis; max-width:100%; }
-  .app-content{ padding-bottom:calc(80px + env(safe-area-inset-bottom)); }
+  .app-content{ padding-bottom:calc(84px + env(safe-area-inset-bottom)); }
 }
 
 /* CARDS */
