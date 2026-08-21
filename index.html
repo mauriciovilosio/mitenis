@@ -3246,7 +3246,7 @@ function buildCircuitoTorneos(){
   const totP = playersOf(sel).size;
 
   // ── Categorías: valor fijo (no calculado desde los datos) ──
-  const catsTxt = '+18 | A - B - C';
+  const catsTxt = 'A / B / C';
 
   const cards = `<div class="metrics-row cz-kpis">
     <div class="metric-card"><div class="mc-label">🏆 Torneos hechos</div><div class="mc-body"><div class="mc-value">${totT}</div></div></div>
@@ -3303,7 +3303,7 @@ function buildCircuitoRanking(){
       <span class="rank-pts">${p.pts}<small>pts</small></span></div>`;
   }).join('');
   const rankAcc = `<div class="acc open cz-rank-acc">
-    <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">🏅 Ranking de jugadores <span class="acc-sub">· ${catLabel(circuitoCat)}</span></span><span class="acc-chevron">▾</span></div>
+    <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">🏅 Ranking de jugadores</span><span class="acc-chevron">▾</span></div>
     <div class="acc-body"><div class="acc-body-inner"><div class="cz-rank-scroll">${rankRows||'<div class="empty">Sin partidos jugados todavía.</div>'}</div></div></div>
   </div>`;
 
