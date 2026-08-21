@@ -123,6 +123,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .header-name{font-family:'Inter',sans-serif;font-size:19px;font-weight:800;color:#fff;letter-spacing:-.01em;display:inline-flex;align-items:center;}
 .coach-header .header-top{padding-bottom:14px;}
 .coach-header .header-name .info-i{margin-left:7px;}
+.coach-header .header-name{text-transform:uppercase;letter-spacing:.02em;}
 .header-meta{font-size:11px;color:rgba(255,255,255,.72);}
 .app-tabs{display:flex;padding:10px 20px 0;overflow-x:auto;scrollbar-width:none;}
 .app-tabs::-webkit-scrollbar{display:none;}
@@ -1085,13 +1086,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .cz-search:focus{outline:none;border-color:var(--blue);}
 .cz-search-empty{font-size:12px;color:var(--muted);margin-top:8px;}
 
-.cz-filter-title{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:9px;letter-spacing:.01em;}
+.cz-filter-title{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:9px;letter-spacing:.04em;text-transform:uppercase;}
 .cz-filter .cz-cats{margin-bottom:0;}
 .cz-kpis{margin-bottom:16px;}
 .cz-kpis .metric-card{padding:0;overflow:hidden;text-align:left;}
 .cz-kpis .metric-card .mc-label{background:#2b2b2b;color:#fff;margin:0;padding:11px 14px;border-radius:var(--radius) var(--radius) 0 0;}
 .cz-kpis .metric-card .mc-body{padding:14px;}
-.cz-kpis .metric-card .mc-value{margin:0;}
+.cz-kpis .metric-card .mc-value{margin:0;font-size:26px;}
 .cz-kpis .metric-card .mc-value.cz-cats-val{word-break:break-word;}
 .cz-next{display:flex;flex-direction:column;justify-content:flex-start;}
 .cz-next-name{font-size:16px;font-weight:800;color:var(--blue);line-height:1.15;margin-top:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
@@ -1114,7 +1115,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .cz-rank-acc .cz-rank-scroll{max-height:360px;margin-top:0;}
 .cz-rank-acc .acc-head,.cz-matches-acc .acc-head{background:#2b2b2b;padding:13px 16px;}
 .cz-rank-acc .acc-head:hover,.cz-matches-acc .acc-head:hover{background:#3a3a3a;}
-.cz-rank-acc .acc-title,.cz-matches-acc .acc-title{color:#fff;}
+.cz-rank-acc .acc-title,.cz-matches-acc .acc-title{color:#fff;text-transform:uppercase;letter-spacing:.04em;}
 .cz-rank-acc .acc-chevron,.cz-matches-acc .acc-chevron{color:#ffde59;font-size:20px;}
 .cz-cat{border:1.5px solid var(--border);background:var(--surf);color:var(--muted);font-weight:700;font-size:12px;padding:8px 14px;border-radius:12px;cursor:pointer;transition:all .15s;}
 .cz-cat:hover{background:var(--surf2);border-color:var(--blue);color:var(--blue);}
@@ -1174,6 +1175,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .filter-acc .acc-head{padding:8px 2px;}
 .filter-acc .acc-head:hover{background:transparent;}
 .filter-acc .acc-title{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--blue);display:inline-flex;align-items:center;gap:4px;}
+/* En Portal del Profe (no en Escuela de Tenis) los títulos de los filtros también van en mayúsculas */
+.coach-view .filter-acc .acc-title{text-transform:uppercase;letter-spacing:.04em;}
 .filter-acc .acc-sub{font-size:12px;font-weight:500;color:var(--muted);margin-left:4px;}
 .filter-acc .acc-chevron{color:var(--muted);}
 .filter-acc .acc-body{position:absolute;top:calc(100% + 2px);left:0;z-index:130;min-width:210px;max-width:min(90vw,330px);background:var(--surf);border:1px solid var(--border);border-radius:14px;box-shadow:0 18px 44px rgba(10,61,42,.22);max-height:0;overflow:hidden;transition:max-height .28s ease;border-color:transparent;}
@@ -3242,12 +3245,11 @@ function buildCircuitoTorneos(){
   const totM = sel.length;
   const totP = playersOf(sel).size;
 
-  // ── Categorías actualmente en juego (según partidos cargados) ──
-  const catsPlaying=[...new Set(matchRows.map(m=>(m[MATCH.categoria]||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
-  const catsTxt = catsPlaying.length ? 'Adultos '+joinEs(catsPlaying.map(catLetter)) : '—';
+  // ── Categorías: valor fijo (no calculado desde los datos) ──
+  const catsTxt = '+18 | A - B - C';
 
   const cards = `<div class="metrics-row cz-kpis">
-    <div class="metric-card"><div class="mc-label">🏆 Torneos realizados</div><div class="mc-body"><div class="mc-value">${totT}</div></div></div>
+    <div class="metric-card"><div class="mc-label">🏆 Torneos hechos</div><div class="mc-body"><div class="mc-value">${totT}</div></div></div>
     <div class="metric-card"><div class="mc-label">🎾 Partidos jugados</div><div class="mc-body"><div class="mc-value">${totM}</div></div></div>
     <div class="metric-card"><div class="mc-label">👥 Jugadores activos</div><div class="mc-body"><div class="mc-value">${totP}</div></div></div>
     <div class="metric-card"><div class="mc-label">🏷️ Categorías</div><div class="mc-body"><div class="mc-value cz-cats-val">${catsTxt}</div></div></div>
@@ -3268,7 +3270,7 @@ function buildCircuitoTorneos(){
     .sort((a,b)=>a.iso.localeCompare(b.iso));
   const _nextEv=_upcoming[0]||null;
   const _linkOk = _nextEv && /^https?:\/\//i.test(_nextEv.link);
-  const nextSection = `<hr class="coach-sec-hr"><div class="coach-sec-title">Próximo torneo</div><div class="card cz-next-card">
+  const nextSection = `<hr class="coach-sec-hr"><div class="coach-sec-title">📅 Próximo torneo</div><div class="card cz-next-card">
     ${_nextEv
       ? `<div class="cz-next-name">${_nextEv.nombre}</div>
          <div class="cz-next-date">${fmtDate(_nextEv.raw)}${_nextEv.cat?' · '+catLabel(_nextEv.cat):''}</div>
