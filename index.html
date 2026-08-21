@@ -78,8 +78,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .start-btn:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 12px 28px rgba(10,81,58,.16);}
 .dev-badge{margin-top:22px;text-align:center;font-size:11px;color:var(--muted);font-style:normal;line-height:1.5;animation:introMenuIn .5s ease 1.15s both;}
 .start-ico{flex-shrink:0;width:48px;height:48px;border-radius:14px;background:#2b2b2b;display:flex;align-items:center;justify-content:center;font-size:23px;line-height:1;}
-.start-txt{flex:1;color:var(--blue);display:flex;flex-direction:column;gap:3px;min-width:0;}
-.start-desc{font-size:12.5px;font-weight:500;color:var(--muted);font-style:normal;letter-spacing:0;}
+.start-txt{flex:1;color:var(--blue);display:flex;flex-direction:column;gap:3px;min-width:0;text-transform:uppercase;letter-spacing:.02em;}
+.start-desc{font-size:12.5px;font-weight:500;color:var(--muted);font-style:normal;letter-spacing:0;text-transform:none;}
 .start-info{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:rgba(10,81,58,.10);color:var(--blue);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;font-style:italic;font-family:Georgia,serif;cursor:pointer;transition:transform .15s,background .15s;}
 .start-info:hover{transform:scale(1.15);background:rgba(10,81,58,.20);}
 .start-info:focus-visible{outline:2px solid var(--blue);outline-offset:1px;}
@@ -1092,7 +1092,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .cz-kpis .metric-card .mc-label{background:#2b2b2b;color:#fff;margin:0;padding:11px 14px;border-radius:var(--radius) var(--radius) 0 0;}
 .cz-kpis .metric-card .mc-body{padding:14px;}
 .cz-kpis .metric-card .mc-value{margin:0;}
-.cz-kpis .metric-card .mc-value.cz-cats-val{font-size:22px;word-break:break-word;}
+.cz-kpis .metric-card .mc-value.cz-cats-val{word-break:break-word;}
 .cz-next{display:flex;flex-direction:column;justify-content:flex-start;}
 .cz-next-name{font-size:16px;font-weight:800;color:var(--blue);line-height:1.15;margin-top:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
 .cz-next-date{font-size:14px;font-weight:600;color:var(--muted);margin-top:4px;}
@@ -1101,6 +1101,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .cz-next-link:hover{background:#3a3a3a;}
 .posc-card{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#1f1f1f;border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;}
 .posc-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.55);}
+.posc-badge{display:inline-block;margin-left:6px;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:rgba(255,255,255,.16);padding:3px 9px;border-radius:99px;vertical-align:middle;}
 .posc-value{font-size:34px;font-weight:800;color:#fff;line-height:1.1;margin-top:6px;letter-spacing:.01em;}
 .posc-right{text-align:right;}
 .posc-delta{font-size:16px;font-weight:800;line-height:1;}
@@ -1408,7 +1409,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
   <header class="app-header coach-header">
     <div class="header-top">
       <button class="header-back" onclick="closeCircuito()">← Volver</button>
-      <div class="header-player"><div class="header-name">🏆 Circuito interno</div></div>
+      <div class="header-player"><div class="header-name">Circuito interno</div></div>
       <div style="width:60px;"></div>
     </div>
     <nav class="app-tabs" id="tabs-circuito">
@@ -3246,9 +3247,9 @@ function buildCircuitoTorneos(){
   const catsTxt = catsPlaying.length ? 'Adultos '+joinEs(catsPlaying.map(catLetter)) : '—';
 
   const cards = `<div class="metrics-row cz-kpis">
-    <div class="metric-card"><div class="mc-label">🏆 Torneos</div><div class="mc-body"><div class="mc-value">${totT}</div></div></div>
+    <div class="metric-card"><div class="mc-label">🏆 Torneos realizados</div><div class="mc-body"><div class="mc-value">${totT}</div></div></div>
     <div class="metric-card"><div class="mc-label">🎾 Partidos jugados</div><div class="mc-body"><div class="mc-value">${totM}</div></div></div>
-    <div class="metric-card"><div class="mc-label">👥 Jugadores</div><div class="mc-body"><div class="mc-value">${totP}</div></div></div>
+    <div class="metric-card"><div class="mc-label">👥 Jugadores activos</div><div class="mc-body"><div class="mc-value">${totP}</div></div></div>
     <div class="metric-card"><div class="mc-label">🏷️ Categorías</div><div class="mc-body"><div class="mc-value cz-cats-val">${catsTxt}</div></div></div>
   </div>`;
 
@@ -3267,8 +3268,7 @@ function buildCircuitoTorneos(){
     .sort((a,b)=>a.iso.localeCompare(b.iso));
   const _nextEv=_upcoming[0]||null;
   const _linkOk = _nextEv && /^https?:\/\//i.test(_nextEv.link);
-  const nextSection = `<div class="card cz-next-card">
-    <div class="card-title">📅 Próximo torneo</div>
+  const nextSection = `<hr class="coach-sec-hr"><div class="coach-sec-title">Próximo torneo</div><div class="card cz-next-card">
     ${_nextEv
       ? `<div class="cz-next-name">${_nextEv.nombre}</div>
          <div class="cz-next-date">${fmtDate(_nextEv.raw)}${_nextEv.cat?' · '+catLabel(_nextEv.cat):''}</div>
@@ -3276,39 +3276,32 @@ function buildCircuitoTorneos(){
       : `<div class="cz-next-empty">Sin torneos próximos</div>`}
   </div>`;
 
-  el.innerHTML = cards + nextSection;
+  el.innerHTML = `<div class="coach-sec-title">Resumen del circuito</div>` + cards + nextSection;
 }
 function buildCircuitoRanking(){
   const el=document.getElementById('circuito-content');
   const cats=[...new Set([...adultRows.map(r=>(r[ADULT.categoria]||'').trim()), ...matchRows.map(m=>(m[MATCH.categoria]||'').trim())].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
   if(!cats.length){ el.innerHTML='<div class="empty">No hay categorías de torneos cargadas todavía.</div>'; return; }
 
+  // Sin filtro "Todas": siempre hay una categoría específica activa.
+  if(!cats.some(c=>normCat(c)===normCat(circuitoCat))) circuitoCat=cats[0];
+
   // ── Filtro de categoría (con título) ──
   const chips=`<div class="cz-filter">
     <div class="cz-filter-title">Seleccioná una categoría</div>
-    <div class="cz-cats">`+['all',...cats].map(c=>`<button class="cz-cat${circuitoCat===c?' active':''}" onclick="setCatCircuito('${c==='all'?'all':c.replace(/'/g,"\\'")}')">${c==='all'?'Todas':catLabel(c)}</button>`).join('')+`</div>
+    <div class="cz-cats">`+cats.map(c=>`<button class="cz-cat${normCat(circuitoCat)===normCat(c)?' active':''}" onclick="setCatCircuito('${c.replace(/'/g,"\\'")}')">${catLabel(c)}</button>`).join('')+`</div>
   </div>`;
 
-  const sel = circuitoCat==='all' ? matchRows : matchRows.filter(m=>normCat(m[MATCH.categoria])===normCat(circuitoCat));
-  const playersOf = list => new Set([].concat(...list.map(m=>[(m[MATCH.jugadorA]||'').trim(),(m[MATCH.jugadorB]||'').trim()])).filter(Boolean));
-
-  // ── Ranking de jugadores (combinado si es "Todas", o por categoría) ──
-  let rank;
-  if(circuitoCat==='all'){
-    const names=[...playersOf(sel)];
-    rank=names.map(n=>({name:n,...playerRecord(n)})).sort((x,y)=>compareRanking(x,y,matchRows));
-  } else {
-    rank=rankingForCat(circuitoCat);
-  }
+  // ── Ranking de jugadores de la categoría elegida ──
+  const rank=rankingForCat(circuitoCat);
   const rankRows = rank.map((p,i)=>{
     const medal = i===0?'🥇':(i===1?'🥈':(i===2?'🥉':''));
     return `<div class="rank-row"><span class="rank-pos">${medal||(i+1)}</span>
       <div class="rank-name"><div class="rank-nm">${p.name}</div><div class="rank-rec">${p.w}-${p.l} · ${p.p} jugados</div></div>
       <span class="rank-pts">${p.pts}<small>pts</small></span></div>`;
   }).join('');
-  const rankScope = circuitoCat==='all' ? 'General' : catLabel(circuitoCat);
   const rankAcc = `<div class="acc open cz-rank-acc">
-    <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">🏅 Ranking de jugadores <span class="acc-sub">· ${rankScope}</span></span><span class="acc-chevron">▾</span></div>
+    <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">🏅 Ranking de jugadores <span class="acc-sub">· ${catLabel(circuitoCat)}</span></span><span class="acc-chevron">▾</span></div>
     <div class="acc-body"><div class="acc-body-inner"><div class="cz-rank-scroll">${rankRows||'<div class="empty">Sin partidos jugados todavía.</div>'}</div></div></div>
   </div>`;
 
@@ -3364,7 +3357,7 @@ function buildCircuitoJugadores(){
       : `<div class="posc-right"><div class="posc-delta flat">=</div><div class="posc-delta-lbl">últimas 4 semanas</div></div>`
     );
     const posCard = (cat && posNum>0)?`<div class="posc-card">
-      <div class="posc-left"><div class="posc-label">Tu posición</div><div class="posc-value">#${String(posNum).padStart(2,'0')}</div></div>
+      <div class="posc-left"><div class="posc-label">Tu posición <span class="posc-badge">${catLabel(cat)}</span></div><div class="posc-value">#${String(posNum).padStart(2,'0')}</div></div>
       ${posDeltaHTML}
     </div>`:'';
     const ms=playerMatches(name).slice().sort((a,b)=>(parseDate(b[MATCH.fecha])||'').localeCompare(parseDate(a[MATCH.fecha])||''));
