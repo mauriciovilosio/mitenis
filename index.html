@@ -1234,7 +1234,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
 .tl-dot{width:9px;height:9px;border-radius:50%;background:var(--ball);margin-top:5px;flex-shrink:0;}
 .tl-line{flex:1;width:1px;background:rgba(255,255,255,.14);margin-top:5px;}
 .tl-body{flex:1;min-width:0;padding-bottom:22px;}
-.tl-date{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.48);margin-bottom:6px;}
+.tl-date{font-size:12px;font-weight:600;color:rgba(255,255,255,.5);margin-bottom:6px;}
 .tl-title{font-size:14.5px;font-weight:800;color:#fff;line-height:1.35;margin-bottom:9px;}
 .tl-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;}
 .tl-pill{font-size:10px;font-weight:700;color:rgba(255,255,255,.86);background:rgba(255,255,255,.12);padding:4px 10px;border-radius:99px;}
@@ -1256,7 +1256,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
 .cal-dl-btn{margin-top:8px;width:100%;min-height:36px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--ball);color:#5b5400;border:1px solid #e8c23e;border-radius:10px;padding:6px 8px;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:transform .12s;line-height:1.2;}
 .cal-dl-btn:hover{transform:translateY(-1px);}
 .cal-dl-note{margin-top:8px;width:100%;min-height:36px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);background:var(--surf2);border:1px dashed var(--border);border-radius:10px;padding:6px 8px;text-align:center;line-height:1.3;}
-.hl-azul{background:#0a513a;color:#fff;padding:1px 7px;border-radius:5px;font-weight:600;}
+.hl-azul{background:#2b2b2b;color:#fff;padding:1px 7px;border-radius:5px;font-weight:600;}
 .hl-rojo{background:#dc2626;color:#fff;padding:1px 7px;border-radius:5px;font-weight:600;}
 .cal-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:10px;}
 .cal-legend span{display:inline-flex;align-items:center;gap:6px;}
@@ -1429,12 +1429,14 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
       <button class="tab-btn active" onclick="switchCoachTab('resumen',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span><span class="tb-lbl">Inicio</span></button>
       <button class="tab-btn" onclick="switchCoachTab('alumnos',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span><span class="tb-lbl">Alumnos</span></button>
       <button class="tab-btn" onclick="switchCoachTab('planificacion',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg></span><span class="tb-lbl">Planificación</span></button>
+      <button class="tab-btn" onclick="switchCoachTab('historial',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span><span class="tb-lbl">Historial</span></button>
     </nav>
   </header>
   <main class="app-content">
     <div class="coach-view active" id="coach-view-resumen"><div id="coach-content"></div></div>
     <div class="coach-view" id="coach-view-alumnos"><div id="coach-alumnos-content"></div></div>
     <div class="coach-view" id="coach-view-planificacion"><div id="coach-plan-content"></div></div>
+    <div class="coach-view" id="coach-view-historial"><div id="coach-hist-content"></div></div>
   </main>
 </div>
 
@@ -2049,6 +2051,14 @@ function parseDate(s){
 function fmtDate(s){
   const d=new Date(parseDate(s)+'T12:00:00');
   return isNaN(d)?s:d.toLocaleDateString('es-AR',{day:'numeric',month:'short',year:'numeric'});
+}
+// Fecha larga con día de la semana, para el Historial de clases: "20 de agosto 2026 - jueves"
+function fmtDateLargo(s){
+  const d=new Date(parseDate(s)+'T12:00:00');
+  if(isNaN(d)) return s;
+  const dias=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  return `${d.getDate()} de ${meses[d.getMonth()]} ${d.getFullYear()} - ${dias[d.getDay()]}`;
 }
 function getInfo(name){ return infoRows.find(r=>r[INFO.alumno]?.trim()===name.trim())||null; }
 // Mi Registro: habilitado salvo que la columna "subscripcion" diga explícitamente "No".
@@ -2842,6 +2852,7 @@ function switchCoachTab(id, btn){
   if(btn) btn.classList.add('active');
   const v=document.getElementById('coach-view-'+id); if(v) v.classList.add('active');
   if(id==='planificacion'){ try{ buildCoachPlanArea(); }catch(e){ const el=document.getElementById('coach-plan-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir la planificación.</strong>'+(e&&e.message?e.message:e)+'</div>'; } }
+  if(id==='historial'){ try{ buildCoachHistorial(); }catch(e){ const el=document.getElementById('coach-hist-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir el historial.</strong>'+(e&&e.message?e.message:e)+'</div>'; } }
   if(id==='alumnos'){ try{ buildCoachAlumnos(); }catch(e){ const el=document.getElementById('coach-alumnos-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir Alumnos.</strong>'+(e&&e.message?e.message:e)+'</div>'; } }
   saveNav();
 }
@@ -3039,9 +3050,8 @@ function renderHistorialClases(entries){
   const rows=entries.map((e,i)=>`<div class="tl-row">
     <div class="tl-rail"><div class="tl-dot"></div>${i<entries.length-1?'<div class="tl-line"></div>':''}</div>
     <div class="tl-body">
-      <div class="tl-date">${esc(fmtDate(e.fecha))}${e.grupo?` · ${esc(e.grupo)}`:''}</div>
+      <div class="tl-date">${esc(fmtDateLargo(e.fecha))}</div>
       ${e.objetivo?`<div class="tl-title">${esc(e.objetivo)}</div>`:''}
-      ${e.categorias.length?`<div class="tl-pills">${e.categorias.map(c=>`<span class="tl-pill">${esc(c)}</span>`).join('')}</div>`:''}
       ${e.ejercicios?`<div class="tl-desc">${esc(e.ejercicios)}</div>`:''}
     </div>
   </div>`).join('');
