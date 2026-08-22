@@ -1715,7 +1715,7 @@ const HIST_ALIASES = {
   fecha:['fecha','dia','día','marca temporal','date'],
   grupo:['grupo','horario','grupo horario','dia y horario','día y horario','clase'],
   categorias:['categoria','categoría','categorias','categorías','nivel','niveles'],
-  objetivo:['objetivo','objetivo del entrenamiento','objetivos','meta','foco'],
+  objetivo:['objetivo','objetivo del entrenamiento','tipo de entrenamiento','tipo entrenamiento','entrenamiento','tipo','objetivos','meta','foco'],
   ejercicios:['ejercicios','ejercicios realizados','actividades','actividad','contenido','desarrollo']
 };
 // A partir de "Adolescentes y Pre Competencia" / "Adolescentes, Pre Competencia" devuelve ['Adolescentes','Pre Competencia']
@@ -2978,6 +2978,19 @@ function histEntries(){
     return { fecha, mk:ymKey(fecha), grupo, categorias, objetivo, ejercicios };
   }).filter(e=>e.fecha).sort((a,b)=>(parseDate(b.fecha)||'').localeCompare(parseDate(a.fecha)||''));
 }
+// Timeline oscuro compartido: fecha (gris) + tipo de entrenamiento/objetivo (blanco) + ejercicios (gris), unidos por puntos/línea.
+// Usado tanto en Informes del alumno (renderHistorialClases) como en Portal del Profe → Historial (buildCoachHistorial).
+function histTimelineHTML(entries){
+  const esc=(s)=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return entries.map((e,i)=>`<div class="tl-row">
+    <div class="tl-rail"><div class="tl-dot"></div>${i<entries.length-1?'<div class="tl-line"></div>':''}</div>
+    <div class="tl-body">
+      <div class="tl-date">${esc(fmtDateLargo(e.fecha))}</div>
+      ${e.objetivo?`<div class="tl-title">${esc(e.objetivo)}</div>`:''}
+      ${e.ejercicios?`<div class="tl-desc">${esc(e.ejercicios)}</div>`:''}
+    </div>
+  </div>`).join('');
+}
 function buildCoachHistorial(){
   const el=document.getElementById('coach-hist-content'); if(!el) return;
   if(!histRows.length){
@@ -3013,21 +3026,15 @@ function buildCoachHistorial(){
       </div>
     </div>
   </div>`;
-  // Mes → tarjetas de clase (más recientes primero)
+  // Mes → timeline de clases (más recientes primero), mismo formato oscuro que Informes del alumno
   const byMes={};
   entries.forEach(e=>{ (byMes[e.mk]=byMes[e.mk]||[]).push(e); });
   const meses=Object.keys(byMes).sort().reverse();
-  const entryCard=(e)=>`<div class="hist-card">
-    <div class="hist-card-h"><span class="hist-fecha">${esc(fmtDate(e.fecha))}</span><span class="hist-dia">${esc(e.grupo)}</span></div>
-    ${e.categorias.length?`<div class="hist-cats">${e.categorias.map(c=>`<span class="plan-tag cat">${esc(c)}</span>`).join('')}</div>`:''}
-    ${e.objetivo?`<div class="hist-row"><b>Objetivo:</b> ${esc(e.objetivo)}</div>`:''}
-    ${e.ejercicios?`<div class="hist-row"><b>Ejercicios:</b> ${esc(e.ejercicios)}</div>`:''}
-  </div>`;
   const mesSections=meses.map((mk)=>{
     const list=byMes[mk];
     return `<div class="acc evo-acc hist-acc" style="margin-top:14px;">
       <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📋 Registro de clases - ${esc(monthLabel(mk))} <span class="acc-sub">· ${list.length} clase${list.length!==1?'s':''}</span></span><span class="acc-chevron">▾</span></div>
-      <div class="acc-body"><div class="acc-body-inner"><div class="hist-semana-cards">${list.map(entryCard).join('')}</div></div></div>
+      <div class="acc-body"><div class="acc-body-inner"><div class="hist-timeline-card" style="margin-top:2px;">${histTimelineHTML(list)}</div></div></div>
     </div>`;
   }).join('');
   el.innerHTML=`${filters}${kpis}${mesSections}`;
@@ -3043,19 +3050,10 @@ function studentHistorialEntries(name){
   return all.filter(e=>e.categorias.length ? e.categorias.some(c=>normCat(c)===nc) : true);
 }
 function renderHistorialClases(entries){
-  const esc=(s)=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   if(!entries.length){
     return `<hr class="coach-sec-hr"><div class="coach-sec-title">Historial de clases</div><div class="empty" style="color:var(--muted);">Todavía no hay clases registradas.</div>`;
   }
-  const rows=entries.map((e,i)=>`<div class="tl-row">
-    <div class="tl-rail"><div class="tl-dot"></div>${i<entries.length-1?'<div class="tl-line"></div>':''}</div>
-    <div class="tl-body">
-      <div class="tl-date">${esc(fmtDateLargo(e.fecha))}</div>
-      ${e.objetivo?`<div class="tl-title">${esc(e.objetivo)}</div>`:''}
-      ${e.ejercicios?`<div class="tl-desc">${esc(e.ejercicios)}</div>`:''}
-    </div>
-  </div>`).join('');
-  return `<hr class="coach-sec-hr"><div class="coach-sec-title">Historial de clases</div><div class="hist-timeline-card">${rows}</div>`;
+  return `<hr class="coach-sec-hr"><div class="coach-sec-title">Historial de clases</div><div class="hist-timeline-card">${histTimelineHTML(entries)}</div>`;
 }
 
 // ══════════════════════════════════════
