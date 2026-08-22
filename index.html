@@ -628,6 +628,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .coach-kpi-val{font-size:22px;font-weight:900;color:#fff;line-height:1;}
 .coach-kpi-val .coach-kpi-max{font-size:13px;font-weight:700;color:rgba(255,255,255,.55);margin-left:1px;}
 .coach-kpi-val .ph-d{font-size:9px;}
+.coach-kpi-spark{margin-top:8px;height:34px;}
+.coach-kpi-spark .area-spark{display:block;width:100%;height:34px;}
 @media(max-width:560px){ .coach-kpi-row{grid-template-columns:repeat(2,1fr);} .coach-kpi-val{font-size:19px;} }
 
 /* Secciones "Atención requerida" / "Área a reforzar": línea divisoria + título oscuro + card negra */
@@ -1212,7 +1214,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
 .cal-cell.cal-dl .cal-dlico{font-size:8px;line-height:1;margin-top:1px;}
 .cal-cell.cal-dl.has{box-shadow:inset 0 0 0 2px var(--blue);}
 .cal-cell.cal-dl.has.cal-torneo{box-shadow:inset 0 0 0 2px var(--lv1);}
-.cal-cell.cal-dl-lock{background:var(--surf2);color:var(--hint);border:1px dashed var(--border);}
+.cal-cell.cal-dl-lock{background:var(--surf2);color:var(--muted);border:1px dashed var(--border);}
 .cal-cell.cal-dl-lock .cal-dlico{font-size:8px;opacity:.7;}
 button.cal-cell.cal-dl-lock{cursor:pointer;}
 /* === Informes: un solo mes con navegación (flechas + indicador de posición) === */
@@ -1263,7 +1265,7 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
 
 .cal-dl-btn{margin-top:8px;width:100%;min-height:36px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:5px;background:var(--ball);color:#5b5400;border:1px solid #e8c23e;border-radius:10px;padding:6px 8px;font-size:11px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:transform .12s;line-height:1.2;}
 .cal-dl-btn:hover{transform:translateY(-1px);}
-.cal-dl-btn.cal-dl-btn-locked{background:var(--surf2);color:var(--hint);border:1px dashed var(--border);}
+.cal-dl-btn.cal-dl-btn-locked{background:var(--surf2);color:var(--muted);border:1px dashed var(--border);}
 .cal-dl-note{margin-top:8px;width:100%;min-height:36px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);background:var(--surf2);border:1px dashed var(--border);border-radius:10px;padding:6px 8px;text-align:center;line-height:1.3;}
 .hl-azul{background:#2b2b2b;color:#fff;padding:1px 7px;border-radius:5px;font-weight:600;}
 .hl-rojo{background:#dc2626;color:#fff;padding:1px 7px;border-radius:5px;font-weight:600;}
@@ -1592,7 +1594,8 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
   <div class="pin-modal" style="max-width:380px;">
     <div class="pin-title">Cómo funcionan los Informes</div>
     <div style="font-size:14px;color:var(--text);line-height:1.7;text-align:left;margin-top:4px;">
-      <p style="margin:0;">Los días en <span class="hl-azul">oscuro</span> tienen una sesión registrada, y los días en <span class="hl-rojo">rojo</span> tienen un Torneo registrado - tocalos para ver el detalle. Al finalizar el mes, podés descargar tu registro completo.</p>
+      <p style="margin:0;">Los días en <span class="hl-azul">oscuro</span> tienen una sesión registrada, y los días en <span class="hl-rojo">rojo</span> tienen un Torneo registrado (tocalos para ver el detalle).</p>
+      <p style="margin:12px 0 0;">Al finalizar el mes, podés descargar un registro completo con más detalle de tu rendimiento evaluado por los Profes. En caso de querer obtener el registro mensual por favor contactar a Profe Mauri para la suscripción del mismo 🎾🙌.</p>
     </div>
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeRegistroInfo()">Entendido</button></div>
   </div>
@@ -3041,35 +3044,8 @@ function buildCoachHistorial(){
     el.innerHTML=`${filters}<div class="empty" style="color:var(--muted);margin-top:12px;">No hay clases cargadas todavía para estos filtros.</div>`;
     return;
   }
-  // KPI rápido (mismo alcance que los filtros activos): objetivo más trabajado
-  const _kpiMks=[...new Set(entries.map(e=>e.mk))].sort();
-  const _kpiMesLbl=_kpiMks.length<=1?monthLabel(_kpiMks[0]||''):(monthLabel(_kpiMks[0])+' – '+monthLabel(_kpiMks[_kpiMks.length-1]));
-  const _objCount={};
-  entries.forEach(e=>{ const k=(e.objetivo||'').trim(); if(k) _objCount[k]=(_objCount[k]||0)+1; });
-  let _topObj='—', _topObjCount=0;
-  Object.entries(_objCount).forEach(([k,c])=>{ if(c>_topObjCount){ _topObjCount=c; _topObj=k; } });
-  const _topObjSub=_topObjCount?`${_kpiMesLbl} · ${_topObjCount} ${_topObjCount===1?'vez':'veces'}`:_kpiMesLbl;
-  const kpis=`<div class="foco2" style="margin-bottom:14px;">
-    <div class="foco2-card foco2-static">
-      <div class="foco2-title">Objetivo más trabajado</div>
-      <div class="foco2-body">
-        <span class="foco2-ic" style="color:#0d5230;">🎯</span>
-        <span class="foco2-tx"><span class="foco2-val foco2-val-txt">${esc(_topObj)}</span><span class="foco2-sub">${esc(_topObjSub)}</span></span>
-      </div>
-    </div>
-  </div>`;
-  // Mes → timeline de clases (más recientes primero), mismo formato oscuro que Informes del alumno
-  const byMes={};
-  entries.forEach(e=>{ (byMes[e.mk]=byMes[e.mk]||[]).push(e); });
-  const meses=Object.keys(byMes).sort().reverse();
-  const mesSections=meses.map((mk)=>{
-    const list=byMes[mk];
-    return `<div class="acc evo-acc hist-acc" style="margin-top:14px;">
-      <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📋 Registro de clases - ${esc(monthLabel(mk))} <span class="acc-sub">· ${list.length} clase${list.length!==1?'s':''}</span></span><span class="acc-chevron">▾</span></div>
-      <div class="acc-body"><div class="acc-body-inner"><div class="hist-timeline-card" style="margin-top:2px;">${histTimelineHTML(list)}</div></div></div>
-    </div>`;
-  }).join('');
-  el.innerHTML=`${filters}${kpis}${mesSections}`;
+  // Timeline de clases (más recientes primero), mismo formato oscuro que Informes del alumno
+  el.innerHTML=`${filters}<hr class="coach-sec-hr"><div class="coach-sec-title">Historial de clases</div><div class="hist-timeline-card">${histTimelineHTML(entries)}</div>`;
 }
 // ── Historial de clases (Escuela de Tenis / Informes): timeline oscuro con las clases de la CATEGORÍA del alumno ──
 // Un alumno ve las sesiones cuyo grupo incluye su categoría (o sesiones sin categoría especificada, por defecto visibles a todos).
@@ -3348,7 +3324,7 @@ function buildCircuitoTorneos(){
       : `<div class="cz-next-empty">Sin torneos próximos</div>`}
   </div>`;
 
-  el.innerHTML = `<div class="coach-sec-title">Resumen del circuito</div>` + cards + nextSection;
+  el.innerHTML = `<div class="coach-sec-title">RESUMEN DE LOS TORNEOS RELÁMPAGOS</div>` + cards + nextSection;
 }
 function buildCircuitoRanking(){
   const el=document.getElementById('circuito-content');
@@ -3654,8 +3630,25 @@ function computeCoachData(){
   const cPrevTot=_pctv.length?_pctv.reduce((x,y)=>x+y,0)/_pctv.length:0;
   // Clases registradas: cantidad de sesiones cargadas por los profes en el mes (hoja Registro-rúbrica)
   const _playersSet=new Set(players);
-  const _clasesCur=allRows.filter(r=>monthKey(r)===curMonth && _playersSet.has(r[COL.alumno])).length;
-  const _clasesPrev=prevMonth?allRows.filter(r=>monthKey(r)===prevMonth && _playersSet.has(r[COL.alumno])).length:0;
+  const clasesInMonth=mk=> mk? allRows.filter(r=>monthKey(r)===mk && _playersSet.has(r[COL.alumno])).length : 0;
+  const _clasesCur=clasesInMonth(curMonth), _clasesPrev=prevMonth?clasesInMonth(prevMonth):0;
+  // Rendimiento general de un mes puntual (mismo cálculo que cAvg/cTot, parametrizado por mes)
+  const coachOverallForMonth=mk=>{
+    if(!mk) return 0;
+    const av={}; areas.forEach(a=>{ const v=players.map(p=>areaAvgScope(p,mk,a)).filter(x=>x>0); av[a]=v.length?v.reduce((x,y)=>x+y,0)/v.length:0; });
+    const tv=areas.map(a=>av[a]).filter(v=>v>0);
+    return tv.length?tv.reduce((x,y)=>x+y,0)/tv.length:0;
+  };
+  // Mini-gráficos de tendencia mensual debajo de cada KPI (últimos meses hasta el mes en curso)
+  const _spMonths=trendMonths.slice(-6);
+  const _spAlumnos=_spMonths.map(studsInMonth);
+  const _spClases=_spMonths.map(clasesInMonth);
+  const _spRend=_spMonths.map(coachOverallForMonth);
+  const _spAsist=_spMonths.map(asistPctOf);
+  const _kpiSpark=(vals,color,gid,maxVal)=>{ const svg=areaSparkline(vals,color,gid,maxVal); return svg?`<div class="coach-kpi-spark">${svg}</div>`:''; };
+  const _spCountColor='rgba(255,255,255,.85)';
+  const _spAlMax=Math.max(1,..._spAlumnos)+1;
+  const _spClMax=Math.max(1,..._spClases)+1;
   const coachHero=`<div class="perfil-hero coach-hero">
     <div class="ph-info">
       <div class="ph-name">${!coachCat.length?'Todas las categorías':coachCat.join(' · ')}</div>
@@ -3664,18 +3657,22 @@ function computeCoachData(){
       <div class="coach-kpi">
         <div class="coach-kpi-lbl">Alumnos activos</div>
         <div class="coach-kpi-val">${_alCur}${deltaBadge(prevMonth?_alCur-_alPrev:null)}</div>
+        ${_kpiSpark(_spAlumnos,_spCountColor,'spk-al',_spAlMax)}
       </div>
       <div class="coach-kpi">
         <div class="coach-kpi-lbl">Clases registradas</div>
         <div class="coach-kpi-val">${_clasesCur}${deltaBadge(prevMonth?_clasesCur-_clasesPrev:null)}</div>
+        ${_kpiSpark(_spClases,_spCountColor,'spk-cl',_spClMax)}
       </div>
       <div class="coach-kpi">
         <div class="coach-kpi-lbl">Rendimiento gral. <button class="kpi-info" onclick="openCoachIndiceInfo()" aria-label="Cómo se mide el rendimiento general">i</button></div>
         <div class="coach-kpi-val">${cTot>0?cTot.toFixed(1):'—'}<span class="coach-kpi-max">/3</span>${deltaBadgeDec((prevMonth&&cTot>0&&cPrevTot>0)?(cTot-cPrevTot):null)}</div>
+        ${_kpiSpark(_spRend,_lvlBar(cTot||0),'spk-re',3)}
       </div>
       <div class="coach-kpi">
         <div class="coach-kpi-lbl">Asistencia a clases</div>
         <div class="coach-kpi-val">${withAt.length?genPct+'%':'—'}${deltaBadge((prevMonth&&withAt.length&&_asPrev!=null)?(genPct-_asPrev):null,'%')}</div>
+        ${_kpiSpark(_spAsist,attPctColor(genPct||0),'spk-as',100)}
       </div>
     </div>
   </div>`;
