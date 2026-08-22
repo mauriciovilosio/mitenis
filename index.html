@@ -1214,6 +1214,33 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
 .cal-cell.cal-dl.has.cal-torneo{box-shadow:inset 0 0 0 2px var(--lv1);}
 .cal-cell.cal-dl-lock{background:var(--surf2);color:var(--hint);border:1px dashed var(--border);cursor:default;}
 .cal-cell.cal-dl-lock .cal-dlico{font-size:8px;opacity:.7;}
+/* === Informes: un solo mes con navegación (flechas + indicador de posición) === */
+.cal-title-bar{background:#2b2b2b;margin:-10px -10px 8px;padding:9px 8px;border-radius:14px 14px 0 0;display:flex;align-items:center;justify-content:space-between;}
+.cal-nav-btn{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.14);border:none;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;cursor:pointer;transition:background .15s;}
+.cal-nav-btn:not(:disabled):hover{background:rgba(255,255,255,.24);}
+.cal-nav-btn:disabled{opacity:.3;cursor:default;}
+.cal-month-lbl{font-size:13px;font-weight:800;color:#fefefe;letter-spacing:.01em;}
+.cal-dots{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin:-2px 0 10px;}
+.cal-dot-ind{width:6px;height:6px;border-radius:50%;background:var(--surf2);opacity:.55;}
+.cal-dot-ind.on{background:var(--ball);opacity:1;width:16px;border-radius:4px;}
+.cal-footer-wrap{margin-top:8px;}
+/* === Informes: layout de 2 columnas en desktop (calendario + Historial de clases) === */
+.informes-layout{display:grid;grid-template-columns:340px 1fr;gap:28px;align-items:start;margin-top:16px;}
+@media(max-width:760px){ .informes-layout{grid-template-columns:1fr;gap:0;margin-top:14px;} }
+/* === Informes: timeline oscuro de Historial de clases (alumno) === */
+.hist-timeline-card{background:linear-gradient(135deg,#2b2b2b,#1a1a1a);border-radius:var(--radius);padding:20px 18px 4px;box-shadow:0 12px 30px rgba(0,0,0,.22);}
+.tl-row{display:flex;gap:14px;}
+.tl-rail{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.tl-dot{width:9px;height:9px;border-radius:50%;background:var(--ball);margin-top:5px;flex-shrink:0;}
+.tl-line{flex:1;width:1px;background:rgba(255,255,255,.14);margin-top:5px;}
+.tl-body{flex:1;min-width:0;padding-bottom:22px;}
+.tl-date{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.48);margin-bottom:6px;}
+.tl-title{font-size:14.5px;font-weight:800;color:#fff;line-height:1.35;margin-bottom:9px;}
+.tl-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;}
+.tl-pill{font-size:10px;font-weight:700;color:rgba(255,255,255,.86);background:rgba(255,255,255,.12);padding:4px 10px;border-radius:99px;}
+.tl-desc{font-size:12.5px;color:rgba(255,255,255,.62);line-height:1.58;}
+/* === Historial de clases (Portal del Profe): chips de categoría por sesión === */
+.hist-cats{display:flex;flex-wrap:wrap;gap:5px;}
 /* === Informes: calendarios en 2 columnas (mobile) === */
 @media(max-width:620px){
   .cal-months{display:grid!important;grid-template-columns:1fr 1fr;gap:10px;}
@@ -1231,7 +1258,7 @@ button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,8
 .cal-dl-note{margin-top:8px;width:100%;min-height:36px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);background:var(--surf2);border:1px dashed var(--border);border-radius:10px;padding:6px 8px;text-align:center;line-height:1.3;}
 .hl-azul{background:#0a513a;color:#fff;padding:1px 7px;border-radius:5px;font-weight:600;}
 .hl-rojo{background:#dc2626;color:#fff;padding:1px 7px;border-radius:5px;font-weight:600;}
-.cal-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted);}
+.cal-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:10px;}
 .cal-legend span{display:inline-flex;align-items:center;gap:6px;}
 .cal-legend .lg-swatch{width:13px;height:13px;border-radius:4px;flex-shrink:0;}
 /* === Mi Registro — bloqueo por subscripción === */
@@ -1606,7 +1633,7 @@ const ADULTS_SHEET = 'informacion adultos'; // alumno | categoria | edad | brazo
 const MATCHES_SHEET = 'Partidos Torneos';   // torneo | categoria | fecha | jugadorA | jugadorB | resultado | ganador | fase
 const EVENTS_SHEET = 'Torneos';  // (opcional) torneo | categoria | fecha | estado
 const PLAN_SHEET = 'Planificacion'; // golpe | actividad | categoria | descripcion | (opcionales: objetivo | material | duracion | nivel)
-const HIST_SHEET = 'historial'; // fecha | categoria | nivel | objetivo | ejercicios | descripcion
+const HIST_SHEET = 'historial'; // fecha | grupo | categorias | objetivo del entrenamiento | ejercicios realizados
 const MATCH_WIN_PTS = 25;        // puntaje por victoria para el ranking interno
 
 // ══════════════════════════════════════
@@ -1678,24 +1705,20 @@ const PLAN_ALIASES = {
   duracion:['duracion','duración','tiempo','minutos'],
   nivel:['nivel','dificultad','intensidad']
 };
-// Historial de clases (Portal del Profe): la hoja es una grilla semanal —
-// Mes | Grupo (dia y horario, ej. "Lun y mie - 14hs") | Nivel | Semana 1 | (2da col, sin encabezado) | Semana 2 | ... | Semana 5
-// Cada grupo va 2 días por semana => cada "Semana N" ocupa 2 columnas (una por día de clase de esa semana).
-// índices resueltos por encabezado. -1 = ausente. weekCols = pares de columnas por semana detectadas.
-let HIST = { mes:-1, grupo:-1, nivel:-1, weekCols:[] };
+// Historial de clases: una fila por sesión dictada —
+// Fecha | Grupo (dia y horario, ej. "Lun y Mié - 17hs") | Categorías (que concurren a ese grupo) | Objetivo del entrenamiento | Ejercicios realizados
+// índices resueltos por encabezado. -1 = ausente.
+let HIST = { fecha:-1, grupo:-1, categorias:-1, objetivo:-1, ejercicios:-1 };
 const HIST_ALIASES = {
-  mes:['mes'],
-  grupo:['grupo','horario','grupo horario','dia y horario','día y horario'],
-  nivel:['nivel','categoria','categoría','categoria/nivel','categorianivel']
+  fecha:['fecha','dia','día','marca temporal','date'],
+  grupo:['grupo','horario','grupo horario','dia y horario','día y horario','clase'],
+  categorias:['categoria','categoría','categorias','categorías','nivel','niveles'],
+  objetivo:['objetivo','objetivo del entrenamiento','objetivos','meta','foco'],
+  ejercicios:['ejercicios','ejercicios realizados','actividades','actividad','contenido','desarrollo']
 };
-function isHistWeekHeader(h){ return /^semana\s*\d+/i.test((h||'').toString().trim()); }
-// A partir de "Lun y mie - 14hs" devuelve ['Lun','Mie'] (los 2 días de clase del grupo)
-function histDayLabels(grupo){
-  const g=((grupo||'').split(' - ')[0]||'').trim();
-  const parts=g.split(/\s+y\s+/i).map(x=>x.trim()).filter(Boolean);
-  if(parts.length>=2) return [parts[0], parts[1]];
-  if(parts.length===1) return [parts[0], parts[0]];
-  return ['Clase 1','Clase 2'];
+// A partir de "Adolescentes y Pre Competencia" / "Adolescentes, Pre Competencia" devuelve ['Adolescentes','Pre Competencia']
+function histCategorias(v){
+  return (v||'').toString().split(/\s+y\s+|,|\/|;/i).map(s=>s.trim()).filter(Boolean);
 }
 const AVATAR_COLORS = ['#22b16c','#178a54','#52c98c','#15734a','#22b16c','#178a54','#52c98c','#15734a'];
 const BALL_COLORS=['#c8d42b','#22b16c','#ff5d5d','#ff9f43','#8e5cff','#17b890','#ff6fb5'];
@@ -1901,7 +1924,7 @@ const RESUMEN_GROUPS = {
 // ══════════════════════════════════════
 // ESTADO GLOBAL
 // ══════════════════════════════════════
-let allRows=[], infoRows=[], asistRows=[], videoRows=[], currentPlayer=null, playerSessions=[], charts={}, selectedMonth='all', coachCat=[], radarRange='30d', golpesRange='3m';
+let allRows=[], infoRows=[], asistRows=[], videoRows=[], currentPlayer=null, playerSessions=[], charts={}, selectedMonth='all', coachCat=[], radarRange='30d', golpesRange='3m', informesMonth=null;
 let appMode='escuela'; // 'escuela' | 'torneos'
 let ligaView='mensual'; // 'mensual' | 'anual' (Mi Ranking)
 let adultRows=[], matchRows=[], eventRows=[], circuitoCat='all';
@@ -2296,16 +2319,12 @@ function applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatr
     PLAN={ golpe:_resolve(PLAN_ALIASES.golpe), actividad:_resolve(PLAN_ALIASES.actividad), categoria:_resolve(PLAN_ALIASES.categoria), descripcion:_resolve(PLAN_ALIASES.descripcion), objetivo:_resolve(PLAN_ALIASES.objetivo), material:_resolve(PLAN_ALIASES.material), duracion:_resolve(PLAN_ALIASES.duracion), nivel:_resolve(PLAN_ALIASES.nivel) };
     planRows=planMatrix.slice(1).filter(r=>r.some(c=>(c||'').trim().length>0));
   } else { planHeader=[]; planRows=[]; }
-  // Historial de clases: grilla semanal — resolver columnas fijas + detectar pares de columnas por semana
+  // Historial de clases: una fila por sesión — resolver columnas por encabezado
   if(histMatrix && histMatrix.length){
     histHeader=histMatrix[0]||[];
-    const _nhh=histHeader.map(normHeader);
-    const _resolveH=(aliases)=>{ for(const a of aliases){ const i=_nhh.indexOf(normHeader(a)); if(i>=0) return i; } return -1; };
-    const _weekCols=[];
-    histHeader.forEach((h,i)=>{ if(isHistWeekHeader(h)) _weekCols.push({label:(h||'').toString().trim(), i1:i, i2:i+1}); });
-    HIST={ mes:_resolveH(HIST_ALIASES.mes), grupo:_resolveH(HIST_ALIASES.grupo), nivel:_resolveH(HIST_ALIASES.nivel), weekCols:_weekCols };
+    HIST=buildColMap(histHeader, {fecha:-1,grupo:-1,categorias:-1,objetivo:-1,ejercicios:-1}, HIST_ALIASES);
     histRows=histMatrix.slice(1).filter(r=>r.some(c=>(c||'').trim().length>0));
-  } else { histHeader=[]; histRows=[]; HIST.weekCols=[]; }
+  } else { histHeader=[]; histRows=[]; HIST={fecha:-1,grupo:-1,categorias:-1,objetivo:-1,ejercicios:-1}; }
 }
 function getAdultInfo(name){ return adultRows.find(r=>r[ADULT.alumno]?.trim()===name.trim())||null; }
 function renderPlayers(){
@@ -2477,6 +2496,8 @@ function openPlayer(name){
     const _now=new Date(); const _cmk=_now.getFullYear()+'-'+String(_now.getMonth()+1).padStart(2,'0');
     selectedMonth = _ms.includes(_cmk) ? _cmk : (_ms[_ms.length-1]||'all');
   })();
+  // Informes: el calendario arranca en el último mes con registro de clase (navegable con flechas)
+  informesMonth = [...new Set(allRows.filter(r=>r[COL.alumno]===name).map(monthKey).filter(Boolean))].sort().pop() || null;
   const color=avatarColor(name);
   const ini=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   const av=document.getElementById('h-avatar');
@@ -2522,9 +2543,8 @@ function switchTab(id,btn){
   document.querySelectorAll('.tab-view').forEach(v=>v.classList.remove('active'));
   if(btn) btn.classList.add('active');
   document.getElementById('tab-'+id).classList.add('active');
-  // Defaults de filtro por pestaña: Informes -> Todos · Mi Tenis -> mes actual
-  if(id==='historial'){ if(selectedMonth!=='all'){ selectedMonth='all'; try{buildHistorial();}catch(e){} } }
-  else if(id==='rubrica'){ const cm=playerCurrentMonth(); if(selectedMonth!==cm){ selectedMonth=cm; try{buildRubrica();}catch(e){} } }
+  // Defaults de filtro por pestaña: Mi Tenis -> mes actual (Informes usa su propio estado, informesMonth, fijado en openPlayer)
+  if(id==='rubrica'){ const cm=playerCurrentMonth(); if(selectedMonth!==cm){ selectedMonth=cm; try{buildRubrica();}catch(e){} } }
   saveNav();
 }
 function toggleAcc(head){
@@ -2895,8 +2915,8 @@ function buildCoachPlanificacion(){
   renderPlanList();
 }
 
-// ── Modo Profe: Historial de clases (hoja 'historial', grilla semanal: Mes | Grupo | Nivel | Semana 1..5 x2 días) ──
-// Navegación pensada para acceso rápido: Mes → Semana → Grupo/día, con filtros de Grupo y Nivel para ir directo a lo buscado.
+// ── Modo Profe: Historial de clases (hoja 'historial', una fila por sesión dictada) ──
+// Filtros de Mes, Categoría y Grupo para ir directo a lo buscado; agrupado por mes, más reciente primero.
 function setHistCat(c){
   histCat = c==='all' ? [] : [c]; // selección única
   buildCoachHistorial();
@@ -2912,79 +2932,64 @@ function setHistMes(m){
   buildCoachHistorial();
   const mf=document.getElementById('hist-mes-filter'); if(mf) mf.classList.add('open');
 }
-// Orden cronológico de meses (no alfabético)
-const HIST_MES_ORDER=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'].map(normHeader);
-function histMesRank(v){ const i=HIST_MES_ORDER.indexOf(normHeader(v)); return i>=0?i:999; }
 function histMesChips(){
-  const meses=[...new Set(histRows.map(r=>((HIST.mes>=0?r[HIST.mes]:'')||'').trim()).filter(Boolean))]
-    .sort((a,b)=>{ const d=histMesRank(a)-histMesRank(b); return d!==0?d:a.localeCompare(b,'es',{sensitivity:'base',numeric:true}); });
+  const meses=[...new Set(histEntries().map(e=>e.mk).filter(Boolean))].sort();
   if(!meses.length) return '';
-  return `<div class="acc filter-acc" id="hist-mes-filter"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📅 Mes <span class="acc-sub">· ${histMes.length?histMes[0]:'Todos'}</span></span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
+  return `<div class="acc filter-acc" id="hist-mes-filter"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📅 Mes <span class="acc-sub">· ${histMes.length?monthLabel(histMes[0]):'Todos'}</span></span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
     <button class="mf-chip ${!histMes.length?'active':''}" onclick="setHistMes('all')">Todos</button>
-    ${meses.map(m=>`<button class="mf-chip ${histMes.includes(m)?'active':''}" onclick="setHistMes('${m.replace(/'/g,"\\'")}')">${m}</button>`).join('')}
+    ${meses.map(m=>`<button class="mf-chip ${histMes.includes(m)?'active':''}" onclick="setHistMes('${m}')">${monthLabel(m)}</button>`).join('')}
   </div></div></div></div>`;
 }
-// Orden fijo de niveles (no alfabético): de menor a mayor exigencia/edad de grupo
-const HIST_NIVEL_ORDER=['pre competencia','adolescentes','adultos - iniciantes','adultos - intermedio','adultos - avanzado'].map(normHeader);
-function histNivelRank(v){ const i=HIST_NIVEL_ORDER.indexOf(normHeader(v)); return i>=0?i:999; }
 function histCatChips(){
-  const nivs=[...new Set(histRows.map(r=>((HIST.nivel>=0?r[HIST.nivel]:'')||'').trim()).filter(Boolean))]
-    .sort((a,b)=>{ const d=histNivelRank(a)-histNivelRank(b); return d!==0?d:a.localeCompare(b,'es',{sensitivity:'base',numeric:true}); });
-  if(!nivs.length) return '';
-  return `<div class="acc filter-acc" id="hist-cat-filter"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">🏷️ Nivel <span class="acc-sub">· ${histCat.length?(histCat.length===1?histCat[0]:histCat.length+' seleccionados'):'Todos'}</span></span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
-    <button class="mf-chip ${!histCat.length?'active':''}" onclick="setHistCat('all')">Todos</button>
-    ${nivs.map(c=>`<button class="mf-chip ${histCat.includes(c)?'active':''}" onclick="setHistCat('${c.replace(/'/g,"\\'")}')">${c}</button>`).join('')}
+  const cats=[...new Set(histEntries().flatMap(e=>e.categorias))].sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base',numeric:true}));
+  if(!cats.length) return '';
+  return `<div class="acc filter-acc" id="hist-cat-filter"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">🏷️ Categoría <span class="acc-sub">· ${histCat.length?(histCat.length===1?histCat[0]:histCat.length+' seleccionadas'):'Todas'}</span></span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
+    <button class="mf-chip ${!histCat.length?'active':''}" onclick="setHistCat('all')">Todas</button>
+    ${cats.map(c=>`<button class="mf-chip ${histCat.includes(c)?'active':''}" onclick="setHistCat('${c.replace(/'/g,"\\'")}')">${c}</button>`).join('')}
   </div></div></div></div>`;
 }
 function histGrupoChips(){
-  const grupos=[...new Set(histRows.map(r=>((HIST.grupo>=0?r[HIST.grupo]:'')||'').trim()).filter(Boolean))]
-    .sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base',numeric:true}));
+  const grupos=[...new Set(histEntries().map(e=>e.grupo).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base',numeric:true}));
   if(!grupos.length) return '';
   return `<div class="acc filter-acc" id="hist-grupo-filter"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">👥 Grupo <span class="acc-sub">· ${histGrupo.length?(histGrupo.length===1?histGrupo[0]:histGrupo.length+' seleccionados'):'Todos'}</span></span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
     <button class="mf-chip ${!histGrupo.length?'active':''}" onclick="setHistGrupo('all')">Todos</button>
     ${grupos.map(g=>`<button class="mf-chip ${histGrupo.includes(g)?'active':''}" onclick="setHistGrupo('${g.replace(/'/g,"\\'")}')">${g}</button>`).join('')}
   </div></div></div></div>`;
 }
-// Aplana la grilla en entradas individuales (mes, semana, grupo, día, contenido) — una por cada columna con datos
+// Normaliza las filas de la hoja 'historial' en entradas de sesión — una por clase dictada, más reciente primero
 function histEntries(){
-  const out=[];
-  histRows.forEach(r=>{
+  return histRows.map(r=>{
+    const fecha=((HIST.fecha>=0?r[HIST.fecha]:'')||'').trim();
     const grupo=((HIST.grupo>=0?r[HIST.grupo]:'')||'').trim();
-    const nivel=((HIST.nivel>=0?r[HIST.nivel]:'')||'').trim()||'Sin nivel';
-    const mes=((HIST.mes>=0?r[HIST.mes]:'')||'').trim()||'Sin mes';
-    const [diaA,diaB]=histDayLabels(grupo);
-    (HIST.weekCols||[]).forEach(wc=>{
-      const num=parseInt((wc.label.match(/\d+/)||[0])[0],10)||0;
-      const vA=(r[wc.i1]||'').trim(), vB=(r[wc.i2]||'').trim();
-      if(vA) out.push({mes, semana:wc.label, semanaNum:num, grupo, nivel, dia:diaA, contenido:vA});
-      if(vB) out.push({mes, semana:wc.label, semanaNum:num, grupo, nivel, dia:diaB, contenido:vB});
-    });
-  });
-  return out;
+    const categorias=histCategorias(HIST.categorias>=0?r[HIST.categorias]:'');
+    const objetivo=((HIST.objetivo>=0?r[HIST.objetivo]:'')||'').trim();
+    const ejercicios=((HIST.ejercicios>=0?r[HIST.ejercicios]:'')||'').trim();
+    return { fecha, mk:ymKey(fecha), grupo, categorias, objetivo, ejercicios };
+  }).filter(e=>e.fecha).sort((a,b)=>(parseDate(b.fecha)||'').localeCompare(parseDate(a.fecha)||''));
 }
 function buildCoachHistorial(){
   const el=document.getElementById('coach-hist-content'); if(!el) return;
-  if(!histRows.length || !HIST.weekCols || !HIST.weekCols.length){
+  if(!histRows.length){
     el.innerHTML=`<div class="card"><div class="card-title">📚 Historial de clases</div>
-      <div class="nota" style="margin:8px 0 0;line-height:1.6;">Todavía no hay clases cargadas, o no se encontraron columnas de semana.<br>
-      La hoja <b>«historial»</b> debe tener las columnas <b>Mes</b>, <b>Grupo</b> (ej: «Lun y mie - 14hs») y <b>Nivel</b>, seguidas de las columnas <b>Semana 1</b> a <b>Semana 5</b> (cada una ocupando 2 columnas, una por día de clase de esa semana).</div></div>`;
+      <div class="nota" style="margin:8px 0 0;line-height:1.6;">Todavía no hay clases cargadas.<br>
+      La hoja <b>«historial»</b> debe tener las columnas <b>Fecha</b>, <b>Grupo</b>, <b>Categorías</b>, <b>Objetivo del entrenamiento</b> y <b>Ejercicios realizados</b>.</div></div>`;
     return;
   }
   const esc=(s)=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   let entries=histEntries();
-  if(histMes.length) entries=entries.filter(e=>histMes.includes(e.mes));
-  if(histCat.length) entries=entries.filter(e=>histCat.includes(e.nivel));
+  if(histMes.length) entries=entries.filter(e=>histMes.includes(e.mk));
+  if(histCat.length) entries=entries.filter(e=>e.categorias.some(c=>histCat.includes(c)));
   if(histGrupo.length) entries=entries.filter(e=>histGrupo.includes(e.grupo));
-  const filters=`<div class="cz-filters">${histMesChips()}${histGrupoChips()}</div>`;
+  const filters=`<div class="cz-filters">${histMesChips()}${histCatChips()}${histGrupoChips()}</div>`;
   if(!entries.length){
     el.innerHTML=`${filters}<div class="empty" style="color:var(--muted);margin-top:12px;">No hay clases cargadas todavía para estos filtros.</div>`;
     return;
   }
   // KPI rápido (mismo alcance que los filtros activos): objetivo más trabajado
-  const _kpiMeses=[...new Set(entries.map(e=>e.mes))];
-  const _kpiMesLbl=_kpiMeses.length<=1?(_kpiMeses[0]||''):_kpiMeses.join(' / ');
+  const _kpiMks=[...new Set(entries.map(e=>e.mk))].sort();
+  const _kpiMesLbl=_kpiMks.length<=1?monthLabel(_kpiMks[0]||''):(monthLabel(_kpiMks[0])+' – '+monthLabel(_kpiMks[_kpiMks.length-1]));
   const _objCount={};
-  entries.forEach(e=>{ const k=(e.contenido||'').trim(); if(k) _objCount[k]=(_objCount[k]||0)+1; });
+  entries.forEach(e=>{ const k=(e.objetivo||'').trim(); if(k) _objCount[k]=(_objCount[k]||0)+1; });
   let _topObj='—', _topObjCount=0;
   Object.entries(_objCount).forEach(([k,c])=>{ if(c>_topObjCount){ _topObjCount=c; _topObj=k; } });
   const _topObjSub=_topObjCount?`${_kpiMesLbl} · ${_topObjCount} ${_topObjCount===1?'vez':'veces'}`:_kpiMesLbl;
@@ -2997,29 +3002,50 @@ function buildCoachHistorial(){
       </div>
     </div>
   </div>`;
-  // Mes → Semana → tarjetas por grupo/día
+  // Mes → tarjetas de clase (más recientes primero)
   const byMes={};
-  entries.forEach(e=>{ (byMes[e.mes]=byMes[e.mes]||{}); (byMes[e.mes][e.semana]=byMes[e.mes][e.semana]||{num:e.semanaNum,list:[]}).list.push(e); });
-  const meses=Object.keys(byMes);
+  entries.forEach(e=>{ (byMes[e.mk]=byMes[e.mk]||[]).push(e); });
+  const meses=Object.keys(byMes).sort().reverse();
   const entryCard=(e)=>`<div class="hist-card">
-    <div class="hist-card-h"><span class="hist-grupo-lbl">👥 ${esc(e.grupo)}</span><span class="hist-dia">${esc(e.dia)}</span></div>
-    <div class="hist-row">${esc(e.contenido)}</div>
+    <div class="hist-card-h"><span class="hist-fecha">${esc(fmtDate(e.fecha))}</span><span class="hist-dia">${esc(e.grupo)}</span></div>
+    ${e.categorias.length?`<div class="hist-cats">${e.categorias.map(c=>`<span class="plan-tag cat">${esc(c)}</span>`).join('')}</div>`:''}
+    ${e.objetivo?`<div class="hist-row"><b>Objetivo:</b> ${esc(e.objetivo)}</div>`:''}
+    ${e.ejercicios?`<div class="hist-row"><b>Ejercicios:</b> ${esc(e.ejercicios)}</div>`:''}
   </div>`;
-  const mesSections=meses.map((mes)=>{
-    const semanas=Object.keys(byMes[mes]).sort((a,b)=>byMes[mes][b].num-byMes[mes][a].num); // semana más reciente primero
-    const semanaBlocks=semanas.map(s=>{
-      const list=byMes[mes][s].list;
-      return `<div class="hist-semana">
-        <div class="hist-slot-h">🗓️ ${esc(s)} <span class="acc-sub">· ${list.length} clase${list.length!==1?'s':''}</span></div>
-        <div class="hist-semana-cards">${list.map(entryCard).join('')}</div>
-      </div>`;
-    }).join('');
+  const mesSections=meses.map((mk)=>{
+    const list=byMes[mk];
     return `<div class="acc evo-acc hist-acc" style="margin-top:14px;">
-      <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📋 Registro de clases - ${esc(mes)}</span><span class="acc-chevron">▾</span></div>
-      <div class="acc-body"><div class="acc-body-inner">${semanaBlocks}</div></div>
+      <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📋 Registro de clases - ${esc(monthLabel(mk))} <span class="acc-sub">· ${list.length} clase${list.length!==1?'s':''}</span></span><span class="acc-chevron">▾</span></div>
+      <div class="acc-body"><div class="acc-body-inner"><div class="hist-semana-cards">${list.map(entryCard).join('')}</div></div></div>
     </div>`;
   }).join('');
   el.innerHTML=`${filters}${kpis}${mesSections}`;
+}
+// ── Historial de clases (Escuela de Tenis / Informes): timeline oscuro con las clases de la CATEGORÍA del alumno ──
+// Un alumno ve las sesiones cuyo grupo incluye su categoría (o sesiones sin categoría especificada, por defecto visibles a todos).
+function studentHistorialEntries(name){
+  const info=getInfo(name);
+  const cat=info?(info[INFO.categoria]||'').trim():'';
+  const nc=normCat(cat);
+  const all=histEntries();
+  if(!nc) return all;
+  return all.filter(e=>e.categorias.length ? e.categorias.some(c=>normCat(c)===nc) : true);
+}
+function renderHistorialClases(entries){
+  const esc=(s)=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  if(!entries.length){
+    return `<hr class="coach-sec-hr"><div class="coach-sec-title">Historial de clases</div><div class="empty" style="color:var(--muted);">Todavía no hay clases registradas.</div>`;
+  }
+  const rows=entries.map((e,i)=>`<div class="tl-row">
+    <div class="tl-rail"><div class="tl-dot"></div>${i<entries.length-1?'<div class="tl-line"></div>':''}</div>
+    <div class="tl-body">
+      <div class="tl-date">${esc(fmtDate(e.fecha))}${e.grupo?` · ${esc(e.grupo)}`:''}</div>
+      ${e.objetivo?`<div class="tl-title">${esc(e.objetivo)}</div>`:''}
+      ${e.categorias.length?`<div class="tl-pills">${e.categorias.map(c=>`<span class="tl-pill">${esc(c)}</span>`).join('')}</div>`:''}
+      ${e.ejercicios?`<div class="tl-desc">${esc(e.ejercicios)}</div>`:''}
+    </div>
+  </div>`).join('');
+  return `<hr class="coach-sec-hr"><div class="coach-sec-title">Historial de clases</div><div class="hist-timeline-card">${rows}</div>`;
 }
 
 // ══════════════════════════════════════
@@ -4299,7 +4325,20 @@ function monthEnded(mk){
   const todayMk=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
   return mk < todayMk; // el mes terminó una vez que estamos en un mes posterior
 }
-function buildMonthCalendar(mk, monthSessions, pl){
+// Un solo mes por vez, con flechas ← → para navegar entre los meses con registro (playerInformesMonths())
+function playerInformesMonths(){
+  return [...new Set(playerSessions.map(monthKey).filter(Boolean))].sort();
+}
+function goInformesMonth(dir){
+  const months=playerInformesMonths();
+  if(!months.length) return;
+  let idx=months.indexOf(informesMonth);
+  if(idx<0) idx=months.length-1;
+  idx=Math.min(months.length-1, Math.max(0, idx+dir));
+  informesMonth=months[idx];
+  buildHistorial();
+}
+function buildMonthCalendar(mk, monthSessions, pl, months){
   const parts=mk.split('-'); const y=Number(parts[0]); const m=Number(parts[1]);
   const lastDay=new Date(y, m, 0).getDate();
   let startDow=new Date(y, m-1, 1).getDay();   // 0=Dom..6=Sáb
@@ -4339,13 +4378,25 @@ function buildMonthCalendar(mk, monthSessions, pl){
     ? `<button class="cal-dl-btn" onclick="downloadMonthReport('${pl}','${mk}')" title="Descargar el reporte completo de ${monthLabel(mk)}">📄 Descargar reporte</button>`
     : `<button class="cal-dl-btn cal-prev-btn" onclick="previewMonthReport('${pl}','${mk}')" title="Vista previa del reporte (solo profe, con PIN)">👁 Vista previa (profe)</button>
        <div class="cal-dl-note cal-prev-note">El alumno verá el reporte al cerrar el mes</div>`;
-  return `<div class="cal-month-block">
-    <div class="card cal-card">
-      <div class="card-title">${monthLabel(mk)}</div>
+  const idx=(months||[mk]).indexOf(mk);
+  const hasPrev=idx>0, hasNext=idx>=0 && idx<(months||[mk]).length-1;
+  const navBar=`<div class="cal-title-bar">
+    <button class="cal-nav-btn" ${hasPrev?'onclick="goInformesMonth(-1)"':'disabled'} title="Mes anterior"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+    <span class="cal-month-lbl">${monthLabel(mk)}</span>
+    <button class="cal-nav-btn" ${hasNext?'onclick="goInformesMonth(1)"':'disabled'} title="Mes siguiente"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+  </div>${(months&&months.length>1)?`<div class="cal-dots">${months.map(m=>`<span class="cal-dot-ind${m===mk?' on':''}"></span>`).join('')}</div>`:''}`;
+  const legend=`<div class="cal-legend">
+    <span><span class="lg-swatch" style="background:#2b2b2b;"></span> Día con clase registrada</span>
+    <span><span class="lg-swatch" style="background:var(--ball);"></span> Descargar / vista previa del reporte</span>
+  </div>`;
+  return `<div class="cal-card">
+    ${navBar}
+    <div class="cal-body-wrap">
       <div class="cal-dows">${dows.map(d=>`<div class="cal-dow">${d}</div>`).join('')}</div>
       <div class="cal-grid">${cells}</div>
     </div>
-    ${footer}
+    ${legend}
+    <div class="cal-footer-wrap">${footer}</div>
   </div>`;
 }
 
@@ -4370,23 +4421,20 @@ function buildHistorial(){
       </div>`;
     return;
   }
-  const sess=filterByMonth(playerSessions);
-  if(!sess.length){
-    ldEl.style.display='none'; el.style.display='block';
-    el.innerHTML=monthChipsHTML()+'<div class="empty">No hay sesiones registradas.</div>'; return;
-  }
-  // Agrupar por mes (más reciente primero)
-  const byMonth={};
-  sess.forEach(s=>{ const mk=monthKey(s); if(!mk) return; (byMonth[mk]=byMonth[mk]||[]).push(s); });
-  const months=Object.keys(byMonth).sort();
-  const pl=currentPlayer.replace(/'/g,"\\'");
   const infoBtn=`<button class="lg-info-btn" onclick="openRegistroInfo()">ℹ️ ¿Cómo funcionan los Informes?</button>`;
-  const legend=`<div class="cal-legend" style="margin:18px 0 12px;">
-    <span><span class="lg-swatch" style="background:var(--ball);"></span> Descargar reporte (mes cerrado)</span>
-    <span><span class="lg-swatch" style="background:var(--ball);"></span> 👁 Vista previa profe (mes en curso)</span>
-  </div>`;
-  const calsHTML=months.map(mk=>buildMonthCalendar(mk, byMonth[mk], pl)).join('');
-  el.innerHTML=infoBtn+`<div class="cal-months">${calsHTML}</div>`;
+  const timelineHTML=renderHistorialClases(studentHistorialEntries(currentPlayer));
+  if(!playerSessions.length){
+    ldEl.style.display='none'; el.style.display='block';
+    el.innerHTML=infoBtn+'<div class="empty" style="margin-top:14px;">No hay sesiones registradas.</div>'+timelineHTML;
+    return;
+  }
+  // Un solo mes por vez: arranca en el último con registro (fijado en openPlayer), navegable con flechas
+  const months=playerInformesMonths();
+  if(!informesMonth || !months.includes(informesMonth)) informesMonth=months[months.length-1];
+  const monthSessions=playerSessions.filter(s=>monthKey(s)===informesMonth);
+  const pl=currentPlayer.replace(/'/g,"\\'");
+  const calHTML=buildMonthCalendar(informesMonth, monthSessions, pl, months);
+  el.innerHTML=infoBtn+`<div class="informes-layout">${calHTML}<div>${timelineHTML}</div></div>`;
   ldEl.style.display='none'; el.style.display='block';
 }
 
