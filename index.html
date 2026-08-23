@@ -84,6 +84,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .start-info:hover{transform:scale(1.15);background:rgba(10,81,58,.20);}
 .start-info:focus-visible{outline:2px solid var(--blue);outline-offset:1px;}
 .start-chev{flex-shrink:0;font-size:22px;font-weight:700;color:var(--hint);line-height:1;}
+.start-divider{border:none;border-top:1px solid var(--border);margin:0;width:100%;}
 .select-back{background:none;border:none;color:var(--blue);font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;padding:0 0 12px;display:block;}
 .select-back:hover{text-decoration:underline;}
 
@@ -631,6 +632,33 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .coach-kpi-spark{margin-top:8px;height:34px;}
 .coach-kpi-spark .area-spark{display:block;width:100%;height:34px;}
 @media(max-width:560px){ .coach-kpi-row{grid-template-columns:repeat(2,1fr);} .coach-kpi-val{font-size:19px;} }
+
+/* === Mercado: grilla de artículos en venta === */
+.mkt-count{font-size:12.5px;color:var(--muted);margin-bottom:12px;}
+.mkt-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+@media(max-width:900px){ .mkt-grid{grid-template-columns:repeat(3,1fr);} }
+@media(max-width:620px){ .mkt-grid{grid-template-columns:repeat(2,1fr);gap:12px;} }
+@media(max-width:360px){ .mkt-grid{grid-template-columns:1fr;} }
+.mkt-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 4px 14px rgba(10,81,58,.06);}
+.mkt-photo{position:relative;aspect-ratio:1/1;background:linear-gradient(135deg,#eef2e6,#e2e8d8);overflow:hidden;}
+.mkt-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;}
+.mkt-img.active{display:block;}
+.mkt-photo-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:40px;opacity:.32;}
+.mkt-badge{position:absolute;top:9px;left:9px;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:4px 10px;border-radius:999px;z-index:2;}
+.mkt-badge.nuevo{background:#2b2b2b;color:#fff;}
+.mkt-badge.usado{background:rgba(255,255,255,.92);color:var(--muted);border:1px solid var(--border);}
+.mkt-nav{position:absolute;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;border:none;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3;padding:0;}
+.mkt-nav-prev{left:8px;}
+.mkt-nav-next{right:8px;}
+.mkt-dots{position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:4px;z-index:3;}
+.mkt-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.55);}
+.mkt-dot.active{background:#fff;}
+.mkt-body{padding:13px 14px 15px;display:flex;flex-direction:column;gap:5px;flex:1;}
+.mkt-name{font-size:14.5px;font-weight:800;color:var(--text);line-height:1.3;}
+.mkt-price{font-size:18px;font-weight:900;color:var(--text);}
+.mkt-desc{font-size:11.5px;color:var(--muted);line-height:1.55;flex:1;}
+.mkt-cta{margin-top:8px;width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--ball);color:#5b5400;border:1px solid #e8c23e;border-radius:10px;padding:9px;font-size:12px;font-weight:800;font-family:'Inter',sans-serif;text-decoration:none;cursor:pointer;}
+.mkt-cta:hover{transform:translateY(-1px);}
 
 /* Secciones "Atención requerida" / "Área a reforzar": línea divisoria + título oscuro + card negra */
 .coach-sec-hr{border:none;border-top:1px solid var(--border);margin:20px 0 14px;}
@@ -1361,6 +1389,13 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
         <span class="start-info" role="button" tabindex="0" aria-label="Qué es Portal del Profe" onclick="event.stopPropagation();openCoachInfo()">i</span>
         <span class="start-chev" aria-hidden="true">›</span>
       </button>
+      <hr class="start-divider">
+      <button class="start-btn" id="start-mercado" onclick="openMercado()">
+        <span class="start-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fefefe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg></span>
+        <span class="start-txt">Mercado<span class="start-desc">Comprá y vendé artículos de tenis.</span></span>
+        <span class="start-info" role="button" tabindex="0" aria-label="Qué es Mercado" onclick="event.stopPropagation();openMercadoInfo()">i</span>
+        <span class="start-chev" aria-hidden="true">›</span>
+      </button>
     </div>
     <div class="select-card" id="select-card" style="display:none;">
       <button class="select-back" onclick="closeSelect()">← Volver</button>
@@ -1470,6 +1505,17 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
   <main class="app-content"><div id="circuito-content"></div></main>
 </div>
 
+<div class="coach" id="mercado">
+  <header class="app-header coach-header">
+    <div class="header-top">
+      <button class="header-back" onclick="closeMercado()">← Volver</button>
+      <div class="header-player"><div class="header-name">Mercado</div></div>
+      <div style="width:60px;"></div>
+    </div>
+  </header>
+  <main class="app-content"><div id="mercado-content"></div></main>
+</div>
+
 <div class="pin-overlay" id="pin-overlay">
   <div class="pin-modal">
     <div class="pin-title">Acceso del jugador</div>
@@ -1528,6 +1574,21 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
       </ul>
     </div>
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeTorneosInfo()">Entendido</button></div>
+  </div>
+</div>
+
+<div class="pin-overlay" id="mercado-info-overlay" onclick="if(event.target===this)closeMercadoInfo()">
+  <div class="pin-modal" style="max-width:380px;">
+    <div class="pin-title">🎾 Mercado</div>
+    <div style="font-size:14px;color:var(--text);line-height:1.7;text-align:left;margin-top:2px;">
+      <p style="margin-bottom:10px;font-weight:600;">En <strong>Mercado</strong> vas a poder:</p>
+      <ul class="info-list" style="margin:0;padding:0;list-style:none;">
+        <li style="margin-bottom:8px;">ver <strong>artículos en venta</strong> del club 🎾</li>
+        <li style="margin-bottom:8px;">raquetas, bolsos, pelotas, ropa y más 🎒</li>
+        <li>consultar directamente por <strong>WhatsApp</strong> 💬</li>
+      </ul>
+    </div>
+    <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeMercadoInfo()">Entendido</button></div>
   </div>
 </div>
 
@@ -1660,6 +1721,7 @@ const MATCHES_SHEET = 'Partidos Torneos';   // torneo | categoria | fecha | juga
 const EVENTS_SHEET = 'Torneos';  // (opcional) torneo | categoria | fecha | estado
 const PLAN_SHEET = 'Planificacion'; // golpe | actividad | categoria | descripcion | (opcionales: objetivo | material | duracion | nivel)
 const HIST_SHEET = 'historial'; // fecha | grupo | categorias | objetivo del entrenamiento | ejercicios realizados
+const MERCADO_SHEET = 'Mercado'; // nombre | estado | precio | caracteristicas | link foto 1 | link foto 2 | link foto 3
 const MATCH_WIN_PTS = 25;        // puntaje por victoria para el ranking interno
 
 // ══════════════════════════════════════
@@ -1746,6 +1808,19 @@ const HIST_ALIASES = {
 function histCategorias(v){
   return (v||'').toString().split(/\s+y\s+|,|\/|;/i).map(s=>s.trim()).filter(Boolean);
 }
+// Mercado: una fila por artículo publicado —
+// Nombre | Estado | Precio | Características | Link foto 1 | Link foto 2 | Link foto 3
+// índices resueltos por encabezado. -1 = ausente.
+let MERCADO = { nombre:-1, estado:-1, precio:-1, caracteristicas:-1, foto1:-1, foto2:-1, foto3:-1 };
+const MERCADO_ALIASES = {
+  nombre:['nombre','nombre del elemento','articulo','artículo','producto','item','ítem','nombre del articulo','nombre del producto'],
+  estado:['estado','condicion','condición'],
+  precio:['precio','valor','monto','precio $'],
+  caracteristicas:['caracteristicas','características','detalle','detalles','descripcion','descripción'],
+  foto1:['link foto','link con la foto','foto','foto 1','link foto 1','imagen','imagen 1','link imagen','link imagen 1','link de la foto','link de la foto 1'],
+  foto2:['foto 2','link foto 2','imagen 2','link imagen 2','link de la foto 2'],
+  foto3:['foto 3','link foto 3','imagen 3','link imagen 3','link de la foto 3']
+};
 const AVATAR_COLORS = ['#22b16c','#178a54','#52c98c','#15734a','#22b16c','#178a54','#52c98c','#15734a'];
 const BALL_COLORS=['#c8d42b','#22b16c','#ff5d5d','#ff9f43','#8e5cff','#17b890','#ff6fb5'];
 const COACH_PIN_FALLBACK='';
@@ -1959,6 +2034,7 @@ let coachSort='rendimiento';
 let __pendingCircuito=null, __circuitoUnlocked=new Set();
 let planRows=[], planHeader=[], planFilters={golpe:'all', categoria:'all', nivel:'all', q:''};
 let histRows=[], histHeader=[], histCat=[], histGrupo=[], histMes=[];
+let mercadoRows=[], mercadoHeader=[];
 
 // ══════════════════════════════════════
 // FETCH CSV DESDE GOOGLE SHEETS
@@ -2220,10 +2296,12 @@ let __navRestored=false, __restoringNav=false;
 function navState(){
   const coachVisible=document.getElementById('coach')?.classList.contains('visible');
   const circuitoVisible=document.getElementById('circuito')?.classList.contains('visible');
+  const mercadoVisible=document.getElementById('mercado')?.classList.contains('visible');
   const appVisible=document.getElementById('app')?.classList.contains('visible');
   let v='landing', tab=null, player=null;
   if(coachVisible){ v='coach'; const cv=document.querySelector('.coach-view.active'); tab=cv?cv.id.replace('coach-view-',''):'resumen'; }
   else if(circuitoVisible){ v='circuito'; }
+  else if(mercadoVisible){ v='mercado'; }
   else if(appVisible){ v='player'; player=currentPlayer; const tv=document.querySelector('.tab-view.active'); tab=tv?tv.id.replace('tab-',''):null; }
   return {v, mode:appMode, player, tab, month:selectedMonth, coachCat};
 }
@@ -2249,6 +2327,10 @@ function restoreNav(){
     } else if(s.v==='circuito'){
       if(!adultRows.length && !matchRows.length){ __restoringNav=false; return; } // datos aún no disponibles
       openCircuito();
+      __navRestored=true;
+    } else if(s.v==='mercado'){
+      if(!mercadoHeader.length){ __restoringNav=false; return; } // hoja Mercado aún no cargada
+      openMercado();
       __navRestored=true;
     } else if(s.v==='player' && s.player){
       const exists = appMode==='torneos'
@@ -2281,6 +2363,7 @@ function __navCurrentScreen(){
   if(document.getElementById('app')?.classList.contains('visible')) return 'app';
   if(document.getElementById('coach')?.classList.contains('visible')) return 'coach';
   if(document.getElementById('circuito')?.classList.contains('visible')) return 'circuito';
+  if(document.getElementById('mercado')?.classList.contains('visible')) return 'mercado';
   const sc=document.getElementById('select-card');
   if(sc && sc.style.display==='block') return 'select';
   return 'landing';
@@ -2316,6 +2399,7 @@ function __navCurrentScreen(){
       if(scr==='app') goBack();
       else if(scr==='coach') closeCoach();
       else if(scr==='circuito') closeCircuito();
+      else if(scr==='mercado') closeMercado();
       else if(scr==='select') closeSelect();
     }catch(e){}
     __navPopping=false;
@@ -2323,7 +2407,7 @@ function __navCurrentScreen(){
 })();
 function fmtUpdated(ts){ const d=new Date(ts); return isNaN(d)?'':d.toLocaleString('es-AR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }
 function setUpdated(ts){ const e=document.getElementById('last-update'); if(e) e.textContent = ts ? ('Última actualización: '+fmtUpdated(ts)) : ''; }
-function applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix){
+function applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix){
   if(dataMatrix.length) COL  = buildColMap(dataMatrix[0], COL_DEFAULT,  HEADER_ALIASES);
   if(infoMatrix && infoMatrix.length){
     INFO = buildColMap(infoMatrix[0], INFO_DEFAULT, INFO_ALIASES);
@@ -2359,6 +2443,12 @@ function applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatr
     HIST=buildColMap(histHeader, {fecha:-1,grupo:-1,categorias:-1,objetivo:-1,ejercicios:-1}, HIST_ALIASES);
     histRows=histMatrix.slice(1).filter(r=>r.some(c=>(c||'').trim().length>0));
   } else { histHeader=[]; histRows=[]; HIST={fecha:-1,grupo:-1,categorias:-1,objetivo:-1,ejercicios:-1}; }
+  // Mercado: una fila por artículo publicado — resolver columnas por encabezado
+  if(mercadoMatrix && mercadoMatrix.length){
+    mercadoHeader=mercadoMatrix[0]||[];
+    MERCADO=buildColMap(mercadoHeader, {nombre:-1,estado:-1,precio:-1,caracteristicas:-1,foto1:-1,foto2:-1,foto3:-1}, MERCADO_ALIASES);
+    mercadoRows=mercadoMatrix.slice(1).filter(r=>r.some(c=>(c||'').trim().length>0));
+  } else { mercadoHeader=[]; mercadoRows=[]; MERCADO={nombre:-1,estado:-1,precio:-1,caracteristicas:-1,foto1:-1,foto2:-1,foto3:-1}; }
 }
 function getAdultInfo(name){ return adultRows.find(r=>r[ADULT.alumno]?.trim()===name.trim())||null; }
 function renderPlayers(){
@@ -2435,12 +2525,12 @@ async function init(){
   // 1) Cache para pintado instantáneo
   try{
     const raw=localStorage.getItem(CACHE_KEY);
-    if(raw){ const cc=JSON.parse(raw); if(cc && cc.data){ applyData(cc.data, cc.info||[], cc.asist||[], cc.videos||[], cc.adults||[], cc.matches||[], cc.events||[], cc.plan||[], cc.hist||[]); renderPlayers(); setUpdated(cc.ts); } }
+    if(raw){ const cc=JSON.parse(raw); if(cc && cc.data){ applyData(cc.data, cc.info||[], cc.asist||[], cc.videos||[], cc.adults||[], cc.matches||[], cc.events||[], cc.plan||[], cc.hist||[], cc.mercado||[]); renderPlayers(); setUpdated(cc.ts); } }
   }catch(e){}
   try{ restoreNav(); }catch(e){}
   // 2) Refresco en vivo desde el Sheet
   try{
-    const [dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix] = await Promise.all([
+    const [dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix] = await Promise.all([
       fetchSheet(DATA_SHEET),
       fetchSheet(INFO_SHEET).catch(()=>[]),
       fetchSheet(ASIST_SHEET).catch(()=>[]),
@@ -2449,13 +2539,14 @@ async function init(){
       fetchByNames([MATCHES_SHEET,'Partidos Torneos','partidos torneos','Partidos','partidos']).catch(()=>[]),
       fetchByNames([EVENTS_SHEET,'Torneos','torneos']).catch(()=>[]),
       fetchByNames([PLAN_SHEET,'Planificacion','Planificación','planificacion','planificación']).catch(()=>[]),
-      fetchByNames([HIST_SHEET,'historial','Historial','Historial de clases','historial de clases']).catch(()=>[])
+      fetchByNames([HIST_SHEET,'historial','Historial','Historial de clases','historial de clases']).catch(()=>[]),
+      fetchByNames([MERCADO_SHEET,'mercado','Marketplace','marketplace']).catch(()=>[])
     ]);
-    applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix);
+    applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix);
     renderPlayers();
     try{ restoreNav(); }catch(e){}
     const ts=Date.now(); setUpdated(ts);
-    try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ts, data:dataMatrix, info:infoMatrix, asist:asistMatrix, videos:videosMatrix, adults:adultsMatrix, matches:matchesMatrix, events:eventsMatrix, plan:planMatrix, hist:histMatrix})); }catch(e){}
+    try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ts, data:dataMatrix, info:infoMatrix, asist:asistMatrix, videos:videosMatrix, adults:adultsMatrix, matches:matchesMatrix, events:eventsMatrix, plan:planMatrix, hist:histMatrix, mercado:mercadoMatrix})); }catch(e){}
   }catch(e){
     if(!allRows.length){
       const g=document.getElementById('player-grid');
@@ -2636,6 +2727,8 @@ function openAppInfo(){ const ov=document.getElementById('app-info-overlay'); if
 function closeAppInfo(){ const ov=document.getElementById('app-info-overlay'); if(ov) ov.classList.remove('show'); }
 function openTorneosInfo(){ const ov=document.getElementById('torneos-info-overlay'); if(ov) ov.classList.add('show'); }
 function closeTorneosInfo(){ const ov=document.getElementById('torneos-info-overlay'); if(ov) ov.classList.remove('show'); }
+function openMercadoInfo(){ const ov=document.getElementById('mercado-info-overlay'); if(ov) ov.classList.add('show'); }
+function closeMercadoInfo(){ const ov=document.getElementById('mercado-info-overlay'); if(ov) ov.classList.remove('show'); }
 function openFocoArea(){ const o=document.getElementById('foco-area-overlay'); if(o) o.classList.add('show'); }
 function closeFocoArea(){ const o=document.getElementById('foco-area-overlay'); if(o) o.classList.remove('show'); }
 function openFocoAlumnos(){ const o=document.getElementById('foco-alum-overlay'); if(o) o.classList.add('show'); }
@@ -3259,6 +3352,103 @@ function openCircuito(){
 }
 function closeCircuito(){ document.getElementById('circuito').classList.remove('visible'); document.getElementById('landing').style.display=''; resetLanding(); scrollAppTop(); saveNav(); __navSyncBack(); }
 function setCatCircuito(c){ circuitoCat=c; buildCircuito(); }
+
+// ══════════════════════════════════════
+// MERCADO — repositorio de artículos de tenis a la venta
+// ══════════════════════════════════════
+const MERCADO_WA_NUMBER='5493576457030';
+const MERCADO_WA_MSG='Hola! Tengo una consulta 🎾';
+const MERCADO_WA_LINK='https://wa.me/'+MERCADO_WA_NUMBER+'?text='+encodeURIComponent(MERCADO_WA_MSG);
+function openMercado(){
+  document.getElementById('landing').style.display='none';
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('mercado').classList.add('visible');
+  try{ buildMercado(); }catch(e){ const el=document.getElementById('mercado-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir Mercado.</strong>'+(e&&e.message?e.message:e)+'</div>'; }
+  scrollAppTop();
+  saveNav();
+  __navPushScreen('mercado');
+}
+function closeMercado(){ document.getElementById('mercado').classList.remove('visible'); document.getElementById('landing').style.display=''; resetLanding(); scrollAppTop(); saveNav(); __navSyncBack(); }
+// Convierte un link de Google Drive ("compartir") en un link de imagen directo, hotlinkeable en <img>.
+// Otros links (Google Photos, Imgur, URL directa a .jpg/.png, etc.) se devuelven tal cual.
+function resolveImgUrl(url){
+  url=(url||'').toString().trim();
+  if(!url) return '';
+  if(/drive\.google\.com/i.test(url)){
+    const m=url.match(/\/file\/d\/([^/]+)/) || url.match(/[?&]id=([^&]+)/);
+    if(m && m[1]) return 'https://drive.google.com/uc?export=view&id='+m[1];
+  }
+  return url;
+}
+function mercadoEntries(){
+  return mercadoRows.map(r=>{
+    const g=(i)=> i>=0 ? (r[i]||'').toString().trim() : '';
+    const fotos=[MERCADO.foto1,MERCADO.foto2,MERCADO.foto3].map(g).filter(Boolean);
+    return {
+      nombre:g(MERCADO.nombre),
+      estado:g(MERCADO.estado),
+      precio:g(MERCADO.precio),
+      caracteristicas:g(MERCADO.caracteristicas),
+      fotos
+    };
+  }).filter(e=>e.nombre);
+}
+// Navega entre las fotos de UNA card sin reconstruir toda la grilla (misma idea que toggleAcc/togglePlayerAcc).
+function mktPhotoNav(btn, dir){
+  const wrap=btn.closest('.mkt-photo'); if(!wrap) return;
+  const imgs=[...wrap.querySelectorAll('.mkt-img')];
+  if(imgs.length<2) return;
+  let idx=imgs.findIndex(im=>im.classList.contains('active'));
+  if(idx<0) idx=0;
+  imgs[idx].classList.remove('active');
+  idx=(idx+dir+imgs.length)%imgs.length;
+  imgs[idx].classList.add('active');
+  const dots=[...wrap.querySelectorAll('.mkt-dot')];
+  dots.forEach((d,i)=>d.classList.toggle('active', i===idx));
+}
+function mercadoCardHTML(e){
+  const esc=(s)=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const estadoNorm=e.estado.trim().toLowerCase();
+  const isUsado=/usad/.test(estadoNorm);
+  const badgeCls=isUsado?'usado':'nuevo';
+  const badgeTxt=e.estado||(isUsado?'Usado':'Nuevo');
+  const photoHTML=e.fotos.length
+    ? e.fotos.map((f,i)=>`<img class="mkt-img${i===0?' active':''}" src="${esc(resolveImgUrl(f))}" alt="${esc(e.nombre)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none';">`).join('')
+    : `<div class="mkt-photo-empty">🎾</div>`;
+  const arrows=e.fotos.length>1 ? `
+    <button class="mkt-nav mkt-nav-prev" onclick="event.stopPropagation();mktPhotoNav(this,-1)" aria-label="Foto anterior">‹</button>
+    <button class="mkt-nav mkt-nav-next" onclick="event.stopPropagation();mktPhotoNav(this,1)" aria-label="Foto siguiente">›</button>
+    <div class="mkt-dots">${e.fotos.map((_,i)=>`<span class="mkt-dot${i===0?' active':''}"></span>`).join('')}</div>` : '';
+  const precioTxt=e.precio ? (/^\$/.test(e.precio)?e.precio:'$'+e.precio) : 'Consultar precio';
+  return `<div class="mkt-card">
+    <div class="mkt-photo">
+      <span class="mkt-badge ${badgeCls}">${esc(badgeTxt)}</span>
+      ${photoHTML}
+      ${arrows}
+    </div>
+    <div class="mkt-body">
+      <div class="mkt-name">${esc(e.nombre)}</div>
+      <div class="mkt-price">${esc(precioTxt)}</div>
+      ${e.caracteristicas?`<div class="mkt-desc">${esc(e.caracteristicas)}</div>`:''}
+      <a class="mkt-cta" href="${MERCADO_WA_LINK}" target="_blank" rel="noopener">💬 Consultar</a>
+    </div>
+  </div>`;
+}
+function buildMercado(){
+  const el=document.getElementById('mercado-content'); if(!el) return;
+  if(!mercadoHeader.length){
+    el.innerHTML=`<div class="card"><div class="card-title">🎾 Mercado</div>
+      <div class="nota" style="margin:8px 0 0;line-height:1.6;">Todavía no hay artículos cargados.<br>
+      La hoja <b>«Mercado»</b> debe tener las columnas <b>Nombre</b>, <b>Estado</b>, <b>Precio</b>, <b>Características</b> y hasta 3 columnas de foto (<b>Link foto 1/2/3</b>).</div></div>`;
+    return;
+  }
+  const entries=mercadoEntries();
+  if(!entries.length){
+    el.innerHTML=`<div class="empty" style="color:var(--muted);margin-top:8px;">Todavía no hay artículos publicados.</div>`;
+    return;
+  }
+  el.innerHTML=`<div class="mkt-count">${entries.length} artículo${entries.length!==1?'s':''} publicado${entries.length!==1?'s':''}</div><div class="mkt-grid">${entries.map(mercadoCardHTML).join('')}</div>`;
+}
 function buildCircuito(){
   const order=['torneos','ranking','jugadores'];
   document.querySelectorAll('#tabs-circuito .tab-btn').forEach((b,i)=>b.classList.toggle('active', order[i]===circuitoTab));
