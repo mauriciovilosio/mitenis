@@ -85,16 +85,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .start-info:focus-visible{outline:2px solid var(--blue);outline-offset:1px;}
 .start-chev{flex-shrink:0;font-size:22px;font-weight:700;color:var(--hint);line-height:1;}
 .start-divider{border:none;border-top:1px solid var(--border);margin:0;width:100%;}
-/* Marketplace: mismo botón que los otros 3, pero con los colores invertidos (card oscura, ícono claro) para diferenciarlo.
-   La card usa gris oscuro translúcido (no negro sólido) con un leve desenfoque, para que se note el "vidrio" sobre el fondo. */
-#start-mercado{background:rgba(43,43,43,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-color:rgba(43,43,43,.38);}
-#start-mercado:hover{border-color:rgba(43,43,43,.55);}
-#start-mercado .start-ico{background:#fefefe;}
-#start-mercado .start-txt{color:#fff;}
-#start-mercado .start-desc{color:rgba(255,255,255,.65);}
-#start-mercado .start-info{background:rgba(255,255,255,.14);color:#fff;}
-#start-mercado .start-info:hover{background:rgba(255,255,255,.26);}
-#start-mercado .start-chev{color:rgba(255,255,255,.55);}
+/* Marketplace: mismo formato y colores que los otros 3 botones — la única diferencia es el
+   fondo del ícono, en amarillo (var(--ball), el mismo amarillo que ya usa el botón "Consultar"). */
+#start-mercado .start-ico{background:var(--ball);}
 .select-back{background:none;border:none;color:var(--blue);font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;padding:0 0 12px;display:block;}
 .select-back:hover{text-decoration:underline;}
 
