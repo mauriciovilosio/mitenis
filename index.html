@@ -87,8 +87,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .start-divider{border:none;border-top:1px solid var(--border);margin:0;width:100%;}
 .escuela-menu-list{display:flex;flex-direction:column;gap:12px;margin-top:2px;}
 /* Marketplace: mismo formato y colores que los otros 3 botones — la única diferencia es el
-   fondo del ícono, en amarillo (var(--ball), el mismo amarillo que ya usa el botón "Consultar"). */
-#start-mercado .start-ico{background:var(--ball);}
+   fondo del ícono, en gris claro (antes amarillo var(--ball)). */
+#start-mercado .start-ico{background:#e6e6e6;}
+/* Ícono de la ventana informativa de Marketplace, mismo cuadrado que el del botón */
+.mkt-info-ico{width:32px;height:32px;border-radius:9px;background:#e6e6e6;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
 .select-back{background:none;border:none;color:var(--blue);font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;padding:0 0 12px;display:block;}
 .select-back:hover{text-decoration:underline;}
 
@@ -1397,14 +1399,14 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
     <div class="start-menu" id="start-menu">
       <button class="start-btn" id="start-escuela" onclick="openEscuelaMenu()">
         <span class="start-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fefefe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"></polyline><polyline points="14 7 21 7 21 14"></polyline></svg></span>
-        <span class="start-txt">Escuela de Tenis<span class="start-desc">Exclusivo para alumnos y profesores.</span></span>
+        <span class="start-txt">Escuela de Tenis<span class="start-desc">Exclusivo para alumnos y profes.</span></span>
         <span class="start-info" role="button" tabindex="0" aria-label="Qué incluye Escuela de Tenis" onclick="event.stopPropagation();openAppInfo()">i</span>
         <span class="start-chev" aria-hidden="true">›</span>
       </button>
       <button class="start-btn" id="start-torneos" onclick="openCircuito()">
         <span class="start-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fefefe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"></path><path d="M12 17v4"></path><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"></path><path d="M17 5h2a2 2 0 0 1 2 2 4 4 0 0 1-4 4"></path><path d="M7 5H5a2 2 0 0 0-2 2 4 4 0 0 0 4 4"></path></svg></span>
-        <span class="start-txt">Circuito interno<span class="start-desc">Exclusivo para jugadores +18.</span></span>
-        <span class="start-info" role="button" tabindex="0" aria-label="Qué incluye Circuito interno" onclick="event.stopPropagation();openTorneosInfo()">i</span>
+        <span class="start-txt">Competencia abierta<span class="start-desc">Exclusivo para jugadores.</span></span>
+        <span class="start-info" role="button" tabindex="0" aria-label="Qué incluye Competencia abierta" onclick="event.stopPropagation();openTorneosInfo()">i</span>
         <span class="start-chev" aria-hidden="true">›</span>
       </button>
       <hr class="start-divider">
@@ -1421,12 +1423,12 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
       <div class="escuela-menu-list">
         <button class="start-btn" id="start-alumno" onclick="chooseMode('escuela')">
           <span class="start-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fefefe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"></circle><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path></svg></span>
-          <span class="start-txt">Alumno<span class="start-desc">Elegí tu categoría y accedé a tu ficha de rendimiento.</span></span>
+          <span class="start-txt">Alumno<span class="start-desc">Conocé tu rendimiento en clases</span></span>
           <span class="start-chev" aria-hidden="true">›</span>
         </button>
         <button class="start-btn" id="start-profe" onclick="openProfe()">
           <span class="start-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fefefe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"></rect><rect x="9" y="2.5" width="6" height="3" rx="1"></rect><line x1="8" y1="12" x2="16" y2="12"></line><line x1="8" y1="16" x2="13" y2="16"></line></svg></span>
-          <span class="start-txt">Profesor<span class="start-desc">Ingresá con tu PIN para gestionar alumnos y seguimiento.</span></span>
+          <span class="start-txt">Profesor<span class="start-desc">Gestioná tus clases</span></span>
           <span class="start-chev" aria-hidden="true">›</span>
         </button>
       </div>
@@ -1527,7 +1529,7 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
   <header class="app-header coach-header">
     <div class="header-top">
       <button class="header-back" onclick="closeCircuito()">← Volver</button>
-      <div class="header-player"><div class="header-name">Circuito interno</div></div>
+      <div class="header-player"><div class="header-name">Competencia abierta</div></div>
       <div style="width:60px;"></div>
     </div>
     <nav class="app-tabs" id="tabs-circuito">
@@ -1598,7 +1600,7 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
 
 <div class="pin-overlay" id="torneos-info-overlay" onclick="if(event.target===this)closeTorneosInfo()">
   <div class="pin-modal" style="max-width:380px;">
-    <div class="pin-title">🏆 Circuito interno para Adultos</div>
+    <div class="pin-title">🏆 Competencia abierta</div>
     <div style="font-size:14px;color:var(--text);line-height:1.7;text-align:left;margin-top:2px;">
       <p style="margin-bottom:10px;font-weight:600;">Los jugadores registrados en <strong>MI TENIS</strong> podrán:</p>
       <ul class="info-list" style="margin:0;padding:0;list-style:none;">
@@ -1613,7 +1615,10 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
 
 <div class="pin-overlay" id="mercado-info-overlay" onclick="if(event.target===this)closeMercadoInfo()">
   <div class="pin-modal" style="max-width:380px;">
-    <div class="pin-title">🎾 Marketplace</div>
+    <div class="pin-title" style="display:flex;align-items:center;gap:10px;">
+      <span class="mkt-info-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg></span>
+      Marketplace
+    </div>
     <div style="font-size:14px;color:var(--text);line-height:1.7;text-align:left;margin-top:2px;">
       <p style="margin:0;">En <strong>Marketplace</strong> vas a poder vender y comprar artículos de tenis: raquetas, bolsos, pelotas, ropa y más 🎒</p>
     </div>
@@ -3461,7 +3466,7 @@ function openCircuito(){
   document.getElementById('landing').style.display='none';
   document.getElementById('app').classList.remove('visible');
   document.getElementById('circuito').classList.add('visible');
-  try{ buildCircuito(); }catch(e){ const el=document.getElementById('circuito-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir Circuito interno.</strong>'+(e&&e.message?e.message:e)+'</div>'; }
+  try{ buildCircuito(); }catch(e){ const el=document.getElementById('circuito-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir Competencia abierta.</strong>'+(e&&e.message?e.message:e)+'</div>'; }
   scrollAppTop();
   saveNav();
   __navPushScreen('circuito');
