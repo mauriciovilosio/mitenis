@@ -647,6 +647,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .mkt-badge{position:absolute;top:9px;left:9px;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:4px 10px;border-radius:999px;z-index:2;}
 .mkt-badge.nuevo{background:#2b2b2b;color:#fff;}
 .mkt-badge.usado{background:rgba(255,255,255,.92);color:var(--muted);border:1px solid var(--border);}
+.mkt-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
 .mkt-nav{position:absolute;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;border:none;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3;padding:0;}
 .mkt-nav-prev{left:8px;}
 .mkt-nav-next{right:8px;}
@@ -1581,12 +1582,7 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
   <div class="pin-modal" style="max-width:380px;">
     <div class="pin-title">🎾 Mercado</div>
     <div style="font-size:14px;color:var(--text);line-height:1.7;text-align:left;margin-top:2px;">
-      <p style="margin-bottom:10px;font-weight:600;">En <strong>Mercado</strong> vas a poder:</p>
-      <ul class="info-list" style="margin:0;padding:0;list-style:none;">
-        <li style="margin-bottom:8px;">ver <strong>artículos en venta</strong> del club 🎾</li>
-        <li style="margin-bottom:8px;">raquetas, bolsos, pelotas, ropa y más 🎒</li>
-        <li>consultar directamente por <strong>WhatsApp</strong> 💬</li>
-      </ul>
+      <p style="margin:0;">En <strong>Mercado</strong> vas a poder vender y comprar artículos de tenis: raquetas, bolsos, pelotas, ropa y más 🎒</p>
     </div>
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeMercadoInfo()">Entendido</button></div>
   </div>
@@ -1811,12 +1807,13 @@ function histCategorias(v){
 // Mercado: una fila por artículo publicado —
 // Nombre | Estado | Precio | Características | Link foto 1 | Link foto 2 | Link foto 3
 // índices resueltos por encabezado. -1 = ausente.
-let MERCADO = { nombre:-1, estado:-1, precio:-1, caracteristicas:-1, foto1:-1, foto2:-1, foto3:-1 };
+let MERCADO = { nombre:-1, estado:-1, precio:-1, caracteristicas:-1, categoria:-1, foto1:-1, foto2:-1, foto3:-1 };
 const MERCADO_ALIASES = {
   nombre:['nombre','nombre del elemento','articulo','artículo','producto','item','ítem','nombre del articulo','nombre del producto'],
   estado:['estado','condicion','condición'],
   precio:['precio','valor','monto','precio $'],
   caracteristicas:['caracteristicas','características','detalle','detalles','descripcion','descripción'],
+  categoria:['categoria','categoría','tipo','tipo de articulo','tipo de artículo','rubro'],
   foto1:['link foto','link con la foto','foto','foto 1','link foto 1','imagen','imagen 1','link imagen','link imagen 1','link de la foto','link de la foto 1'],
   foto2:['foto 2','link foto 2','imagen 2','link imagen 2','link de la foto 2'],
   foto3:['foto 3','link foto 3','imagen 3','link imagen 3','link de la foto 3']
@@ -2034,7 +2031,7 @@ let coachSort='rendimiento';
 let __pendingCircuito=null, __circuitoUnlocked=new Set();
 let planRows=[], planHeader=[], planFilters={golpe:'all', categoria:'all', nivel:'all', q:''};
 let histRows=[], histHeader=[], histCat=[], histGrupo=[], histMes=[];
-let mercadoRows=[], mercadoHeader=[];
+let mercadoRows=[], mercadoHeader=[], mercadoCat='all';
 
 // ══════════════════════════════════════
 // FETCH CSV DESDE GOOGLE SHEETS
@@ -2446,9 +2443,9 @@ function applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatr
   // Mercado: una fila por artículo publicado — resolver columnas por encabezado
   if(mercadoMatrix && mercadoMatrix.length){
     mercadoHeader=mercadoMatrix[0]||[];
-    MERCADO=buildColMap(mercadoHeader, {nombre:-1,estado:-1,precio:-1,caracteristicas:-1,foto1:-1,foto2:-1,foto3:-1}, MERCADO_ALIASES);
+    MERCADO=buildColMap(mercadoHeader, {nombre:-1,estado:-1,precio:-1,caracteristicas:-1,categoria:-1,foto1:-1,foto2:-1,foto3:-1}, MERCADO_ALIASES);
     mercadoRows=mercadoMatrix.slice(1).filter(r=>r.some(c=>(c||'').trim().length>0));
-  } else { mercadoHeader=[]; mercadoRows=[]; MERCADO={nombre:-1,estado:-1,precio:-1,caracteristicas:-1,foto1:-1,foto2:-1,foto3:-1}; }
+  } else { mercadoHeader=[]; mercadoRows=[]; MERCADO={nombre:-1,estado:-1,precio:-1,caracteristicas:-1,categoria:-1,foto1:-1,foto2:-1,foto3:-1}; }
 }
 function getAdultInfo(name){ return adultRows.find(r=>r[ADULT.alumno]?.trim()===name.trim())||null; }
 function renderPlayers(){
@@ -3357,9 +3354,10 @@ function setCatCircuito(c){ circuitoCat=c; buildCircuito(); }
 // MERCADO — repositorio de artículos de tenis a la venta
 // ══════════════════════════════════════
 const MERCADO_WA_NUMBER='5493576457030';
-const MERCADO_WA_MSG='Hola! Tengo una consulta 🎾';
+const MERCADO_WA_MSG='Hola! Tengo una consulta';
 const MERCADO_WA_LINK='https://wa.me/'+MERCADO_WA_NUMBER+'?text='+encodeURIComponent(MERCADO_WA_MSG);
 function openMercado(){
+  mercadoCat='all';
   document.getElementById('landing').style.display='none';
   document.getElementById('app').classList.remove('visible');
   document.getElementById('mercado').classList.add('visible');
@@ -3372,11 +3370,13 @@ function closeMercado(){ document.getElementById('mercado').classList.remove('vi
 // Convierte un link de Google Drive ("compartir") en un link de imagen directo, hotlinkeable en <img>.
 // Otros links (Google Photos, Imgur, URL directa a .jpg/.png, etc.) se devuelven tal cual.
 function resolveImgUrl(url){
-  url=(url||'').toString().trim();
+  url=(url||'').toString().trim().replace(/^["']|["']$/g,'');
   if(!url) return '';
   if(/drive\.google\.com/i.test(url)){
     const m=url.match(/\/file\/d\/([^/]+)/) || url.match(/[?&]id=([^&]+)/);
-    if(m && m[1]) return 'https://drive.google.com/uc?export=view&id='+m[1];
+    // El endpoint "thumbnail" es más confiable que "uc?export=view" para hotlinkear
+    // (éste último suele fallar/mostrar ícono roto aun con el archivo compartido).
+    if(m && m[1]) return 'https://drive.google.com/thumbnail?id='+m[1]+'&sz=w1000';
   }
   return url;
 }
@@ -3389,10 +3389,12 @@ function mercadoEntries(){
       estado:g(MERCADO.estado),
       precio:g(MERCADO.precio),
       caracteristicas:g(MERCADO.caracteristicas),
+      categoria:g(MERCADO.categoria),
       fotos
     };
   }).filter(e=>e.nombre);
 }
+function setMercadoCat(c){ mercadoCat=c; buildMercado(); }
 // Navega entre las fotos de UNA card sin reconstruir toda la grilla (misma idea que toggleAcc/togglePlayerAcc).
 function mktPhotoNav(btn, dir){
   const wrap=btn.closest('.mkt-photo'); if(!wrap) return;
@@ -3412,9 +3414,11 @@ function mercadoCardHTML(e){
   const isUsado=/usad/.test(estadoNorm);
   const badgeCls=isUsado?'usado':'nuevo';
   const badgeTxt=e.estado||(isUsado?'Usado':'Nuevo');
-  const photoHTML=e.fotos.length
-    ? e.fotos.map((f,i)=>`<img class="mkt-img${i===0?' active':''}" src="${esc(resolveImgUrl(f))}" alt="${esc(e.nombre)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none';">`).join('')
-    : `<div class="mkt-photo-empty">🎾</div>`;
+  // El placeholder queda SIEMPRE detrás de las fotos (z-index menor): si una foto no carga
+  // (permisos de Drive, link roto, etc.) el onerror la oculta y el placeholder se ve solo,
+  // en vez de dejar un recuadro en blanco sin ninguna explicación visual.
+  const photoHTML=`<div class="mkt-photo-empty">🎾</div>`
+    + e.fotos.map((f,i)=>`<img class="mkt-img${i===0?' active':''}" src="${esc(resolveImgUrl(f))}" alt="${esc(e.nombre)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none';">`).join('');
   const arrows=e.fotos.length>1 ? `
     <button class="mkt-nav mkt-nav-prev" onclick="event.stopPropagation();mktPhotoNav(this,-1)" aria-label="Foto anterior">‹</button>
     <button class="mkt-nav mkt-nav-next" onclick="event.stopPropagation();mktPhotoNav(this,1)" aria-label="Foto siguiente">›</button>
@@ -3439,15 +3443,27 @@ function buildMercado(){
   if(!mercadoHeader.length){
     el.innerHTML=`<div class="card"><div class="card-title">🎾 Mercado</div>
       <div class="nota" style="margin:8px 0 0;line-height:1.6;">Todavía no hay artículos cargados.<br>
-      La hoja <b>«Mercado»</b> debe tener las columnas <b>Nombre</b>, <b>Estado</b>, <b>Precio</b>, <b>Características</b> y hasta 3 columnas de foto (<b>Link foto 1/2/3</b>).</div></div>`;
+      La hoja <b>«Mercado»</b> debe tener las columnas <b>Nombre</b>, <b>Estado</b>, <b>Precio</b>, <b>Características</b> y hasta 3 columnas de foto (<b>Link Foto 1/2/3</b>). Opcional: una columna <b>Categoría</b> para poder filtrar por tipo de artículo.</div></div>`;
     return;
   }
-  const entries=mercadoEntries();
-  if(!entries.length){
+  const esc=(s)=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const all=mercadoEntries();
+  if(!all.length){
     el.innerHTML=`<div class="empty" style="color:var(--muted);margin-top:8px;">Todavía no hay artículos publicados.</div>`;
     return;
   }
-  el.innerHTML=`<div class="mkt-count">${entries.length} artículo${entries.length!==1?'s':''} publicado${entries.length!==1?'s':''}</div><div class="mkt-grid">${entries.map(mercadoCardHTML).join('')}</div>`;
+  // El filtro por categoría solo aparece si la hoja tiene esa columna Y hay más de una categoría distinta cargada.
+  const cats=[...new Set(all.map(e=>e.categoria).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base'}));
+  const filtersHTML = cats.length>1 ? `<div class="mkt-filters">
+    <button class="mf-chip${mercadoCat==='all'?' active':''}" onclick="setMercadoCat('all')">Todos</button>
+    ${cats.map(c=>`<button class="mf-chip${mercadoCat===c?' active':''}" onclick="setMercadoCat('${c.replace(/'/g,"\\'")}')">${esc(c)}</button>`).join('')}
+  </div>` : '';
+  const entries = (cats.length>1 && mercadoCat!=='all') ? all.filter(e=>e.categoria===mercadoCat) : all;
+  if(!entries.length){
+    el.innerHTML=`${filtersHTML}<div class="empty" style="color:var(--muted);margin-top:8px;">No hay artículos para esta categoría.</div>`;
+    return;
+  }
+  el.innerHTML=`${filtersHTML}<div class="mkt-count">${entries.length} artículo${entries.length!==1?'s':''} publicado${entries.length!==1?'s':''}</div><div class="mkt-grid">${entries.map(mercadoCardHTML).join('')}</div>`;
 }
 function buildCircuito(){
   const order=['torneos','ranking','jugadores'];
