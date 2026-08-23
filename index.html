@@ -85,9 +85,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .start-info:focus-visible{outline:2px solid var(--blue);outline-offset:1px;}
 .start-chev{flex-shrink:0;font-size:22px;font-weight:700;color:var(--hint);line-height:1;}
 .start-divider{border:none;border-top:1px solid var(--border);margin:0;width:100%;}
-/* Mercado: mismo botón que los otros 3, pero con los colores invertidos (card oscura, ícono claro) para diferenciarlo */
-#start-mercado{background:#2b2b2b;border-color:#2b2b2b;}
-#start-mercado:hover{border-color:#2b2b2b;}
+/* Marketplace: mismo botón que los otros 3, pero con los colores invertidos (card oscura, ícono claro) para diferenciarlo.
+   La card usa gris oscuro translúcido (no negro sólido) con un leve desenfoque, para que se note el "vidrio" sobre el fondo. */
+#start-mercado{background:rgba(43,43,43,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-color:rgba(43,43,43,.38);}
+#start-mercado:hover{border-color:rgba(43,43,43,.55);}
 #start-mercado .start-ico{background:#fefefe;}
 #start-mercado .start-txt{color:#fff;}
 #start-mercado .start-desc{color:rgba(255,255,255,.65);}
@@ -1420,8 +1421,8 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
       <hr class="start-divider">
       <button class="start-btn" id="start-mercado" onclick="openMercado()">
         <span class="start-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg></span>
-        <span class="start-txt">Mercado<span class="start-desc">Comprá y vendé artículos de tenis.</span></span>
-        <span class="start-info" role="button" tabindex="0" aria-label="Qué es Mercado" onclick="event.stopPropagation();openMercadoInfo()">i</span>
+        <span class="start-txt">Marketplace<span class="start-desc">Comprá y vendé artículos de tenis.</span></span>
+        <span class="start-info" role="button" tabindex="0" aria-label="Qué es Marketplace" onclick="event.stopPropagation();openMercadoInfo()">i</span>
         <span class="start-chev" aria-hidden="true">›</span>
       </button>
     </div>
@@ -1537,7 +1538,7 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
   <header class="app-header coach-header">
     <div class="header-top">
       <button class="header-back" onclick="closeMercado()">← Volver</button>
-      <div class="header-player"><div class="header-name">Mercado</div></div>
+      <div class="header-player"><div class="header-name">Marketplace</div></div>
       <div style="width:60px;"></div>
     </div>
   </header>
@@ -1607,9 +1608,9 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
 
 <div class="pin-overlay" id="mercado-info-overlay" onclick="if(event.target===this)closeMercadoInfo()">
   <div class="pin-modal" style="max-width:380px;">
-    <div class="pin-title">🎾 Mercado</div>
+    <div class="pin-title">🎾 Marketplace</div>
     <div style="font-size:14px;color:var(--text);line-height:1.7;text-align:left;margin-top:2px;">
-      <p style="margin:0;">En <strong>Mercado</strong> vas a poder vender y comprar artículos de tenis: raquetas, bolsos, pelotas, ropa y más 🎒</p>
+      <p style="margin:0;">En <strong>Marketplace</strong> vas a poder vender y comprar artículos de tenis: raquetas, bolsos, pelotas, ropa y más 🎒</p>
     </div>
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeMercadoInfo()">Entendido</button></div>
   </div>
@@ -3451,7 +3452,7 @@ function openMercado(){
   document.getElementById('landing').style.display='none';
   document.getElementById('app').classList.remove('visible');
   document.getElementById('mercado').classList.add('visible');
-  try{ buildMercado(); }catch(e){ const el=document.getElementById('mercado-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir Mercado.</strong>'+(e&&e.message?e.message:e)+'</div>'; }
+  try{ buildMercado(); }catch(e){ const el=document.getElementById('mercado-content'); if(el) el.innerHTML='<div class="err-box"><strong>No se pudo construir Marketplace.</strong>'+(e&&e.message?e.message:e)+'</div>'; }
   scrollAppTop();
   saveNav();
   __navPushScreen('mercado');
@@ -3556,9 +3557,9 @@ function mercadoCardHTML(e){
 function buildMercado(){
   const el=document.getElementById('mercado-content'); if(!el) return;
   if(!mercadoHeader.length){
-    el.innerHTML=`<div class="card"><div class="card-title">🎾 Mercado</div>
+    el.innerHTML=`<div class="card"><div class="card-title">🎾 Marketplace</div>
       <div class="nota" style="margin:8px 0 0;line-height:1.6;">Todavía no hay artículos cargados.<br>
-      La hoja <b>«Mercado»</b> debe tener las columnas <b>Nombre</b>, <b>Estado</b>, <b>Precio</b>, <b>Características</b> y hasta 3 columnas de foto (<b>Link Foto 1/2/3</b>). Opcional: una columna <b>Categoría</b> para poder filtrar por tipo de artículo.</div></div>`;
+      La hoja <b>«Mercado»</b> (o «Marketplace») debe tener las columnas <b>Nombre</b>, <b>Estado</b>, <b>Precio</b>, <b>Características</b> y hasta 3 columnas de foto (<b>Link Foto 1/2/3</b>). Opcional: una columna <b>Categoría</b> para poder filtrar por tipo de artículo.</div></div>`;
     return;
   }
   const esc=(s)=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
