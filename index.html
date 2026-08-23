@@ -1238,6 +1238,9 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
 .tl-line{flex:1;width:1px;background:rgba(255,255,255,.14);margin-top:5px;}
 .tl-body{flex:1;min-width:0;padding-bottom:22px;}
 .tl-date{font-size:12px;font-weight:600;color:rgba(255,255,255,.5);margin-bottom:6px;}
+.tl-date-row{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.tl-date-row .tl-date{margin-bottom:6px;}
+.tl-cat{flex-shrink:0;font-size:9.5px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:rgba(255,255,255,.78);background:rgba(255,255,255,.12);padding:2px 9px;border-radius:99px;white-space:nowrap;}
 .tl-title{font-size:14.5px;font-weight:800;color:#fff;line-height:1.35;margin-bottom:9px;}
 .tl-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;}
 .tl-pill{font-size:10px;font-weight:700;color:rgba(255,255,255,.86);background:rgba(255,255,255,.12);padding:4px 10px;border-radius:99px;}
@@ -3017,14 +3020,17 @@ function histEntries(){
 // Usado tanto en Informes del alumno (renderHistorialClases) como en Portal del Profe → Historial (buildCoachHistorial).
 function histTimelineHTML(entries){
   const esc=(s)=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  return entries.map((e,i)=>`<div class="tl-row">
+  return entries.map((e,i)=>{
+    const catLbl=(e.categorias&&e.categorias.length)?joinEs(e.categorias.map(catLabel)):'';
+    return `<div class="tl-row">
     <div class="tl-rail"><div class="tl-dot"></div>${i<entries.length-1?'<div class="tl-line"></div>':''}</div>
     <div class="tl-body">
-      <div class="tl-date">${esc(fmtDateLargo(e.fecha))}</div>
+      <div class="tl-date-row"><div class="tl-date">${esc(fmtDateLargo(e.fecha))}</div>${catLbl?`<span class="tl-cat">${esc(catLbl)}</span>`:''}</div>
       ${e.objetivo?`<div class="tl-title">${esc(e.objetivo)}</div>`:''}
       ${e.ejercicios?`<div class="tl-desc">${esc(e.ejercicios)}</div>`:''}
     </div>
-  </div>`).join('');
+  </div>`;
+  }).join('');
 }
 function buildCoachHistorial(){
   const el=document.getElementById('coach-hist-content'); if(!el) return;
@@ -3039,7 +3045,7 @@ function buildCoachHistorial(){
   if(histMes.length) entries=entries.filter(e=>histMes.includes(e.mk));
   if(histCat.length) entries=entries.filter(e=>e.categorias.some(c=>histCat.includes(c)));
   if(histGrupo.length) entries=entries.filter(e=>histGrupo.includes(e.grupo));
-  const filters=`<div class="cz-filters">${histMesChips()}${histCatChips()}${histGrupoChips()}</div>`;
+  const filters=`<div class="cz-filters">${histMesChips()}${histGrupoChips()}</div>`;
   if(!entries.length){
     el.innerHTML=`${filters}<div class="empty" style="color:var(--muted);margin-top:12px;">No hay clases cargadas todavía para estos filtros.</div>`;
     return;
@@ -3510,7 +3516,7 @@ function computeCoachData(){
     const tA=dd===null?'':(dd>=0.05?'↑':dd<=-0.05?'↓':'='); const tC=dd===null?'#9aaa9a':(dd>=0.05?'#16a34a':dd<=-0.05?'#dc2626':'#6b8a76');
     return `<div class="ag-row"><span class="ag-name">${_areaNom[a]}</span><div class="ag-bar"><i style="width:${w}%;background:${_lvlBar(v)};"></i></div><span class="ag-val">${v>0?v.toFixed(1):'—'}</span><span class="ag-trend" style="color:${tC};">${tA}${dd!==null?(dd>=0?'+':'')+dd.toFixed(1):''}</span></div>`;
   }).join('');
-  const areasCard=`<div class="acc evo-acc cz-areas" style="margin-top:14px;"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📈 Áreas del grupo</span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner">${_areaRows}</div></div></div>`;
+  const areasCard=`<div class="acc open evo-acc cz-areas" style="margin-top:14px;"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📈 Áreas del grupo</span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner">${_areaRows}</div></div></div>`;
   const _focoAreaBody = _weakArea
     ? `<p style="margin:0 0 10px;color:var(--muted);font-size:12px;">El área más floja del grupo es <strong style="color:#0a513a;">${_areaNom[_weakArea]}</strong> (${_weakVal.toFixed(1)}/3). Habilidades a mejorar:</p>`+(_weakGroups.length?_weakGroups.map(g=>{const lv=Math.round(g.avg)||1;return `<div class="fk-row"><span>${g.nombre}</span><span class="fk-lvl lb${lv}">${lvlLabel(lv)} · ${g.avg.toFixed(1)}</span></div>`;}).join(''):'<div class="empty" style="color:var(--muted);">Sin datos de habilidades este mes.</div>')
     : '<div class="empty" style="color:var(--muted);">Sin datos suficientes este mes.</div>';
