@@ -85,6 +85,15 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .start-info:focus-visible{outline:2px solid var(--blue);outline-offset:1px;}
 .start-chev{flex-shrink:0;font-size:22px;font-weight:700;color:var(--hint);line-height:1;}
 .start-divider{border:none;border-top:1px solid var(--border);margin:0;width:100%;}
+/* Mercado: mismo botón que los otros 3, pero con los colores invertidos (card oscura, ícono claro) para diferenciarlo */
+#start-mercado{background:#2b2b2b;border-color:#2b2b2b;}
+#start-mercado:hover{border-color:#2b2b2b;}
+#start-mercado .start-ico{background:#fefefe;}
+#start-mercado .start-txt{color:#fff;}
+#start-mercado .start-desc{color:rgba(255,255,255,.65);}
+#start-mercado .start-info{background:rgba(255,255,255,.14);color:#fff;}
+#start-mercado .start-info:hover{background:rgba(255,255,255,.26);}
+#start-mercado .start-chev{color:rgba(255,255,255,.55);}
 .select-back{background:none;border:none;color:var(--blue);font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;padding:0 0 12px;display:block;}
 .select-back:hover{text-decoration:underline;}
 
@@ -660,6 +669,24 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .mkt-desc{font-size:11.5px;color:var(--muted);line-height:1.55;flex:1;}
 .mkt-cta{margin-top:8px;width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--ball);color:#5b5400;border:1px solid #e8c23e;border-radius:10px;padding:9px;font-size:12px;font-weight:800;font-family:'Inter',sans-serif;text-decoration:none;cursor:pointer;}
 .mkt-cta:hover{transform:translateY(-1px);}
+.mkt-img{cursor:zoom-in;}
+/* Lightbox: ver la foto del producto más grande al hacer click */
+#mkt-lightbox{background:rgba(0,0,0,.88);backdrop-filter:blur(6px);}
+.mkt-lb-inner{max-width:92vw;max-height:88vh;display:flex;align-items:center;justify-content:center;}
+.mkt-lb-img{max-width:92vw;max-height:88vh;object-fit:contain;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.5);display:block;}
+.mkt-lb-close{position:absolute;top:18px;right:18px;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;border:none;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;}
+.mkt-lb-close:hover{background:rgba(255,255,255,.26);}
+.mkt-lb-prev,.mkt-lb-next{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;border:none;font-size:24px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;}
+.mkt-lb-prev:hover,.mkt-lb-next:hover{background:rgba(255,255,255,.26);}
+.mkt-lb-prev{left:14px;}
+.mkt-lb-next{right:14px;}
+.mkt-lb-dots{position:absolute;bottom:18px;left:0;right:0;display:flex;justify-content:center;gap:6px;}
+.mkt-lb-dots .mkt-dot{width:7px;height:7px;background:rgba(255,255,255,.4);}
+.mkt-lb-dots .mkt-dot.active{background:#fff;}
+@media(max-width:640px){
+  .mkt-lb-prev,.mkt-lb-next{width:38px;height:38px;font-size:20px;}
+  .mkt-lb-close{top:10px;right:10px;}
+}
 
 /* Secciones "Atención requerida" / "Área a reforzar": línea divisoria + título oscuro + card negra */
 .coach-sec-hr{border:none;border-top:1px solid var(--border);margin:20px 0 14px;}
@@ -1392,7 +1419,7 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
       </button>
       <hr class="start-divider">
       <button class="start-btn" id="start-mercado" onclick="openMercado()">
-        <span class="start-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fefefe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg></span>
+        <span class="start-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2b2b2b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg></span>
         <span class="start-txt">Mercado<span class="start-desc">Comprá y vendé artículos de tenis.</span></span>
         <span class="start-info" role="button" tabindex="0" aria-label="Qué es Mercado" onclick="event.stopPropagation();openMercadoInfo()">i</span>
         <span class="start-chev" aria-hidden="true">›</span>
@@ -1586,6 +1613,13 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
     </div>
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeMercadoInfo()">Entendido</button></div>
   </div>
+</div>
+<div class="pin-overlay" id="mkt-lightbox" onclick="if(event.target===this)closeMktLightbox()">
+  <div class="mkt-lb-inner"><img class="mkt-lb-img" id="mkt-lb-img" src="" alt=""></div>
+  <button class="mkt-lb-close" onclick="closeMktLightbox()" aria-label="Cerrar">✕</button>
+  <button class="mkt-lb-prev" onclick="mktLightboxNav(-1)" aria-label="Foto anterior">‹</button>
+  <button class="mkt-lb-next" onclick="mktLightboxNav(1)" aria-label="Foto siguiente">›</button>
+  <div class="mkt-lb-dots" id="mkt-lb-dots"></div>
 </div>
 
 <div class="pin-overlay" id="foco-area-overlay" onclick="if(event.target===this)closeFocoArea()">
@@ -2517,6 +2551,26 @@ function renderPlayers(){
     </div>`;
   }).join('');
 }
+// Trae las 10 hojas del Sheet en paralelo, aplica los datos y actualiza el cache local.
+// Compartida por init() (primera carga) y silentRefresh() (revisión silenciosa al volver a la app).
+async function fetchAndApplyLive(){
+  const [dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix] = await Promise.all([
+    fetchSheet(DATA_SHEET),
+    fetchSheet(INFO_SHEET).catch(()=>[]),
+    fetchSheet(ASIST_SHEET).catch(()=>[]),
+    fetchVideosSheet().catch(()=>[]),
+    fetchByNames([ADULTS_SHEET,'informacion adultos','Informacion Adultos','información adultos']).catch(()=>[]),
+    fetchByNames([MATCHES_SHEET,'Partidos Torneos','partidos torneos','Partidos','partidos']).catch(()=>[]),
+    fetchByNames([EVENTS_SHEET,'Torneos','torneos']).catch(()=>[]),
+    fetchByNames([PLAN_SHEET,'Planificacion','Planificación','planificacion','planificación']).catch(()=>[]),
+    fetchByNames([HIST_SHEET,'historial','Historial','Historial de clases','historial de clases']).catch(()=>[]),
+    fetchByNames([MERCADO_SHEET,'mercado','Marketplace','marketplace']).catch(()=>[])
+  ]);
+  applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix);
+  const ts=Date.now();
+  try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ts, data:dataMatrix, info:infoMatrix, asist:asistMatrix, videos:videosMatrix, adults:adultsMatrix, matches:matchesMatrix, events:eventsMatrix, plan:planMatrix, hist:histMatrix, mercado:mercadoMatrix})); }catch(e){}
+  return ts;
+}
 async function init(){
   if(window.Chart){ Chart.defaults.font.family="'Inter', sans-serif"; Chart.defaults.color='#505050'; }
   // 1) Cache para pintado instantáneo
@@ -2527,23 +2581,11 @@ async function init(){
   try{ restoreNav(); }catch(e){}
   // 2) Refresco en vivo desde el Sheet
   try{
-    const [dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix] = await Promise.all([
-      fetchSheet(DATA_SHEET),
-      fetchSheet(INFO_SHEET).catch(()=>[]),
-      fetchSheet(ASIST_SHEET).catch(()=>[]),
-      fetchVideosSheet().catch(()=>[]),
-      fetchByNames([ADULTS_SHEET,'informacion adultos','Informacion Adultos','información adultos']).catch(()=>[]),
-      fetchByNames([MATCHES_SHEET,'Partidos Torneos','partidos torneos','Partidos','partidos']).catch(()=>[]),
-      fetchByNames([EVENTS_SHEET,'Torneos','torneos']).catch(()=>[]),
-      fetchByNames([PLAN_SHEET,'Planificacion','Planificación','planificacion','planificación']).catch(()=>[]),
-      fetchByNames([HIST_SHEET,'historial','Historial','Historial de clases','historial de clases']).catch(()=>[]),
-      fetchByNames([MERCADO_SHEET,'mercado','Marketplace','marketplace']).catch(()=>[])
-    ]);
-    applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix);
+    const ts=await fetchAndApplyLive();
     renderPlayers();
     try{ restoreNav(); }catch(e){}
-    const ts=Date.now(); setUpdated(ts);
-    try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ts, data:dataMatrix, info:infoMatrix, asist:asistMatrix, videos:videosMatrix, adults:adultsMatrix, matches:matchesMatrix, events:eventsMatrix, plan:planMatrix, hist:histMatrix, mercado:mercadoMatrix})); }catch(e){}
+    setUpdated(ts);
+    __lastSilentRefresh=ts; // evita que un focus/visibilitychange disparado justo tras cargar dispare otro fetch de más
   }catch(e){
     if(!allRows.length){
       const g=document.getElementById('player-grid');
@@ -2551,6 +2593,54 @@ async function init(){
     }
   }
 }
+// ── Auto-actualización silenciosa: al volver a mirar la app (pestaña/celular en primer plano),
+// revisa si hay información nueva en el Sheet y refresca en el lugar, sin navegar ni interrumpir.
+// No hace polling en segundo plano — solo chequea cuando alguien vuelve a mirar la pantalla,
+// con un enfriamiento de 1 minuto para no repetir el pedido si hay varios eventos seguidos.
+let __lastSilentRefresh=0;
+const SILENT_REFRESH_COOLDOWN_MS=60000;
+function refreshVisibleContent(){
+  try{
+    const coachVisible=document.getElementById('coach')?.classList.contains('visible');
+    const circuitoVisible=document.getElementById('circuito')?.classList.contains('visible');
+    const mercadoVisible=document.getElementById('mercado')?.classList.contains('visible');
+    const appVisible=document.getElementById('app')?.classList.contains('visible');
+    if(coachVisible){
+      const cv=document.querySelector('.coach-view.active');
+      const id=cv?cv.id.replace('coach-view-',''):'resumen';
+      if(id==='alumnos') buildCoachAlumnos();
+      else if(id==='planificacion') buildCoachPlanArea();
+      else if(id==='historial') buildCoachHistorial();
+      else buildCoach();
+    } else if(circuitoVisible){
+      buildCircuito();
+    } else if(mercadoVisible){
+      buildMercado();
+    } else if(appVisible && currentPlayer && appMode!=='torneos'){
+      // playerSessions es un snapshot armado al abrir el perfil — lo recalculamos para que
+      // una clase nueva cargada por el Profe aparezca sin tener que reabrir el perfil.
+      playerSessions=allRows.filter(r=>r[COL.alumno]===currentPlayer)
+        .sort((a,b)=>new Date(parseDate(a[COL.fecha]))-new Date(parseDate(b[COL.fecha])));
+      rebuildAll();
+    } else if(appVisible && currentPlayer){
+      rebuildAll(); // modo torneos: los tabs ya recalculan en vivo desde matchRows/adultRows
+    }
+  }catch(e){}
+}
+async function silentRefresh(){
+  if(document.hidden) return;
+  const now=Date.now();
+  if(now-__lastSilentRefresh<SILENT_REFRESH_COOLDOWN_MS) return;
+  __lastSilentRefresh=now;
+  try{
+    const ts=await fetchAndApplyLive();
+    renderPlayers();
+    refreshVisibleContent();
+    setUpdated(ts);
+  }catch(e){ /* silencioso: si falla, se sigue viendo lo último que cargó bien */ }
+}
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) silentRefresh(); });
+window.addEventListener('focus', silentRefresh);
 
 // ══════════════════════════════════════
 // SELECT PLAYER
@@ -3408,6 +3498,31 @@ function mktPhotoNav(btn, dir){
   const dots=[...wrap.querySelectorAll('.mkt-dot')];
   dots.forEach((d,i)=>d.classList.toggle('active', i===idx));
 }
+// ── Lightbox: agrandar la foto del producto al hacer click ──
+let __mktLbUrls=[], __mktLbIndex=0;
+function openMktLightbox(imgEl){
+  const photo=imgEl.closest('.mkt-photo'); if(!photo) return;
+  const imgs=[...photo.querySelectorAll('.mkt-img')]; if(!imgs.length) return;
+  __mktLbUrls=imgs.map(im=>im.getAttribute('src'));
+  const activeIdx=imgs.findIndex(im=>im.classList.contains('active'));
+  __mktLbIndex=activeIdx>=0?activeIdx:0;
+  renderMktLightbox();
+  const ov=document.getElementById('mkt-lightbox'); if(ov) ov.classList.add('show');
+}
+function renderMktLightbox(){
+  const img=document.getElementById('mkt-lb-img');
+  if(img) img.src=__mktLbUrls[__mktLbIndex]||'';
+  const multi=__mktLbUrls.length>1;
+  document.querySelectorAll('.mkt-lb-prev,.mkt-lb-next').forEach(b=>{ b.style.display=multi?'flex':'none'; });
+  const dotsEl=document.getElementById('mkt-lb-dots');
+  if(dotsEl) dotsEl.innerHTML=multi?__mktLbUrls.map((_,i)=>`<span class="mkt-dot${i===__mktLbIndex?' active':''}"></span>`).join(''):'';
+}
+function mktLightboxNav(dir){
+  if(!__mktLbUrls.length) return;
+  __mktLbIndex=(__mktLbIndex+dir+__mktLbUrls.length)%__mktLbUrls.length;
+  renderMktLightbox();
+}
+function closeMktLightbox(){ const ov=document.getElementById('mkt-lightbox'); if(ov) ov.classList.remove('show'); }
 function mercadoCardHTML(e){
   const esc=(s)=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const estadoNorm=e.estado.trim().toLowerCase();
@@ -3418,7 +3533,7 @@ function mercadoCardHTML(e){
   // (permisos de Drive, link roto, etc.) el onerror la oculta y el placeholder se ve solo,
   // en vez de dejar un recuadro en blanco sin ninguna explicación visual.
   const photoHTML=`<div class="mkt-photo-empty">🎾</div>`
-    + e.fotos.map((f,i)=>`<img class="mkt-img${i===0?' active':''}" src="${esc(resolveImgUrl(f))}" alt="${esc(e.nombre)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none';">`).join('');
+    + e.fotos.map((f,i)=>`<img class="mkt-img${i===0?' active':''}" src="${esc(resolveImgUrl(f))}" alt="${esc(e.nombre)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none';" onclick="event.stopPropagation();openMktLightbox(this)">`).join('');
   const arrows=e.fotos.length>1 ? `
     <button class="mkt-nav mkt-nav-prev" onclick="event.stopPropagation();mktPhotoNav(this,-1)" aria-label="Foto anterior">‹</button>
     <button class="mkt-nav mkt-nav-next" onclick="event.stopPropagation();mktPhotoNav(this,1)" aria-label="Foto siguiente">›</button>
