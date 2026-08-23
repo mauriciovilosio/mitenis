@@ -102,12 +102,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .player-list{display:block;}
 .player-acc{background:var(--surf);}
 .player-acc:last-child{margin-bottom:0;}
-.player-acc .acc-head{padding:12px 14px;}
-.player-acc .acc-title{font-size:14px;font-weight:700;color:var(--text);}
+.player-acc .acc-head{padding:20px 18px;}
+.player-acc .acc-title{font-size:18px;font-weight:800;color:var(--text);}
 .player-acc .acc-body-inner{padding:10px 12px 12px;}
 .acc-right{display:flex;align-items:center;gap:9px;}
-.player-cat-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.10);}
-.player-cat-count{font-size:11px;font-weight:700;color:var(--muted);background:var(--surf2);border-radius:99px;padding:2px 9px;min-width:24px;text-align:center;}
+.player-cat-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.10);}
+.player-cat-count{font-size:13px;font-weight:700;color:var(--muted);background:var(--surf2);border-radius:99px;padding:3px 11px;min-width:28px;text-align:center;}
+.player-acc .acc-chevron{font-size:17px;}
 .loading-state{color:var(--muted);font-size:13px;padding:1rem;text-align:center;}
 
 /* APP */
@@ -1426,7 +1427,6 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
         <button class="start-btn" id="start-profe" onclick="openProfe()">
           <span class="start-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fefefe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"></rect><rect x="9" y="2.5" width="6" height="3" rx="1"></rect><line x1="8" y1="12" x2="16" y2="12"></line><line x1="8" y1="16" x2="13" y2="16"></line></svg></span>
           <span class="start-txt">Profesor<span class="start-desc">Ingresá con tu PIN para gestionar alumnos y seguimiento.</span></span>
-          <span class="start-info" role="button" tabindex="0" aria-label="Qué es Portal del Profe" onclick="event.stopPropagation();openCoachInfo()">i</span>
           <span class="start-chev" aria-hidden="true">›</span>
         </button>
       </div>
@@ -2539,10 +2539,9 @@ function renderPlayers(){
   const btn=name=>{
     const ini=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
     const color=avatarColor(name);
-    const ns=allRows.filter(r=>r[COL.alumno]===name).length;
     return `<button class="player-btn" onclick="selectPlayer('${name.replace(/'/g,"\\'")}')">
       <div class="pb-avatar" style="background:${color};color:${idealText(color)};">${ini}${champMedal(name)}</div>
-      <div><div class="pb-name">${name}</div><div class="pb-meta">${ns} sesión${ns!==1?'es':''}</div></div>
+      <div class="pb-name">${name}</div>
     </button>`;
   };
   grid.innerHTML=cats.map((c,idx)=>{
