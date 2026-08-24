@@ -1312,39 +1312,40 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
 .hist-cats{display:flex;flex-wrap:wrap;gap:5px;}
 /* === Informes: calendarios en 2 columnas (mobile) === */
 @media(max-width:620px){
-  .informes-layout{grid-template-columns:150px 1fr;gap:12px;}
+  .informes-layout{grid-template-columns:172px 1fr;gap:14px;}
   .cal-months{display:grid!important;grid-template-columns:1fr 1fr;gap:10px;}
   .cal-month-block{width:auto;}
-  .cal-card{padding:6px;}
-  .cal-card .card-title{font-size:11px;}
+  .cal-card{padding:7px;}
+  .cal-card .card-title{font-size:11.5px;}
   /* Calendario compacto en mobile: el calendario ahora va angosto al costado izquierdo y el Historial de
-     clases a la derecha (mismo esquema que desktop, ver .informes-layout), así que las celdas se achican
-     bastante para que las 7 columnas entren en la primera columna de esa grilla (150px). */
-  .cal-dows,.cal-grid{grid-template-columns:repeat(7,17px);gap:2px;}
-  .cal-dow{width:17px;font-size:6.5px;}
-  .cal-cell{width:17px;height:17px;min-width:0;font-size:8px;border-radius:4px;}
-  .cal-cell .cal-dlico{font-size:7px;}
-  .cal-cell .cal-badge{font-size:6px;}
-  .cal-title-bar{padding:5px 6px;margin:-6px -6px 6px;}
-  .cal-nav-btn{width:18px;height:18px;border-radius:5px;}
-  .cal-nav-btn svg{width:11px;height:11px;}
-  .cal-month-lbl{font-size:8.5px;}
-  .cal-dots{gap:3px;margin:-1px 0 6px;}
-  .cal-dot-ind{width:4px;height:4px;}
-  .cal-dot-ind.on{width:10px;}
-  .cal-legend{flex-direction:column;align-items:flex-start;font-size:8px;gap:4px;margin-top:6px;}
-  .cal-legend .lg-swatch{width:9px;height:9px;}
-  .cal-dl-btn,.cal-dl-note{min-height:auto;font-size:8px;padding:5px 4px;margin-top:5px;line-height:1.25;}
-  /* Historial de clases del ALUMNO (columna derecha de .informes-layout) también se achica para acompañar
-     el calendario angosto — escopeado a .informes-layout para no afectar el Historial de Portal del Profe,
+     clases a la derecha (mismo esquema que desktop, ver .informes-layout). Las celdas se achican para que
+     las 7 columnas entren en la primera columna de esa grilla (172px), pero se mantienen legibles (20px,
+     no las 17px de una ronda anterior que el usuario reportó como demasiado apretadas). */
+  .cal-dows,.cal-grid{grid-template-columns:repeat(7,20px);gap:3px;}
+  .cal-dow{width:20px;font-size:7.5px;}
+  .cal-cell{width:20px;height:20px;min-width:0;font-size:9px;border-radius:5px;}
+  .cal-cell .cal-dlico{font-size:7.5px;}
+  .cal-cell .cal-badge{font-size:6.5px;}
+  .cal-title-bar{padding:6px 7px;margin:-7px -7px 7px;}
+  .cal-nav-btn{width:20px;height:20px;border-radius:6px;}
+  .cal-nav-btn svg{width:12px;height:12px;}
+  .cal-month-lbl{font-size:9.5px;}
+  .cal-dots{gap:4px;margin:-1px 0 7px;}
+  .cal-dot-ind{width:4.5px;height:4.5px;}
+  .cal-dot-ind.on{width:11px;}
+  .cal-legend{flex-direction:column;align-items:flex-start;font-size:9px;gap:5px;margin-top:7px;}
+  .cal-legend .lg-swatch{width:10px;height:10px;}
+  .cal-dl-btn,.cal-dl-note{min-height:auto;font-size:9px;padding:6px 5px;margin-top:6px;line-height:1.3;}
+  /* Historial de clases del ALUMNO (columna derecha de .informes-layout) también se agranda un poco para
+     acompañar al calendario — escopeado a .informes-layout para no afectar el Historial de Portal del Profe,
      que comparte las mismas clases .hist-timeline-card/.tl-* pero no está en este layout de 2 columnas. */
-  .informes-layout .hist-timeline-card{padding:12px 10px 2px;}
-  .informes-layout .tl-row{gap:8px;}
-  .informes-layout .tl-body{padding-bottom:14px;}
-  .informes-layout .tl-date{font-size:10px;}
-  .informes-layout .tl-cat{font-size:7.5px;padding:1.5px 6px;}
-  .informes-layout .tl-title{font-size:12px;margin-bottom:6px;}
-  .informes-layout .tl-desc{font-size:10.5px;line-height:1.45;}
+  .informes-layout .hist-timeline-card{padding:13px 11px 3px;}
+  .informes-layout .tl-row{gap:9px;}
+  .informes-layout .tl-body{padding-bottom:15px;}
+  .informes-layout .tl-date{font-size:10.5px;}
+  .informes-layout .tl-cat{font-size:8px;padding:2px 6.5px;}
+  .informes-layout .tl-title{font-size:12.5px;margin-bottom:7px;}
+  .informes-layout .tl-desc{font-size:11px;line-height:1.48;}
 }
 @media(max-width:340px){ .cal-months{grid-template-columns:1fr;} }
 
@@ -3307,9 +3308,9 @@ function studentHistorialEntries(name){
 }
 function renderHistorialClases(entries){
   if(!entries.length){
-    return `<hr class="coach-sec-hr"><div class="coach-sec-title">Historial de clases</div><div class="empty" style="color:var(--muted);">Todavía no hay clases registradas.</div>`;
+    return `<div class="coach-sec-title">Historial de clases</div><div class="empty" style="color:var(--muted);">Todavía no hay clases registradas.</div>`;
   }
-  return `<hr class="coach-sec-hr"><div class="coach-sec-title">Historial de clases</div><div class="hist-timeline-card">${histTimelineHTML(entries)}</div>`;
+  return `<div class="coach-sec-title">Historial de clases</div><div class="hist-timeline-card">${histTimelineHTML(entries)}</div>`;
 }
 
 // ══════════════════════════════════════
@@ -4821,7 +4822,7 @@ function buildMonthCalendar(mk, monthSessions, pl, months, subscribed){
   </div>${(months&&months.length>1)?`<div class="cal-dots">${months.map(m=>`<span class="cal-dot-ind${m===mk?' on':''}"></span>`).join('')}</div>`:''}`;
   const legend=`<div class="cal-legend">
     <span><span class="lg-swatch" style="background:#2b2b2b;"></span> Día con clase registrada</span>
-    <span><span class="lg-swatch" style="background:var(--ball);"></span> Descargar reporte</span>
+    ${ended?`<span><span class="lg-swatch" style="background:var(--ball);"></span> Descargar reporte</span>`:''}
   </div>`;
   return `<div class="cal-card">
     ${navBar}
