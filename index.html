@@ -1292,7 +1292,7 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
 .cal-footer-wrap{margin-top:8px;}
 /* === Informes: layout de 2 columnas en desktop (calendario + Historial de clases) === */
 .informes-layout{display:grid;grid-template-columns:340px 1fr;gap:28px;align-items:start;margin-top:16px;}
-@media(max-width:760px){ .informes-layout{grid-template-columns:1fr;gap:0;margin-top:14px;} }
+@media(max-width:760px){ .informes-layout{grid-template-columns:230px 1fr;gap:16px;margin-top:14px;} }
 /* === Informes: timeline oscuro de Historial de clases (alumno) === */
 .hist-timeline-card{background:linear-gradient(135deg,#2b2b2b,#1a1a1a);border-radius:var(--radius);padding:20px 18px 4px;box-shadow:0 12px 30px rgba(0,0,0,.22);}
 .tl-row{display:flex;gap:14px;}
@@ -1312,20 +1312,39 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
 .hist-cats{display:flex;flex-wrap:wrap;gap:5px;}
 /* === Informes: calendarios en 2 columnas (mobile) === */
 @media(max-width:620px){
+  .informes-layout{grid-template-columns:150px 1fr;gap:12px;}
   .cal-months{display:grid!important;grid-template-columns:1fr 1fr;gap:10px;}
   .cal-month-block{width:auto;}
-  .cal-card{padding:8px;}
+  .cal-card{padding:6px;}
   .cal-card .card-title{font-size:11px;}
-  /* Calendario compacto en mobile: la card sigue ocupando el ancho de pantalla, pero las celdas quedan
-     en un tamaño fijo y centradas (en vez de estirarse a 1fr), para que el bloque sea más bajo y deje ver
-     el comienzo de "Historial de clases" sin scrollear. */
-  .cal-dows,.cal-grid{grid-template-columns:repeat(7,32px);gap:3px;}
-  .cal-dow{width:32px;font-size:8.5px;}
-  .cal-cell{width:32px;height:32px;min-width:0;font-size:10px;border-radius:6px;}
-  .cal-title-bar{padding:7px 8px;}
-  .cal-month-lbl{font-size:12px;}
-  .cal-legend{font-size:10px;gap:10px;margin-top:8px;}
-  .cal-dl-btn,.cal-dl-note{min-height:32px;font-size:10.5px;padding:5px 8px;margin-top:6px;}
+  /* Calendario compacto en mobile: el calendario ahora va angosto al costado izquierdo y el Historial de
+     clases a la derecha (mismo esquema que desktop, ver .informes-layout), así que las celdas se achican
+     bastante para que las 7 columnas entren en la primera columna de esa grilla (150px). */
+  .cal-dows,.cal-grid{grid-template-columns:repeat(7,17px);gap:2px;}
+  .cal-dow{width:17px;font-size:6.5px;}
+  .cal-cell{width:17px;height:17px;min-width:0;font-size:8px;border-radius:4px;}
+  .cal-cell .cal-dlico{font-size:7px;}
+  .cal-cell .cal-badge{font-size:6px;}
+  .cal-title-bar{padding:5px 6px;margin:-6px -6px 6px;}
+  .cal-nav-btn{width:18px;height:18px;border-radius:5px;}
+  .cal-nav-btn svg{width:11px;height:11px;}
+  .cal-month-lbl{font-size:8.5px;}
+  .cal-dots{gap:3px;margin:-1px 0 6px;}
+  .cal-dot-ind{width:4px;height:4px;}
+  .cal-dot-ind.on{width:10px;}
+  .cal-legend{flex-direction:column;align-items:flex-start;font-size:8px;gap:4px;margin-top:6px;}
+  .cal-legend .lg-swatch{width:9px;height:9px;}
+  .cal-dl-btn,.cal-dl-note{min-height:auto;font-size:8px;padding:5px 4px;margin-top:5px;line-height:1.25;}
+  /* Historial de clases del ALUMNO (columna derecha de .informes-layout) también se achica para acompañar
+     el calendario angosto — escopeado a .informes-layout para no afectar el Historial de Portal del Profe,
+     que comparte las mismas clases .hist-timeline-card/.tl-* pero no está en este layout de 2 columnas. */
+  .informes-layout .hist-timeline-card{padding:12px 10px 2px;}
+  .informes-layout .tl-row{gap:8px;}
+  .informes-layout .tl-body{padding-bottom:14px;}
+  .informes-layout .tl-date{font-size:10px;}
+  .informes-layout .tl-cat{font-size:7.5px;padding:1.5px 6px;}
+  .informes-layout .tl-title{font-size:12px;margin-bottom:6px;}
+  .informes-layout .tl-desc{font-size:10.5px;line-height:1.45;}
 }
 @media(max-width:340px){ .cal-months{grid-template-columns:1fr;} }
 
@@ -4792,8 +4811,7 @@ function buildMonthCalendar(mk, monthSessions, pl, months, subscribed){
     ? (subscribed
         ? `<button class="cal-dl-btn" onclick="downloadMonthReport('${pl}','${mk}')" title="Descargar el reporte completo de ${monthLabel(mk)}">📄 Descargar reporte</button>`
         : `<button class="cal-dl-btn cal-dl-btn-locked" onclick="openSubsLock()" title="Para descargar el reporte, contactate con Profe Mauri">🔒 Descargar reporte</button>`)
-    : `<button class="cal-dl-btn cal-prev-btn" onclick="previewMonthReport('${pl}','${mk}')" title="Vista previa del reporte (solo profe, con PIN)">👁 Vista previa (profe)</button>
-       <div class="cal-dl-note cal-prev-note">El alumno verá el reporte al cerrar el mes</div>`;
+    : `<div class="cal-dl-note cal-prev-note">Los reportes están listos al finalizar el mes.</div>`;
   const idx=(months||[mk]).indexOf(mk);
   const hasPrev=idx>0, hasNext=idx>=0 && idx<(months||[mk]).length-1;
   const navBar=`<div class="cal-title-bar">
@@ -4803,7 +4821,7 @@ function buildMonthCalendar(mk, monthSessions, pl, months, subscribed){
   </div>${(months&&months.length>1)?`<div class="cal-dots">${months.map(m=>`<span class="cal-dot-ind${m===mk?' on':''}"></span>`).join('')}</div>`:''}`;
   const legend=`<div class="cal-legend">
     <span><span class="lg-swatch" style="background:#2b2b2b;"></span> Día con clase registrada</span>
-    <span><span class="lg-swatch" style="background:var(--ball);"></span> Descargar / vista previa del reporte</span>
+    <span><span class="lg-swatch" style="background:var(--ball);"></span> Descargar reporte</span>
   </div>`;
   return `<div class="cal-card">
     ${navBar}
@@ -4824,8 +4842,8 @@ function buildHistorial(){
   // (ver buildMonthCalendar: día final del mes con candado 🔒 en vez de descarga para quienes no la tienen).
   const subscribed=!currentPlayer || isSubscribed(currentPlayer);
   const infoBtn=`<button class="lg-info-btn" onclick="openRegistroInfo()">ℹ️ ¿Cómo funcionan los Informes?</button>`;
-  const timelineHTML=renderHistorialClases(studentHistorialEntries(currentPlayer));
   if(!playerSessions.length){
+    const timelineHTML=renderHistorialClases(studentHistorialEntries(currentPlayer));
     ldEl.style.display='none'; el.style.display='block';
     el.innerHTML=infoBtn+'<div class="empty" style="margin-top:14px;">No hay sesiones registradas.</div>'+timelineHTML;
     return;
@@ -4836,6 +4854,9 @@ function buildHistorial(){
   const monthSessions=playerSessions.filter(s=>monthKey(s)===informesMonth);
   const pl=currentPlayer.replace(/'/g,"\\'");
   const calHTML=buildMonthCalendar(informesMonth, monthSessions, pl, months, subscribed);
+  // El Historial de clases muestra solo las clases del mes elegido en el calendario (se recalcula al navegar entre meses)
+  const monthEntries=studentHistorialEntries(currentPlayer).filter(e=>e.mk===informesMonth);
+  const timelineHTML=renderHistorialClases(monthEntries);
   el.innerHTML=infoBtn+`<div class="informes-layout">${calHTML}<div>${timelineHTML}</div></div>`;
   ldEl.style.display='none'; el.style.display='block';
 }
