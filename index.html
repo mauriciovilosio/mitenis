@@ -1773,7 +1773,12 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
 const SHEET_ID   = '1Frlg1Kcl1SZ9qsC7G0NvcxziGua2wZrCE8LIRpg7CJk';
 const DATA_SHEET = 'Registro - Rubricas';
 const INFO_SHEET = 'informacion';
-const ASIST_SHEET = 'asistencia';
+// Hoja "asistencia ok": formato ancho (Alumno + una columna por mes, encabezado = último día del mes,
+// celda = clases cumplidas ese mes). Fuente de "cumplidas" para todos los KPIs de Asistencia. La hoja vieja
+// "asistencia" (fecha/jugador/cumplidas/objetivo/torneos) ya NO se usa para nada — Asistencia migró acá y
+// Torneos jugados migró a "Registro - Rubricas" (ver torneoMonths/tournamentsForMonth) — dejó de traerse
+// del Sheet.
+const ASIST_OK_SHEET = 'asistencia ok';
 const VIDEOS_SHEET = 'Videos';   // hoja: alumno | golpe | fecha | link
 const ADULTS_SHEET = 'informacion adultos'; // alumno | categoria | edad | brazo | pin
 const MATCHES_SHEET = 'Partidos Torneos';   // torneo | categoria | fecha | jugadorA | jugadorB | resultado | ganador | fase
@@ -1828,10 +1833,8 @@ const COL_DEFAULT = {
 };
 let COL = {...COL_DEFAULT};
 
-const INFO_DEFAULT = { alumno:0, brazo:1, altura:2, edad:3, categoria:4, objetivo:5, pin:6, subscripcion:7, estado:8 };
+const INFO_DEFAULT = { alumno:0, brazo:1, altura:2, edad:3, categoria:4, objetivo:5, pin:6, subscripcion:7, estado:8, clasesMes:10 };
 let INFO = {...INFO_DEFAULT};
-const ASIST_DEFAULT = { fecha:0, jugador:1, cumplidas:2, objetivo:3, torneos:4 };
-let ASIST = {...ASIST_DEFAULT};
 const VID_DEFAULT = { alumno:0, golpe:1, fecha:2, link:3 };
 let VID = {...VID_DEFAULT};
 const ADULT_DEFAULT = { alumno:0, categoria:1, edad:2, brazo:3, pin:4 };
@@ -1963,14 +1966,8 @@ const INFO_ALIASES = {
   objetivo:['objetivo','objetivos'],
   pin:['pin','clave','codigo','código','contraseña','password'],
   subscripcion:['subscripcion','subscripción','suscripcion','suscripción','subscription','membresia','membresía','registro','acceso registro'],
-  estado:['estado','status','situación','situacion']
-};
-const ASIST_ALIASES = {
-  fecha:['fecha','mes','marca temporal','periodo','período'],
-  jugador:['jugador','alumno','nombre'],
-  cumplidas:['sesiones cumplidas','cumplidas','asistencias','realizadas','asistencia'],
-  objetivo:['sesiones mensuales objetivo','objetivo','sesiones objetivo','meta','objetivo mensual','sesiones objetivo mensual'],
-  torneos:['torneos jugados','torneos','torneos del mes','cantidad de torneos','torneos jugados en el mes','torneos mes']
+  estado:['estado','status','situación','situacion'],
+  clasesMes:['cantidad de clases por mes','clases por mes','cantidad de clases mensuales','sesiones mensuales','sesiones por mes','clases mensuales']
 };
 const VID_ALIASES = {
   alumno:['alumno','jugador','nombre'],
@@ -2085,7 +2082,10 @@ const RESUMEN_GROUPS = {
 // ══════════════════════════════════════
 // ESTADO GLOBAL
 // ══════════════════════════════════════
-let allRows=[], infoRows=[], asistRows=[], videoRows=[], currentPlayer=null, playerSessions=[], charts={}, selectedMonth='all', coachCat=[], radarRange='30d', golpesRange='3m', informesMonth=null;
+let allRows=[], infoRows=[], videoRows=[], currentPlayer=null, playerSessions=[], charts={}, selectedMonth='all', coachCat=[], radarRange='30d', golpesRange='3m', informesMonth=null;
+// Asistencia (hoja "asistencia ok", formato ancho): nombre de alumno (trim) -> Map("YYYY-MM" -> celda cruda de clases cumplidas).
+// Solo se guardan celdas NO vacías: un mes ausente del Map significa "sin dato cargado todavía", no "0 clases".
+let asistOkMap = new Map();
 let appMode='escuela'; // 'escuela' | 'torneos'
 let ligaView='mensual'; // 'mensual' | 'anual' (Mi Ranking)
 let adultRows=[], matchRows=[], eventRows=[], circuitoCat='all';
@@ -2170,6 +2170,37 @@ function buildColMap(headerRow, defaults, aliases){
       const idx=norm.indexOf(normHeader(a));
       if(idx>=0){ map[key]=idx; break; }
     }
+  }
+  return map;
+}
+// Parsea la hoja "asistencia ok" (formato ancho: columna Alumno + una columna por mes, encabezado = último
+// día del mes correspondiente, celda = clases cumplidas ese mes). Devuelve un Map: nombre (trim) -> Map:
+// "YYYY-MM" -> celda cruda. Columnas cuyo encabezado no parsea como fecha (p.ej. columnas en blanco al final
+// de la planilla) se ignoran. Celdas vacías NO se guardan (mes sin dato cargado ≠ mes con 0 clases).
+function parseAsistOk(matrix){
+  const map=new Map();
+  if(!matrix || !matrix.length) return map;
+  const header=matrix[0]||[];
+  const norm=header.map(normHeader);
+  let alumnoIdx=0;
+  for(const a of HEADER_ALIASES.alumno){ const i=norm.indexOf(normHeader(a)); if(i>=0){ alumnoIdx=i; break; } }
+  const monthCols=[];
+  header.forEach((h,i)=>{
+    if(i===alumnoIdx) return;
+    const d=parseDate(h);
+    const mk=d?d.slice(0,7):'';
+    if(mk) monthCols.push({idx:i, mk});
+  });
+  for(let ri=1; ri<matrix.length; ri++){
+    const row=matrix[ri]; if(!row) continue;
+    const name=(row[alumnoIdx]||'').trim();
+    if(!name) continue;
+    const byMk = map.get(name) || new Map();
+    monthCols.forEach(({idx,mk})=>{
+      const cell=(row[idx]!=null?String(row[idx]):'').trim();
+      if(cell!=='') byMk.set(mk, cell);
+    });
+    map.set(name, byMk);
   }
   return map;
 }
@@ -2470,7 +2501,7 @@ function __navCurrentScreen(){
 })();
 function fmtUpdated(ts){ const d=new Date(ts); return isNaN(d)?'':d.toLocaleString('es-AR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }
 function setUpdated(ts){ const e=document.getElementById('last-update'); if(e) e.textContent = ts ? ('Última actualización: '+fmtUpdated(ts)) : ''; }
-function applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix){
+function applyData(dataMatrix, infoMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix, asistOkMatrix){
   if(dataMatrix.length) COL  = buildColMap(dataMatrix[0], COL_DEFAULT,  HEADER_ALIASES);
   if(infoMatrix && infoMatrix.length){
     INFO = buildColMap(infoMatrix[0], INFO_DEFAULT, INFO_ALIASES);
@@ -2480,14 +2511,13 @@ function applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatr
     for(const a of INFO_ALIASES.subscripcion){ const i=_normH.indexOf(normHeader(a)); if(i>=0){ _subIdx=i; break; } }
     INFO.subscripcion=_subIdx;
   }
-  if(asistMatrix && asistMatrix.length) ASIST = buildColMap(asistMatrix[0], ASIST_DEFAULT, ASIST_ALIASES);
   if(videosMatrix && videosMatrix.length) VID = buildColMap(videosMatrix[0], VID_DEFAULT, VID_ALIASES);
   if(adultsMatrix && adultsMatrix.length) ADULT = buildColMap(adultsMatrix[0], ADULT_DEFAULT, ADULT_ALIASES);
   if(matchesMatrix && matchesMatrix.length) MATCH = buildColMap(matchesMatrix[0], MATCH_DEFAULT, MATCH_ALIASES);
   if(eventsMatrix && eventsMatrix.length) EV = buildColMap(eventsMatrix[0], EV_DEFAULT, EV_ALIASES);
   allRows  = dataMatrix.slice(1).filter(r=>r[COL.alumno] && r[COL.alumno].length>0);
   infoRows = (infoMatrix && infoMatrix.length) ? infoMatrix.slice(1).filter(r=>r[INFO.alumno] && r[INFO.alumno].length>0) : [];
-  asistRows = (asistMatrix && asistMatrix.length) ? asistMatrix.slice(1).filter(r=>r[ASIST.jugador] && r[ASIST.jugador].length>0) : [];
+  asistOkMap = parseAsistOk(asistOkMatrix);
   videoRows = (videosMatrix && videosMatrix.length) ? videosMatrix.slice(1).filter(r=>r[VID.alumno] && r[VID.alumno].length>0 && r[VID.link] && r[VID.link].length>0) : [];
   adultRows = (adultsMatrix && adultsMatrix.length) ? adultsMatrix.slice(1).filter(r=>r[ADULT.alumno] && r[ADULT.alumno].length>0) : [];
   matchRows = (matchesMatrix && matchesMatrix.length) ? matchesMatrix.slice(1).filter(r=>(r[MATCH.jugadorA]&&r[MATCH.jugadorA].length>0)&&(r[MATCH.jugadorB]&&r[MATCH.jugadorB].length>0)) : [];
@@ -2584,22 +2614,24 @@ function renderPlayers(){
 }
 // Trae las 10 hojas del Sheet en paralelo, aplica los datos y actualiza el cache local.
 // Compartida por init() (primera carga) y silentRefresh() (revisión silenciosa al volver a la app).
+// NOTA: la hoja vieja "asistencia" (fecha/jugador/cumplidas/objetivo/torneos) ya NO se trae — Asistencia
+// migró a "asistencia ok" y Torneos jugados migró a "Registro - Rubricas" (Tipo de sesión = Torneo).
 async function fetchAndApplyLive(){
-  const [dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix] = await Promise.all([
+  const [dataMatrix, infoMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix, asistOkMatrix] = await Promise.all([
     fetchSheet(DATA_SHEET),
     fetchSheet(INFO_SHEET).catch(()=>[]),
-    fetchSheet(ASIST_SHEET).catch(()=>[]),
     fetchVideosSheet().catch(()=>[]),
     fetchByNames([ADULTS_SHEET,'informacion adultos','Informacion Adultos','información adultos']).catch(()=>[]),
     fetchByNames([MATCHES_SHEET,'Partidos Torneos','partidos torneos','Partidos','partidos']).catch(()=>[]),
     fetchByNames([EVENTS_SHEET,'Torneos','torneos']).catch(()=>[]),
     fetchByNames([PLAN_SHEET,'Planificacion','Planificación','planificacion','planificación']).catch(()=>[]),
     fetchByNames([HIST_SHEET,'historial','Historial','Historial de clases','historial de clases']).catch(()=>[]),
-    fetchByNames([MERCADO_SHEET,'mercado','Marketplace','marketplace']).catch(()=>[])
+    fetchByNames([MERCADO_SHEET,'mercado','Marketplace','marketplace']).catch(()=>[]),
+    fetchSheet(ASIST_OK_SHEET).catch(()=>[])
   ]);
-  applyData(dataMatrix, infoMatrix, asistMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix);
+  applyData(dataMatrix, infoMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix, asistOkMatrix);
   const ts=Date.now();
-  try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ts, data:dataMatrix, info:infoMatrix, asist:asistMatrix, videos:videosMatrix, adults:adultsMatrix, matches:matchesMatrix, events:eventsMatrix, plan:planMatrix, hist:histMatrix, mercado:mercadoMatrix})); }catch(e){}
+  try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ts, data:dataMatrix, info:infoMatrix, videos:videosMatrix, adults:adultsMatrix, matches:matchesMatrix, events:eventsMatrix, plan:planMatrix, hist:histMatrix, mercado:mercadoMatrix, asistOk:asistOkMatrix})); }catch(e){}
   return ts;
 }
 async function init(){
@@ -2607,7 +2639,7 @@ async function init(){
   // 1) Cache para pintado instantáneo
   try{
     const raw=localStorage.getItem(CACHE_KEY);
-    if(raw){ const cc=JSON.parse(raw); if(cc && cc.data){ applyData(cc.data, cc.info||[], cc.asist||[], cc.videos||[], cc.adults||[], cc.matches||[], cc.events||[], cc.plan||[], cc.hist||[], cc.mercado||[]); renderPlayers(); setUpdated(cc.ts); } }
+    if(raw){ const cc=JSON.parse(raw); if(cc && cc.data){ applyData(cc.data, cc.info||[], cc.videos||[], cc.adults||[], cc.matches||[], cc.events||[], cc.plan||[], cc.hist||[], cc.mercado||[], cc.asistOk||[]); renderPlayers(); setUpdated(cc.ts); } }
   }catch(e){}
   try{ restoreNav(); }catch(e){}
   // 2) Refresco en vivo desde el Sheet
@@ -3996,8 +4028,7 @@ function computeCoachData(){
   // "Alumnos" ahora se calcula desde la hoja Asistencia: alumnos con al menos 1 sesión registrada ese mes.
   const studsInMonth=mk=>{
     if(!mk) return 0;
-    const withSes=new Set(asistRows.filter(r=>ymKey(r[ASIST.fecha])===mk && n(r[ASIST.cumplidas])>=1).map(r=>(r[ASIST.jugador]||'').trim()));
-    return players.filter(p=>withSes.has(p)).length;
+    return players.filter(p=>{ const a=attendanceFor(p,mk); return a && a.cumplidas>=1; }).length;
   };
   const _alCur=studsInMonth(curMonth), _alPrev=prevMonth?studsInMonth(prevMonth):0;
   const asistPctOf=mk=>{ if(!mk) return null; let c=0,o=0; players.forEach(p=>{const a=attendanceFor(p,mk); if(a){c+=a.cumplidas; o+=a.objetivo;}}); return o>0?Math.round(c/o*100):null; };
@@ -4128,16 +4159,24 @@ function rebuildCoachAll(){
 // ══════════════════════════════════════
 function monthKey(s){ const d=parseDate(s[COL.fecha])||''; return d?d.slice(0,7):''; }
 function ymKey(dateStr){ const d=parseDate(dateStr)||''; return d?d.slice(0,7):''; }
+// Asistencia cumplida: hoja "asistencia ok" (celda del mes para el alumno). Objetivo: valor constante por
+// alumno en "informacion" · "Cantidad de clases por mes". Si el mes no tiene celda cargada para el alumno,
+// no hay dato todavía (null) — distinto de "cumplió 0 clases".
 function attendanceFor(name, mk){
-  for(const r of asistRows){
-    if((r[ASIST.jugador]||'').trim()===(name||'').trim() && ymKey(r[ASIST.fecha])===mk){
-      const cum=n(r[ASIST.cumplidas]), obj=n(r[ASIST.objetivo]);
-      return {cumplidas:cum, objetivo:obj, pct: obj>0?Math.round(cum/obj*100):0, met: obj>0 && cum>=obj};
-    }
-  }
-  return null;
+  const nm=(name||'').trim();
+  const byMk = asistOkMap.get(nm);
+  if(!byMk || !byMk.has(mk)) return null;
+  const cum=n(byMk.get(mk));
+  const info=getInfo(nm);
+  const obj=info?n(info[INFO.clasesMes]):0;
+  return {cumplidas:cum, objetivo:obj, pct: obj>0?Math.round(cum/obj*100):0, met: obj>0 && cum>=obj};
 }
-function attMonths(name){ return [...new Set(asistRows.filter(r=>(r[ASIST.jugador]||'').trim()===(name||'').trim()).map(r=>ymKey(r[ASIST.fecha])).filter(Boolean))].sort(); }
+function attMonths(name){ const byMk=asistOkMap.get((name||'').trim()); return byMk?[...byMk.keys()].sort():[]; }
+// Meses con Torneos jugados: hoja "Registro - Rubricas" (allRows/sessionsOf), sesiones cuya columna
+// "Tipo de sesión" (COL.tipo) indica Torneo — mismo criterio que ya usaba el calendario de Informes para
+// marcar días de torneo en rojo (buildMonthCalendar). Se mantiene separado de attMonths (que sigue
+// asistencia/hoja "asistencia ok") porque son dos conceptos independientes.
+function torneoMonths(name){ return [...new Set(sessionsOf(name).filter(s=>(s[COL.tipo]||'').toLowerCase().includes('torneo')).map(monthKey).filter(Boolean))].sort(); }
 function monthLabel(key){
   if(!key) return '';
   const MES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
@@ -5380,9 +5419,9 @@ function buildCoachPlanHTML(mk, cat){
 
 // ══════════════════════════════════════
 // LIGA — puntaje:
-// +1 por cada clase a la que asistió en el mes (columna 'Clases cumplidas' de la hoja asistencia)
+// +1 por cada clase a la que asistió en el mes (hoja "asistencia ok" + "Cantidad de clases por mes" de informacion)
 // Actitud: suma el promedio mensual que asignó el profe en cada clase (1, 2 o 3), mes a mes
-// +1 por cada torneo jugado en el mes (columna 'Torneos jugados' de la hoja asistencia)
+// +1 por cada torneo jugado en el mes (hoja "Registro - Rubricas", sesiones con "Tipo de sesión" = Torneo)
 // ══════════════════════════════════════
 const LG = { ATTEND:1, TORNEO:1 };
 function sessionsOf(name){
@@ -5394,14 +5433,9 @@ function areaAvgScope(name, period, areaId){
   const vals=ss.map(s=>avgLvlKeys(s,AREA_KEYS[areaId])).filter(v=>v>0);
   return vals.length? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
 }
-// Torneos jugados (de la hoja asistencia) para un mes puntual
+// Torneos jugados (hoja "Registro - Rubricas": sesiones con "Tipo de sesión" = Torneo) para un mes puntual
 function tournamentsForMonth(name, mk){
-  for(const r of asistRows){
-    if((r[ASIST.jugador]||'').trim()===(name||'').trim() && ymKey(r[ASIST.fecha])===mk){
-      return Math.max(0, Math.round(n(r[ASIST.torneos])));
-    }
-  }
-  return 0;
+  return sessionsOf(name).filter(s=> monthKey(s)===mk && (s[COL.tipo]||'').toLowerCase().includes('torneo')).length;
 }
 // ¿La Actitud del período llega a nivel Excelente? (promedio redondeado de la variable Actitud = 3)
 function actitudExcelente(name, period){
@@ -5426,9 +5460,11 @@ function scorePlayer(name, period){
   // +1 por cada clase a la que asistió en los meses del período
   let asistencia=0;
   aMonths.forEach(mk=>{ const at=attendanceFor(name,mk); if(at) asistencia+=at.cumplidas*LG.ATTEND; });
-  // +1 por cada torneo jugado en los meses del período
+  // +1 por cada torneo jugado en los meses del período (fuente: hoja vieja "asistencia", vía torneoMonths —
+  // independiente de aMonths/asistencia ok para no perder historial de torneos)
+  const tMonths = period==='all' ? torneoMonths(name) : (inYear ? torneoMonths(name).filter(mk=>mk.startsWith(yr)) : [period]);
   let torneos=0;
-  aMonths.forEach(mk=>{ torneos+=tournamentsForMonth(name,mk)*LG.TORNEO; });
+  tMonths.forEach(mk=>{ torneos+=tournamentsForMonth(name,mk)*LG.TORNEO; });
   // Actitud: suma el promedio mensual (1, 2 o 3) de cada mes con sesiones — acumulativo en el anual
   const sessMonths=[...new Set(sessScope.map(monthKey).filter(Boolean))];
   let actitud=0;
