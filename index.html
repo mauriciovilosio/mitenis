@@ -1320,6 +1320,10 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
 .stat-tile.ready .stat-ico{background:#fff6d6;color:#8a6d00;}
 .stat-val{font-size:15px;font-weight:800;color:var(--text);line-height:1.15;}
 .stat-lbl{font-size:9.5px;color:var(--muted);font-weight:500;line-height:1.3;}
+/* En desktop la línea divisoria arriba de "Historial de clases" (dentro de Informes del alumno) queda oculta
+   — a diferencia de mobile, donde sí se muestra. Escopeado a .informes-hist-col para no afectar ningún otro
+   uso de .coach-sec-hr en la app (Portal del Profe, Próximo torneo, Área a reforzar, Atención requerida). */
+@media(min-width:761px){ .informes-hist-col .coach-sec-hr{display:none;} }
 /* === Informes en mobile: calendario a todo el ancho arriba, Historial de clases a todo el ancho abajo ===
    (vuelve al esquema apilado de una sola columna; se probaron layouts de 2 columnas en rondas anteriores
    y no convencieron al usuario en su celular — ver mitenis-informes-mobile-2col-y-historial-por-mes.md) */
@@ -1342,6 +1346,7 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
 .cal-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-top:10px;}
 .cal-legend span{display:inline-flex;align-items:center;gap:6px;}
 .cal-legend .lg-swatch{width:13px;height:13px;border-radius:4px;flex-shrink:0;}
+.cal-legend .lg-swatch.lg-lock{background:transparent;display:flex;align-items:center;justify-content:center;font-size:11px;line-height:1;}
 /* === Mi Registro — bloqueo por subscripción === */
 .reg-lock-wrap{position:relative;min-height:340px;}
 .reg-lock-blur{filter:blur(6px);opacity:.55;pointer-events:none;user-select:none;}
@@ -4834,7 +4839,8 @@ function buildMonthCalendar(mk, monthSessions, pl, months, subscribed){
   // los mismos 2 ítems — la descarga real sigue disponible tocando el último día del mes en el calendario.
   const legend=`<div class="cal-legend">
     <span><span class="lg-swatch" style="background:#2b2b2b;"></span> Día de evaluación</span>
-    <span><span class="lg-swatch" style="background:var(--ball);"></span> Descargar reporte</span>
+    <span><span class="lg-swatch" style="background:var(--lv1);"></span> Torneo</span>
+    <span>${subscribed?'<span class="lg-swatch" style="background:var(--ball);"></span>':'<span class="lg-swatch lg-lock">🔒</span>'} Descargar reporte</span>
   </div>`;
   return `<div class="cal-card">
     ${navBar}
