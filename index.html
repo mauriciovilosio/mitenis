@@ -471,6 +471,22 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .mt-tile .skills-acc .vid-icos{background:rgba(255,255,255,.12);border-radius:7px;padding:2px 6px;}
 .mt-tile .skills-acc .vid-sep{color:rgba(255,255,255,.3);}
 .mt-tile .skills-acc .vid-ico.pending{opacity:.5;filter:grayscale(.5) brightness(1.6);}
+/* Mi Tenis: fila de habilidad — todo en una sola fila (nombre · pill), igual que en desktop.
+   El tile es angosto (2 por fila en mobile), así que la pill y los iconos de video se achican
+   al mínimo legible para dejarle lugar al nombre; si aun así un nombre largo no entra en una
+   línea, pasa a 2 líneas (nunca "…" — recorte por altura, sin el puntito que agrega
+   -webkit-line-clamp por su cuenta) y la pill queda alineada arriba (la pill y el +1 nunca se
+   cortan ni se ocultan). La pregunta de abajo (.ball-q) ya envuelve normal, sin límite de líneas. */
+.mt-tile .skills-acc .ball-item{padding:9px 0;}
+.mt-tile .skills-acc .ball-row{flex-wrap:nowrap;gap:6px;align-items:flex-start;}
+.mt-tile .skills-acc .ball-name{display:flex;align-items:flex-start;gap:3px;font-size:10.5px;line-height:1.32;flex:1 1 auto;min-width:30px;padding-top:1px;}
+.mt-tile .skills-acc .ball-name-text{overflow:hidden;white-space:normal;overflow-wrap:break-word;max-height:2.7em;min-width:0;}
+.mt-tile .skills-acc .vid-icos{font-size:0;flex-shrink:0;padding:1px 3px;margin-left:0;gap:2px;align-self:flex-start;}
+.mt-tile .skills-acc .vid-ico{font-size:10px;}
+.mt-tile .skills-acc .vid-sep{font-size:9px;}
+.mt-tile .skills-acc .rise-badge{font-size:8.5px;padding:1px 5px;margin-left:0;flex-shrink:0;align-self:flex-start;}
+.mt-tile .skills-acc .ball-label{width:auto;min-width:0;flex:0 0 auto;padding:2px 7px;font-size:9.5px;white-space:nowrap;}
+.mt-tile .skills-acc .ball-q{font-size:10px;margin-top:2px;}
 @media(max-width:560px){ .mt-tile-row{grid-template-columns:repeat(2,1fr);} .mt-tile-val{font-size:22px;} }
 
 
@@ -4653,7 +4669,7 @@ function buildRubrica(){
       const q=PERF_Q[g.nombre]||'';
       return `<div class="ball-item">
         <div class="ball-row">
-          <span class="ball-name">${g.nombre}${vidIconsHTML(g.nombre)}${rise?'<span class="rise-badge">+1</span>':''}</span>
+          <span class="ball-name"><span class="ball-name-text">${g.nombre}</span>${vidIconsHTML(g.nombre)}${rise?'<span class="rise-badge">+1</span>':''}</span>
           ${(lv===1||lv===2)
             ? `<span class="ball-label lb${lv} mejora-trigger" onclick="openMejora('${g.nombre.replace(/'/g,"\\'")}',${lv})" title="Cómo mejorar">${lvlLabel(lv)}</span>`
             : `<span class="ball-label lb${lv}">${lvlLabel(lv)}</span>`}
