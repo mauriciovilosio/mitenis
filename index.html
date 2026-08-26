@@ -441,6 +441,34 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 @media(max-width:900px){ .mt-grid{grid-template-columns:repeat(2,1fr);} }
 @media(max-width:520px){ .mt-grid{grid-template-columns:1fr;} }
 
+/* Mi Tenis: módulo unificado de las 4 áreas, estilo Portal del Profe (Dirección A) */
+.mt-hero{background:linear-gradient(135deg,#2b2b2b,#1a1a1a);border-radius:var(--radius);padding:18px 16px 16px;margin-top:8px;color:#fff;box-shadow:0 12px 30px rgba(0,0,0,.28);}
+.mt-hero-title{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:14px;}
+.mt-tile-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.mt-tile{background:rgba(255,255,255,.10);border-radius:12px;padding:13px 13px 12px;min-width:0;overflow:hidden;}
+.mt-tile-h{display:flex;align-items:center;gap:8px;}
+.mt-tile-ic{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.mt-tile-nm{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6);}
+.mt-tile-val{margin-top:10px;line-height:1;font-size:26px;font-weight:900;color:#fff;}
+.mt-tile-val span{font-size:12px;font-weight:700;color:rgba(255,255,255,.4);margin-left:2px;}
+.mt-tile-bar{height:5px;border-radius:99px;background:rgba(255,255,255,.14);margin-top:8px;overflow:hidden;}
+.mt-tile-bar i{display:block;height:100%;border-radius:99px;}
+.mt-tile-st{font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;margin-top:9px;}
+.mt-tile-st.st-up{color:#4ade80;} .mt-tile-st.st-eq{color:rgba(255,255,255,.55);} .mt-tile-st.st-dn{color:#ff8fa3;}
+.mt-tile-dl{font-size:9px;font-weight:600;color:rgba(255,255,255,.4);margin-top:1px;}
+.mt-tile-spark{margin-top:9px;height:24px;}
+.mt-tile-spark .area-spark{display:block;width:100%;height:24px;}
+.mt-tile .skills-acc{background:transparent;border:none;box-shadow:none;border-radius:0;margin:10px -13px -12px;border-top:1px solid rgba(255,255,255,.14);overflow:hidden;}
+.mt-tile .skills-acc .acc-head{padding:9px 13px;}
+.mt-tile .skills-acc .acc-head:hover{background:rgba(255,255,255,.06);}
+.mt-tile .skills-acc .acc-title{font-size:10px;font-weight:700;color:rgba(255,255,255,.75);}
+.mt-tile .skills-acc .acc-chevron{color:rgba(255,255,255,.5);font-size:16px;}
+.mt-tile .skills-acc .acc-body-inner{padding:0 13px 10px;}
+.mt-tile .skills-acc .ball-name{color:rgba(255,255,255,.85);}
+.mt-tile .skills-acc .ball-q{color:rgba(255,255,255,.5);}
+.mt-tile .skills-acc .ball-item{border-bottom-color:rgba(255,255,255,.1);}
+@media(max-width:560px){ .mt-tile-row{grid-template-columns:repeat(2,1fr);} .mt-tile-val{font-size:22px;} }
+
 
 .metric-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:13px;text-align:center;}
 .metric-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
@@ -4582,7 +4610,8 @@ function buildRubrica(){
   ];
   const PERF_Q={'Construcción del punto':'¿Construye con variación?','Velocidad':'¿Llega con equilibrio?','Resistencia':'¿Mantiene su nivel?','Tolerancia al error':'¿Resetea entre puntos?','Actitud':'¿Postura activa y positiva?'};
 
-  // KPI por área — formato del Reporte mensual (ícono + barra + estado)
+  // KPI por área — módulo unificado estilo Portal del Profe (tile translúcido + sparkline)
+  const _mtSparkMonths=_months.filter(mk=>!_curMk||mk<=_curMk).slice(-6);
   const kpiCard=(a)=>{
     const v=areaAvgScope(currentPlayer,_curMk,a.id);
     const pv=_prevMk?areaAvgScope(currentPlayer,_prevMk,a.id):0;
@@ -4594,14 +4623,17 @@ function buildRubrica(){
       if(Math.abs(d)<0.05){cls='st-eq';ar='→';lbl='ESTABLE';val='0.0';}
       else if(d>0){cls='st-up';ar='↗';lbl='EN EVOLUCIÓN';val='+'+d.toFixed(1);}
       else {cls='st-dn';ar='↘';lbl='EN AJUSTE';val=d.toFixed(1);}
-      st=`<div class="ac-st ${cls}">${ar} ${lbl}</div><div class="ac-dl">${val}${_prevShort?' vs '+_prevShort:''}</div>`;
+      st=`<div class="mt-tile-st ${cls}">${ar} ${lbl}</div><div class="mt-tile-dl">${val}${_prevShort?' vs '+_prevShort:''}</div>`;
     }
     const lc=v>0?areaLvlColor(v):'#9aaa9a';
-    return `<div class="ac">
-      <div class="ac-h"><div class="ac-ic" style="background:${lc};">${a.emoji}</div><div class="ac-nm">${a.nombre}</div></div>
-      <div class="ac-val" style="color:${lc};">${v>0?v.toFixed(1):'—'}<span> / 3</span></div>
-      <div class="ac-bar"><i style="width:${w}%;background:${lc};"></i></div>
+    const spVals=_mtSparkMonths.map(mk=>areaAvgScope(currentPlayer,mk,a.id));
+    const sparkSvg=areaSparkline(spVals,lc,'mtspk-'+a.id,3);
+    return `<div class="mt-tile">
+      <div class="mt-tile-h"><div class="mt-tile-ic" style="background:${lc};">${a.emoji}</div><div class="mt-tile-nm">${a.nombre}</div></div>
+      <div class="mt-tile-val">${v>0?v.toFixed(1):'—'}<span> / 3</span></div>
+      <div class="mt-tile-bar"><i style="width:${w}%;background:${lc};"></i></div>
       ${st}
+      ${sparkSvg?`<div class="mt-tile-spark">${sparkSvg}</div>`:''}
       ${skillsCard(a)}
     </div>`;
   };
@@ -4627,12 +4659,12 @@ function buildRubrica(){
     }).filter(Boolean).join('');
     const body = rows || '<div class="empty" style="color:var(--muted);padding:10px 0;font-size:12px;">Sin evaluación este mes.</div>';
     return `<div class="acc skills-acc">
-      <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">Ver mis habilidades</span><span class="acc-chevron">▾</span></div>
+      <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">Ver habilidades</span><span class="acc-chevron">▾</span></div>
       <div class="acc-body"><div class="acc-body-inner">${body}</div></div>
     </div>`;
   };
 
-  const grid=`<div class="mt-grid">${RAREAS.map(kpiCard).join('')}</div>`;
+  const grid=`<div class="mt-hero"><div class="mt-hero-title">Evaluación · ${monthLabel(_curMk)}</div><div class="mt-tile-row">${RAREAS.map(kpiCard).join('')}</div></div>`;
   const radarHTML=`<div class="acc evo-acc" style="margin-top:18px;">
     <div class="acc-head" onclick="toggleAcc(this)">
       <span class="acc-title">📊 Evaluación de Mi Tenis</span>
