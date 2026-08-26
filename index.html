@@ -465,7 +465,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .mt-tile .skills-acc .acc-chevron{color:rgba(255,255,255,.5);font-size:16px;}
 .mt-tile .skills-acc .acc-body-inner{padding:0 13px 10px;}
 .mt-tile .skills-acc .ball-name{color:rgba(255,255,255,.85);}
-.mt-tile .skills-acc .ball-q{color:rgba(255,255,255,.5);}
 .mt-tile .skills-acc .ball-item{border-bottom-color:rgba(255,255,255,.1);}
 /* Mi Tenis: iconos de cámara (vidIconsHTML) legibles sobre el tile oscuro */
 .mt-tile .skills-acc .vid-icos{background:rgba(255,255,255,.12);border-radius:7px;padding:2px 6px;}
@@ -476,17 +475,19 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
    al mínimo legible para dejarle lugar al nombre; si aun así un nombre largo no entra en una
    línea, pasa a 2 líneas (nunca "…" — recorte por altura, sin el puntito que agrega
    -webkit-line-clamp por su cuenta) y la pill queda alineada arriba (la pill y el +1 nunca se
-   cortan ni se ocultan). La pregunta de abajo (.ball-q) ya envuelve normal, sin límite de líneas. */
+   cortan ni se ocultan). La pregunta ya no se muestra en la fila — ver openPregunta(): el nombre
+   es clickeable (cuando la habilidad tiene pregunta) y abre un popup con esa pregunta. */
 .mt-tile .skills-acc .ball-item{padding:9px 0;}
 .mt-tile .skills-acc .ball-row{flex-wrap:nowrap;gap:6px;align-items:flex-start;}
 .mt-tile .skills-acc .ball-name{display:flex;align-items:flex-start;gap:3px;font-size:10.5px;line-height:1.32;flex:1 1 auto;min-width:30px;padding-top:1px;}
 .mt-tile .skills-acc .ball-name-text{overflow:hidden;white-space:normal;overflow-wrap:break-word;max-height:2.7em;min-width:0;}
+.mt-tile .skills-acc .ball-name-text.pregunta-trigger{cursor:pointer;text-decoration:underline dotted rgba(255,255,255,.4);text-underline-offset:2px;}
+.mt-tile .skills-acc .ball-name-text.pregunta-trigger:active{opacity:.7;}
 .mt-tile .skills-acc .vid-icos{font-size:0;flex-shrink:0;padding:1px 3px;margin-left:0;gap:2px;align-self:flex-start;}
 .mt-tile .skills-acc .vid-ico{font-size:10px;}
 .mt-tile .skills-acc .vid-sep{font-size:9px;}
 .mt-tile .skills-acc .rise-badge{font-size:8.5px;padding:1px 5px;margin-left:0;flex-shrink:0;align-self:flex-start;}
 .mt-tile .skills-acc .ball-label{width:auto;min-width:0;flex:0 0 auto;padding:2px 7px;font-size:9.5px;white-space:nowrap;}
-.mt-tile .skills-acc .ball-q{font-size:10px;margin-top:2px;}
 @media(max-width:560px){ .mt-tile-row{grid-template-columns:repeat(2,1fr);} .mt-tile-val{font-size:22px;} }
 
 
@@ -1805,6 +1806,14 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
   </div>
 </div>
 
+<div class="pin-overlay" id="pregunta-overlay" onclick="if(event.target===this)closePregunta()">
+  <div class="pin-modal" style="max-width:340px;">
+    <div class="pin-title" id="pregunta-title">Pregunta</div>
+    <div id="pregunta-body" style="text-align:left;margin-top:6px;"></div>
+    <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closePregunta()">Entendido</button></div>
+  </div>
+</div>
+
 <div class="pin-overlay" id="video-overlay" onclick="if(event.target===this)closeVideo()">
   <div class="video-modal">
     <div class="pin-title" id="video-title">🎥 Video</div>
@@ -2073,7 +2082,7 @@ const RUBRICAS = {
       desc:['No gana el punto en la red','Devuelve pero sin terminar el punto','Cierra el punto con volea dirigida']}
   ],
   tactica: [
-    { key:'Punto', nombre:'Construcción del punto',
+    { key:'Punto', nombre:'Arma el punto',
       desc:['Golpea sin plan, reacciona al punto','Usa un patrón de 2 o 3 golpes en situación simple','Juega con estrategia clara']}
   ],
   fisico: [
@@ -2083,7 +2092,7 @@ const RUBRICAS = {
       desc:['Errores no forzados aumentan cuando el punto o set es largo','Mantiene buena energia durante los puntos, baja un poco al final','Saca un plus de energia cuando define los puntos']}
   ],
   mental: [
-    { key:'Error', nombre:'Tolerancia al error',
+    { key:'Error', nombre:'Gestión de errores',
       desc:['Cambia su juego constantemente al errar sus golpes','Se recupera pero tarda en estabilizarse','Se resetea entre puntos rapidamente']},
     { key:'Actitud', nombre:'Actitud',
       desc:['Se frustra o se queja con frecuencia y le cuesta sostener una actitud positiva','Mantiene buena actitud cuando las cosas salen bien, pero decae ante la dificultad','Sostiene una actitud positiva y de compromiso durante toda la sesión, incluso en los momentos difíciles']}
@@ -2115,17 +2124,22 @@ const RESUMEN_GROUPS = {
     {nombre:'Volea', keys:['Volea_subida','Volea_Ejecucion']}
   ],
   tactica:[
-    {nombre:'Construcción del punto', keys:['Punto']}
+    {nombre:'Arma el punto', keys:['Punto']}
   ],
   fisico:[
     {nombre:'Velocidad', keys:['Velocidad']},
     {nombre:'Resistencia', keys:['Resistencia']}
   ],
   mental:[
-    {nombre:'Tolerancia al error', keys:['Error']},
+    {nombre:'Gestión de errores', keys:['Error']},
     {nombre:'Actitud', keys:['Actitud']}
   ]
 };
+// Pregunta en modo "¿...?" por grupo de RESUMEN_GROUPS (clave = nombre del grupo). Se muestra en el
+// popup que abre openPregunta() al hacer click en el nombre de la habilidad, en "Ver habilidades" de
+// Mi Tenis. Global (no local a buildRubrica()) porque openPregunta() la necesita fuera de esa función.
+// Los 4 grupos de Técnica (Drive/Revés/Saque/Volea) no tienen entrada — no muestran pregunta.
+const PERF_Q={'Arma el punto':'¿Tiene un plan de juego?','Velocidad':'¿Llega a golpear con equilibrio?','Resistencia':'¿Mantiene su nivel durante el punto?','Gestión de errores':'¿Le afecta perder un punto?','Actitud':'¿Mantiene una postura activa y positiva?'};
 
 // ══════════════════════════════════════
 // ESTADO GLOBAL
@@ -2989,7 +3003,7 @@ const MEJORAS = {
     1:{ objetivo:'Bloqueo firme.', ejercicio:'Voleas cortas contra la pared, manteniendo la muñeca firme.' },
     2:{ objetivo:'Dirigir la volea.', ejercicio:'20 voleas a una zona, alternando derecha y revés.' }
   }},
-  'Construcción del punto':{ emoji:'♟️', niveles:{
+  'Arma el punto':{ emoji:'♟️', niveles:{
     1:{ objetivo:'Tener un plan de 3 golpes.', ejercicio:'Declarar en voz alta dónde vas a jugar antes de sacar y cómo vas a terminar el punto.' },
     2:{ objetivo:'Variar el ritmo.', ejercicio:'Jugar un punto donde tengas que cambiar de profundidad al menos 1 vez.' }
   }},
@@ -3001,7 +3015,7 @@ const MEJORAS = {
     1:{ objetivo:'Disfrutar el movimiento continuo.', ejercicio:'Juegos de persecución: "la mancha", 10-15 min.' },
     2:{ objetivo:'Sostener la intensidad.', ejercicio:'Desafío: sostener un peloteo de 20 bolas seguidas.' }
   }, nota:'Para un plan serio, derivá con un preparador físico.' },
-  'Tolerancia al error':{ emoji:'🧠', niveles:{
+  'Gestión de errores':{ emoji:'🧠', niveles:{
     1:{ objetivo:'Borrón y cuenta nueva.', ejercicio:'Ritual: acomodar las cuerdas de la raqueta + respiración (4-4-4) antes de sacar.' },
     2:{ objetivo:'Bajar la autocrítica.', ejercicio:'Desafío: jugar puntos "sin enojos".' }
   }, nota:'Es autogestión, no reemplaza a un psicólogo deportivo.' },
@@ -3032,6 +3046,19 @@ function openMejora(name, lv){
   const ov=document.getElementById('mejora-overlay'); if(ov) ov.classList.add('show');
 }
 function closeMejora(){ const ov=document.getElementById('mejora-overlay'); if(ov) ov.classList.remove('show'); }
+// Pregunta de una habilidad (antes se mostraba en cursiva debajo de cada fila de "Ver habilidades";
+// ahora se abre en un popup al hacer click en el nombre — ver PERF_Q en buildRubrica()/skillsCard()).
+function openPregunta(nombre, emoji){
+  const q = (typeof PERF_Q!=='undefined' && PERF_Q[nombre]) ? PERF_Q[nombre] : '';
+  if(!q) return;
+  const tEl=document.getElementById('pregunta-title');
+  const bEl=document.getElementById('pregunta-body');
+  if(!tEl||!bEl) return;
+  tEl.innerHTML=`${emoji?emoji+' ':''}${nombre}`;
+  bEl.innerHTML=`<p class="mejora-intro" style="font-style:italic;">${q}</p>`;
+  const ov=document.getElementById('pregunta-overlay'); if(ov) ov.classList.add('show');
+}
+function closePregunta(){ const ov=document.getElementById('pregunta-overlay'); if(ov) ov.classList.remove('show'); }
 
 // ══════════════════════════════════════
 // VIDEOS — clip por golpe (Inicio / Fin de año)
@@ -4628,7 +4655,6 @@ function buildRubrica(){
     {id:'fisico', nombre:'Físico',   emoji:'⚡',col:'#1f9d57'},
     {id:'mental', nombre:'Mentalidad',emoji:'🧠',col:'#c2185b'}
   ];
-  const PERF_Q={'Construcción del punto':'¿Construye con variación?','Velocidad':'¿Llega con equilibrio?','Resistencia':'¿Mantiene su nivel?','Tolerancia al error':'¿Resetea entre puntos?','Actitud':'¿Postura activa y positiva?'};
 
   // KPI por área — módulo unificado estilo Portal del Profe (tile translúcido + sparkline)
   const _mtSparkMonths=_months.filter(mk=>!_curMk||mk<=_curMk).slice(-6);
@@ -4667,14 +4693,17 @@ function buildRubrica(){
       let prevLv=0; { const pa=prevSessList.map(s=>avgLvlKeys(s,g.keys)).filter(v=>v>0); if(pa.length) prevLv=Math.round(pa.reduce((x,y)=>x+y,0)/pa.length); }
       const rise = prevLv>0 && lv>prevLv;
       const q=PERF_Q[g.nombre]||'';
+      const nEsc=g.nombre.replace(/'/g,"\\'");
+      const nameText=q
+        ? `<span class="ball-name-text pregunta-trigger" onclick="openPregunta('${nEsc}','${a.emoji}')" title="Ver pregunta">${g.nombre}</span>`
+        : `<span class="ball-name-text">${g.nombre}</span>`;
       return `<div class="ball-item">
         <div class="ball-row">
-          <span class="ball-name"><span class="ball-name-text">${g.nombre}</span>${vidIconsHTML(g.nombre)}${rise?'<span class="rise-badge">+1</span>':''}</span>
+          <span class="ball-name">${nameText}${vidIconsHTML(g.nombre)}${rise?'<span class="rise-badge">+1</span>':''}</span>
           ${(lv===1||lv===2)
-            ? `<span class="ball-label lb${lv} mejora-trigger" onclick="openMejora('${g.nombre.replace(/'/g,"\\'")}',${lv})" title="Cómo mejorar">${lvlLabel(lv)}</span>`
+            ? `<span class="ball-label lb${lv} mejora-trigger" onclick="openMejora('${nEsc}',${lv})" title="Cómo mejorar">${lvlLabel(lv)}</span>`
             : `<span class="ball-label lb${lv}">${lvlLabel(lv)}</span>`}
         </div>
-        ${q?`<div class="ball-q">${q}</div>`:''}
       </div>`;
     }).filter(Boolean).join('');
     const body = rows || '<div class="empty" style="color:var(--muted);padding:10px 0;font-size:12px;">Sin evaluación este mes.</div>';
