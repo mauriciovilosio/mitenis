@@ -161,8 +161,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   /* El header pierde el "colchón" inferior que antes le daba .app-tabs (ahora fija abajo,
      fuera del flujo), así que se le da una altura mínima + padding propios para que no
      cambie de tamaño según haya o no avatar/meta de alumno, y el back/nombre queden
-     siempre centrados con el mismo margen arriba y abajo. */
-  .header-top{ min-height:70px; padding-bottom:14px; box-sizing:border-box; }
+     siempre centrados con el mismo margen arriba y abajo. Altura reducida a pedido del
+     usuario (antes 70px) para que el header ocupe menos espacio en mobile; align-items:center
+     en .header-top mantiene el botón Volver y el título centrados verticalmente igual. */
+  .header-top{ min-height:54px; padding-top:9px; padding-bottom:9px; box-sizing:border-box; }
   .app-tabs{
     position:fixed; left:0; right:0; bottom:0; z-index:200;
     display:flex; padding:8px 2px max(10px, env(safe-area-inset-bottom));
@@ -3359,13 +3361,13 @@ function histEntries(){
     return { fecha, mk:ymKey(fecha), grupo, categorias, objetivo, ejercicios };
   }).filter(e=>e.fecha).sort((a,b)=>(parseDate(b.fecha)||'').localeCompare(parseDate(a.fecha)||''));
 }
-// Cuenta los entrenamientos (columna "Entrenamiento"/objetivo de la hoja historial) de TODAS las clases
-// cargadas hasta el momento (sin filtros de mes/categoría/grupo). Cuando un registro combina varias
-// actividades separadas por "+" (ej. "Físico + Puntos"), cada una cuenta como un entrenamiento independiente.
-// Devuelve hasta 2 entradas {label, n}, ordenadas de más a menos entrenadas.
-function computeTopEntrenamientos(){
+// Cuenta los entrenamientos (columna "Entrenamiento"/objetivo de la hoja historial) respetando los
+// filtros de mes/grupo activos en Portal del Profe → Historial (recibe la lista de entries YA filtrada).
+// Cuando un registro combina varias actividades separadas por "+" (ej. "Físico + Puntos"), cada una
+// cuenta como un entrenamiento independiente. Devuelve hasta 2 entradas {label, n}, ordenadas de más a menos entrenadas.
+function computeTopEntrenamientos(entries){
   const counts={};
-  histEntries().forEach(e=>{
+  (entries||histEntries()).forEach(e=>{
     if(!e.objetivo) return;
     e.objetivo.split('+').map(s=>s.trim()).filter(Boolean).forEach(act=>{
       const key=act.toLowerCase();
@@ -3405,9 +3407,9 @@ function buildCoachHistorial(){
   if(histCat.length) entries=entries.filter(e=>e.categorias.some(c=>histCat.includes(c)));
   if(histGrupo.length) entries=entries.filter(e=>histGrupo.includes(e.grupo));
   const filters=`<div class="cz-filters">${histMesChips()}${histGrupoChips()}</div>`;
-  // Card oscura "Entrenamientos": los 2 entrenamientos más repetidos hasta el momento (todas las clases
-  // cargadas, sin aplicar los filtros de mes/categoría/grupo de arriba).
-  const _topEnt=computeTopEntrenamientos();
+  // Card oscura "Entrenamientos": los 2 entrenamientos más repetidos, respetando los filtros de Mes y
+  // Grupo activos arriba (usa `entries`, ya filtrado, en vez de todas las clases cargadas).
+  const _topEnt=computeTopEntrenamientos(entries);
   const entCard=`<div class="coach-sec-title">Entrenamientos</div><div class="perfil-hero coach-hero" style="margin-bottom:16px;"><div class="coach-kpi-row" style="grid-template-columns:repeat(2,1fr);margin-top:0;">
     <div class="coach-kpi"><div class="coach-kpi-lbl">Más entrenado</div><div class="coach-kpi-val" style="font-size:17px;line-height:1.25;">${_topEnt[0]?esc(_topEnt[0].label):'—'}</div></div>
     <div class="coach-kpi"><div class="coach-kpi-lbl">2do más entrenado</div><div class="coach-kpi-val" style="font-size:17px;line-height:1.25;">${_topEnt[1]?esc(_topEnt[1].label):'—'}</div></div>
