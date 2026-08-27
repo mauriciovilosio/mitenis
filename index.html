@@ -49,10 +49,11 @@
   --radius-sm:  10px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;}
+html{height:100%;overflow:hidden;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);height:100vh;height:100dvh;overflow:hidden;-webkit-font-smoothing:antialiased;}
 
 /* LANDING */
-.landing{min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:2rem;position:relative;overflow:hidden;}
+.landing{height:100vh;height:100dvh;display:flex;align-items:center;justify-content:center;padding:2rem;position:relative;overflow-y:auto;overflow-x:hidden;}
 .landing-bg{position:absolute;inset:0;background:#fefefe;}
 .landing-content{position:relative;z-index:2;text-align:center;max-width:540px;width:100%;}
 .logo-ball{margin:0 auto .7rem;display:flex;align-items:center;justify-content:center;}
@@ -123,11 +124,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .loading-state{color:var(--muted);font-size:13px;padding:1rem;text-align:center;}
 
 /* APP */
-.app{display:none;min-height:100vh;min-height:100dvh;flex-direction:column;}
+.app{display:none;height:100vh;height:100dvh;flex-direction:column;overflow:hidden;}
 .app.visible{display:flex;}
 
 /* HEADER */
-.app-header{background:#2b2b2b;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.28);}
+.app-header{background:#2b2b2b;flex-shrink:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.28);}
 .header-top{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 0;}
 #app .header-top,#coach .header-top,#circuito .header-top{justify-content:flex-start;gap:16px;}
 #app .header-top > div[style],#coach .header-top > div[style],#circuito .header-top > div[style]{display:none;}
@@ -142,7 +143,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .coach-header .header-name .info-i{margin-left:7px;}
 .coach-header .header-name{text-transform:uppercase;letter-spacing:.02em;}
 .header-meta{font-size:11px;color:rgba(255,255,255,.72);}
-.app-tabs{display:flex;padding:10px 20px 0;overflow-x:auto;scrollbar-width:none;}
+.app-tabs{display:flex;padding:10px 20px 0;overflow-x:auto;scrollbar-width:none;flex-shrink:0;}
 .app-tabs::-webkit-scrollbar{display:none;}
 .tab-btn{padding:8px 16px;font-family:'Inter',sans-serif;font-size:13px;color:rgba(255,255,255,.6);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all .15s;}
 .tab-btn.active{color:#ffde59;border-bottom-color:#ffde59;font-weight:600;}
@@ -150,7 +151,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .tb-ico{display:none;}
 
 /* CONTENT */
-.app-content{flex:1;padding:20px 16px 48px;}
+.app-content{flex:1;min-height:0;padding:20px 16px 48px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .tab-view{display:none;}
 .tab-view.active{display:block;}
 
@@ -165,14 +166,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
      usuario (antes 70px) para que el header ocupe menos espacio en mobile; align-items:center
      en .header-top mantiene el botón Volver y el título centrados verticalmente igual. */
   .header-top{ min-height:54px; padding-top:9px; padding-bottom:9px; box-sizing:border-box; }
+  /* Nav inferior: reestructuración del "shell" (2026-08-27) — dejó de usar position:fixed.
+     .app/.coach ahora tienen height:100dvh + overflow:hidden (no scrollean), .app-content es
+     el ÚNICO elemento que scrollea (flex:1; overflow-y:auto) y el nav pasa a ser un elemento
+     de flujo normal, reordenado al final visualmente con order (el HTML lo tiene inmediatamente
+     después del header). Header y nav quedan así completamente fijos en su lugar sin usar
+     fixed/sticky, que en mobile "saltaban" cuando el navegador ocultaba/mostraba su barra de URL. */
+  .app-content{ order:1; }
   .app-tabs{
-    position:fixed; left:0; right:0; bottom:0; z-index:200;
+    order:2; flex-shrink:0;
     display:flex; padding:8px 2px max(10px, env(safe-area-inset-bottom));
     background:#1f1f1f; box-shadow:0 -4px 16px rgba(0,0,0,.32);
     overflow-x:visible; box-sizing:border-box; min-height:64px;
-    transform:translateZ(0); -webkit-transform:translateZ(0);
-    backface-visibility:hidden; -webkit-backface-visibility:hidden;
-    will-change:transform;
   }
   .tab-btn{
     flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -184,7 +189,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   .tb-ico{ display:flex; flex-shrink:0; opacity:.8; }
   .tab-btn.active .tb-ico{ opacity:1; }
   .tb-lbl{ overflow:hidden; text-overflow:ellipsis; max-width:100%; }
-  .app-content{ padding-bottom:calc(84px + env(safe-area-inset-bottom)); }
 }
 
 /* CARDS */
@@ -999,7 +1003,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .lg-info-btn:hover{background:var(--surf2);}
 
 /* === v14: Modo Profe === */
-.coach{display:none;min-height:100vh;min-height:100dvh;flex-direction:column;}
+.coach{display:none;height:100vh;height:100dvh;flex-direction:column;overflow:hidden;}
 .coach.visible{display:flex;}
 .coach-btn{margin-top:16px;width:100%;background:#0a513a;border:1.5px solid #0a513a;color:#fff;border-radius:12px;padding:12px 18px;font-size:14px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s;}
 .coach-btn:hover{background:var(--blue-d);border-color:var(--blue-d);color:#fff;}
@@ -1532,18 +1536,20 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
       </div>
       <div style="width:60px;"></div>
     </div>
-    <nav class="app-tabs" id="tabs-escuela">
+    
+  </header>
+  <nav class="app-tabs" id="tabs-escuela">
       <button class="tab-btn active" onclick="switchTab('resumen',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span><span class="tb-lbl">Mi Perfil</span></button>
       <button class="tab-btn" onclick="switchTab('rubrica',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M4 9.5c4.5-3 6 8.5 16 5"></path></svg></span><span class="tb-lbl">Mi Tenis</span></button>
       <button class="tab-btn" onclick="switchTab('liga',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg></span><span class="tb-lbl">Mi Ranking</span></button>
       <button class="tab-btn" onclick="switchTab('historial',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span><span class="tb-lbl">Informes</span></button>
     </nav>
-    <nav class="app-tabs" id="tabs-torneos" style="display:none;">
+  <nav class="app-tabs" id="tabs-torneos" style="display:none;">
       <button class="tab-btn active" onclick="switchTab('partidos',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="8.5" rx="6" ry="7"></ellipse><line x1="12" y1="4" x2="12" y2="13"></line><line x1="7.5" y1="8.5" x2="16.5" y2="8.5"></line><line x1="12" y1="15.5" x2="12" y2="22"></line></svg></span><span class="tb-lbl">Mis Partidos</span></button>
       <button class="tab-btn" onclick="switchTab('ranking',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg></span><span class="tb-lbl">Ranking</span></button>
       <button class="tab-btn" onclick="switchTab('calendario',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span><span class="tb-lbl">Calendario</span></button>
     </nav>
-  </header>
+  
   <main class="app-content">
     <div class="tab-view active" id="tab-resumen">
       <div class="loading-view" id="loading-resumen"><div class="spinner"></div><p>Cargando…</p></div>
@@ -1583,13 +1589,14 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
       <div class="header-player"><div class="header-name">Portal del Profe</div></div>
       <div style="width:60px;"></div>
     </div>
-    <nav class="app-tabs" id="tabs-coach">
+  </header>
+  <nav class="app-tabs" id="tabs-coach">
       <button class="tab-btn active" onclick="switchCoachTab('resumen',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span><span class="tb-lbl">Inicio</span></button>
       <button class="tab-btn" onclick="switchCoachTab('alumnos',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span><span class="tb-lbl">Alumnos</span></button>
       <button class="tab-btn" onclick="switchCoachTab('planificacion',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg></span><span class="tb-lbl">Planificación</span></button>
       <button class="tab-btn" onclick="switchCoachTab('historial',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span><span class="tb-lbl">Historial</span></button>
     </nav>
-  </header>
+  
   <main class="app-content">
     <div class="coach-view active" id="coach-view-resumen"><div id="coach-content"></div></div>
     <div class="coach-view" id="coach-view-alumnos"><div id="coach-alumnos-content"></div></div>
@@ -1605,12 +1612,13 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
       <div class="header-player"><div class="header-name">Competencia abierta</div></div>
       <div style="width:60px;"></div>
     </div>
-    <nav class="app-tabs" id="tabs-circuito">
+  </header>
+  <nav class="app-tabs" id="tabs-circuito">
       <button class="tab-btn active" onclick="setCircuitoTab('torneos')"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span><span class="tb-lbl">Inicio</span></button>
       <button class="tab-btn" onclick="setCircuitoTab('ranking')"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg></span><span class="tb-lbl">Ranking</span></button>
       <button class="tab-btn" onclick="setCircuitoTab('jugadores')"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span><span class="tb-lbl">Jugadores</span></button>
     </nav>
-  </header>
+  
   <main class="app-content"><div id="circuito-content"></div></main>
 </div>
 
@@ -2836,7 +2844,17 @@ function setupTabsForMode(){
 // con clases (no hay navegación real de página), el navegador NO resetea el scroll al cambiar de pantalla.
 // Si quedaba scrolleado en la vista anterior, la pantalla nueva "arranca" scrolleada y el header tapa las
 // primeras cards. Se llama a esto en cada cambio de pantalla/pestaña para que siempre arranque arriba.
-function scrollAppTop(){ try{ window.scrollTo(0,0); }catch(e){} }
+function scrollAppTop(){
+  // El shell ya no scrollea a nivel documento (html/body con overflow:hidden) — el único
+  // elemento que scrollea es .app-content de la pantalla visible, así que hay que resetear
+  // SU scroll, no el de window. window.scrollTo queda como no-op de respaldo por las dudas.
+  try{ window.scrollTo(0,0); }catch(e){}
+  try{
+    const active=document.querySelector('.app.visible, .coach.visible');
+    const content=active ? active.querySelector('.app-content') : null;
+    if(content) content.scrollTop=0;
+  }catch(e){}
+}
 function openPlayer(name){
   currentPlayer=name;
   // El filtro de mes arranca en el mes en curso (si hay datos), si no en el último mes con datos
@@ -3223,8 +3241,7 @@ function setCatCoach(c){
   if(c==='all'){ coachCat=[]; }
   else { const i=coachCat.indexOf(c); if(i>=0) coachCat.splice(i,1); else coachCat.push(c); }
   rebuildCoachAll(); saveNav();
-  // Los 3 subtabs comparten el mismo filtro (mismo id) — reabrimos el acordeón solo en el que está visible.
-  const cf=document.querySelector('.coach-view.active #coach-cat-filter'); if(cf) cf.classList.add('open');
+  // El acordeón se cierra solo al reconstruirse (mismo comportamiento que el filtro de Mes).
 }
 
 // ── Modo Profe: subpestañas (Mi Resumen / Mi Planificación) ──
@@ -3314,17 +3331,17 @@ function buildCoachPlanificacion(){
 function setHistCat(c){
   histCat = c==='all' ? [] : [c]; // selección única
   buildCoachHistorial();
-  const cf=document.getElementById('hist-cat-filter'); if(cf) cf.classList.add('open');
+  // El acordeón se cierra solo al reconstruirse (mismo comportamiento que el filtro de Mes).
 }
 function setHistGrupo(g){
   histGrupo = g==='all' ? [] : [g]; // selección única
   buildCoachHistorial();
-  const gf=document.getElementById('hist-grupo-filter'); if(gf) gf.classList.add('open');
+  // El acordeón se cierra solo al reconstruirse (mismo comportamiento que el filtro de Mes).
 }
 function setHistMes(m){
   histMes = m==='all' ? [] : [m]; // selección única
   buildCoachHistorial();
-  const mf=document.getElementById('hist-mes-filter'); if(mf) mf.classList.add('open');
+  // El acordeón se cierra solo al reconstruirse (mismo comportamiento que el filtro de Mes).
 }
 function histMesChips(){
   const meses=[...new Set(histEntries().map(e=>e.mk).filter(Boolean))].sort();
