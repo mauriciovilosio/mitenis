@@ -49,10 +49,10 @@
   --radius-sm:  10px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;-webkit-font-smoothing:antialiased;}
 
 /* LANDING */
-.landing{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;position:relative;overflow:hidden;}
+.landing{min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:2rem;position:relative;overflow:hidden;}
 .landing-bg{position:absolute;inset:0;background:#fefefe;}
 .landing-content{position:relative;z-index:2;text-align:center;max-width:540px;width:100%;}
 .logo-ball{margin:0 auto .7rem;display:flex;align-items:center;justify-content:center;}
@@ -123,7 +123,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .loading-state{color:var(--muted);font-size:13px;padding:1rem;text-align:center;}
 
 /* APP */
-.app{display:none;min-height:100vh;flex-direction:column;}
+.app{display:none;min-height:100vh;min-height:100dvh;flex-direction:column;}
 .app.visible{display:flex;}
 
 /* HEADER */
@@ -743,7 +743,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* Secciones "Atención requerida" / "Área a reforzar": línea divisoria + título oscuro + card negra */
 .coach-sec-hr{border:none;border-top:1px solid var(--border);margin:20px 0 14px;}
-.coach-sec-title{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin:0 0 10px;}
+.coach-sec-title{font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin:0 0 10px;}
 .risk-card{background:linear-gradient(135deg,#2b2b2b,#1a1a1a);border-radius:var(--radius);padding:4px 16px;box-shadow:0 12px 30px rgba(0,0,0,.22);}
 .risk-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.10);}
 .risk-row:last-child{border-bottom:none;}
@@ -997,7 +997,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .lg-info-btn:hover{background:var(--surf2);}
 
 /* === v14: Modo Profe === */
-.coach{display:none;min-height:100vh;flex-direction:column;}
+.coach{display:none;min-height:100vh;min-height:100dvh;flex-direction:column;}
 .coach.visible{display:flex;}
 .coach-btn{margin-top:16px;width:100%;background:#0a513a;border:1.5px solid #0a513a;color:#fff;border-radius:12px;padding:12px 18px;font-size:14px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:all .15s;}
 .coach-btn:hover{background:var(--blue-d);border-color:var(--blue-d);color:#fff;}
@@ -1300,6 +1300,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .filter-acc .mf-chip{background:var(--surf);border:1.5px solid var(--border);color:var(--muted);border-radius:12px;font-weight:700;width:100%;text-align:left;}
 .filter-acc .mf-chip:hover{background:var(--surf2);border-color:var(--blue);color:var(--blue);}
 .filter-acc .mf-chip.active{background:#2b2b2b;border-color:#2b2b2b;color:#fff;font-weight:700;}
+/* Mobile: el label + valor del filtro (ej. "Grupo · Lun y Mié - 17hs") puede no entrar en una
+   sola línea dentro de la mitad de ancho que le toca en .cz-filters (grid de 2 columnas) — se
+   achica la fuente para que la fila no se rompa en 2 líneas. */
+@media(max-width:480px){
+  .filter-acc .acc-title{font-size:10px;gap:3px;}
+  .filter-acc .acc-sub{font-size:9px;margin-left:2px;}
+}
 
 /* === Historial: calendario de sesiones (tamaño fijo, sin desbordes) === */
 .cal-months{display:flex;flex-wrap:wrap;gap:14px;max-width:1494px;}
@@ -3352,6 +3359,22 @@ function histEntries(){
     return { fecha, mk:ymKey(fecha), grupo, categorias, objetivo, ejercicios };
   }).filter(e=>e.fecha).sort((a,b)=>(parseDate(b.fecha)||'').localeCompare(parseDate(a.fecha)||''));
 }
+// Cuenta los entrenamientos (columna "Entrenamiento"/objetivo de la hoja historial) de TODAS las clases
+// cargadas hasta el momento (sin filtros de mes/categoría/grupo). Cuando un registro combina varias
+// actividades separadas por "+" (ej. "Físico + Puntos"), cada una cuenta como un entrenamiento independiente.
+// Devuelve hasta 2 entradas {label, n}, ordenadas de más a menos entrenadas.
+function computeTopEntrenamientos(){
+  const counts={};
+  histEntries().forEach(e=>{
+    if(!e.objetivo) return;
+    e.objetivo.split('+').map(s=>s.trim()).filter(Boolean).forEach(act=>{
+      const key=act.toLowerCase();
+      if(!counts[key]) counts[key]={label:act, n:0};
+      counts[key].n++;
+    });
+  });
+  return Object.values(counts).sort((a,b)=>b.n-a.n).slice(0,2);
+}
 // Timeline oscuro compartido: fecha (gris) + tipo de entrenamiento/objetivo (blanco) + ejercicios (gris), unidos por puntos/línea.
 // Usado tanto en Informes del alumno (renderHistorialClases) como en Portal del Profe → Historial (buildCoachHistorial).
 function histTimelineHTML(entries){
@@ -3382,12 +3405,19 @@ function buildCoachHistorial(){
   if(histCat.length) entries=entries.filter(e=>e.categorias.some(c=>histCat.includes(c)));
   if(histGrupo.length) entries=entries.filter(e=>histGrupo.includes(e.grupo));
   const filters=`<div class="cz-filters">${histMesChips()}${histGrupoChips()}</div>`;
+  // Card oscura "Entrenamientos": los 2 entrenamientos más repetidos hasta el momento (todas las clases
+  // cargadas, sin aplicar los filtros de mes/categoría/grupo de arriba).
+  const _topEnt=computeTopEntrenamientos();
+  const entCard=`<div class="coach-sec-title">Entrenamientos</div><div class="perfil-hero coach-hero" style="margin-bottom:16px;"><div class="coach-kpi-row" style="grid-template-columns:repeat(2,1fr);margin-top:0;">
+    <div class="coach-kpi"><div class="coach-kpi-lbl">Más entrenado</div><div class="coach-kpi-val" style="font-size:17px;line-height:1.25;">${_topEnt[0]?esc(_topEnt[0].label):'—'}</div></div>
+    <div class="coach-kpi"><div class="coach-kpi-lbl">2do más entrenado</div><div class="coach-kpi-val" style="font-size:17px;line-height:1.25;">${_topEnt[1]?esc(_topEnt[1].label):'—'}</div></div>
+  </div></div>`;
   if(!entries.length){
-    el.innerHTML=`${filters}<div class="empty" style="color:var(--muted);margin-top:12px;">No hay clases cargadas todavía para estos filtros.</div>`;
+    el.innerHTML=`${filters}${entCard}<div class="empty" style="color:var(--muted);margin-top:12px;">No hay clases cargadas todavía para estos filtros.</div>`;
     return;
   }
   // Timeline de clases (más recientes primero), mismo formato oscuro que Informes del alumno
-  el.innerHTML=`${filters}<hr class="coach-sec-hr"><div class="coach-sec-title">Historial de clases</div><div class="hist-timeline-card">${histTimelineHTML(entries)}</div>`;
+  el.innerHTML=`${filters}${entCard}<hr class="coach-sec-hr"><div class="coach-sec-title">Historial de clases</div><div class="hist-timeline-card">${histTimelineHTML(entries)}</div>`;
 }
 // ── Historial de clases (Escuela de Tenis / Informes): timeline oscuro con las clases de la CATEGORÍA del alumno ──
 // Un alumno ve las sesiones cuyo grupo incluye su categoría (o sesiones sin categoría especificada, por defecto visibles a todos).
@@ -4079,7 +4109,7 @@ function computeCoachData(){
         <div class="cz-trend" style="color:${tCol};">${tArrow} ${tTxt}</div>
       </div>
       <div class="cz-ind">
-        <div class="cz-ind-row"><span class="cz-ind-lbl">Promedio</span><span class="cz-ind-val">${d.overall>0?d.overall.toFixed(1):'—'}<span>/3</span></span></div>
+        <div class="cz-ind-row"><span class="cz-ind-lbl">Rendimiento</span><span class="cz-ind-val">${d.overall>0?d.overall.toFixed(1):'—'}<span>/3</span></span></div>
         <div class="cz-ind-row"><span class="cz-ind-lbl">Asistencia</span><span class="cz-ind-val cz-ind-val-sm" style="color:${a?(a.pct<50?'#dc2626':a.pct<=80?'#e0a200':'#16a34a'):'inherit'};">${a?a.pct+'%':'—'}</span></div>
       </div>
     </div>`;
@@ -4132,9 +4162,6 @@ function computeCoachData(){
   const _spAlMax=Math.max(1,..._spAlumnos)+1;
   const _spClMax=Math.max(1,..._spClases)+1;
   const coachHero=`<div class="perfil-hero coach-hero">
-    <div class="ph-info">
-      <div class="ph-name">${!coachCat.length?'Todas las categorías':coachCat.join(' · ')}</div>
-    </div>
     <div class="coach-kpi-row">
       <div class="coach-kpi">
         <div class="coach-kpi-lbl">Alumnos activos</div>
@@ -4158,7 +4185,7 @@ function computeCoachData(){
       </div>
     </div>
   </div>`;
-  const _rankCard=`<div class="acc open cz-rank-acc" style="margin-top:14px;"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">🏆 Ranking de alumnos</span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="cz-rank-scroll">${studRows||'<div class="empty" style="color:var(--muted);">Sin alumnos en este filtro.</div>'}</div></div></div></div>`;
+  const _rankCard=`<div class="acc open cz-rank-acc" style="margin-top:14px;"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">🏆 Ranking por rendimiento</span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="cz-rank-scroll">${studRows||'<div class="empty" style="color:var(--muted);">Sin alumnos en este filtro.</div>'}</div></div></div></div>`;
   const _radarAcc=`<div class="acc evo-acc" style="margin-top:14px;">
     <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📊 Comparación por categoría</span><span class="acc-chevron">▾</span></div>
     <div class="acc-body"><div class="acc-body-inner"><div class="chart-wrap" style="height:320px;margin-top:6px;"><canvas id="ch-coach-radar"></canvas></div></div></div>
@@ -4175,6 +4202,7 @@ function buildCoach(){
   const cd=computeCoachData();
   if(!cd){ el.innerHTML='<div class="empty">No hay jugadores cargados.</div>'; return; }
   el.innerHTML = `<div class="cz-filters">${cd.monthChips}${cd.catChips}</div>`
+    + `<div class="coach-sec-title">Resumen de clases</div>`
     + cd.coachHero
     + cd.atencionCard;
   const _flb=document.getElementById('foco-alum-body'); if(_flb) _flb.innerHTML=cd._focoAlumBody;
@@ -4185,6 +4213,7 @@ function buildCoachAlumnos(){
   const cd=computeCoachData();
   if(!cd){ el.innerHTML='<div class="empty">No hay jugadores cargados.</div>'; return; }
   el.innerHTML = `<div class="cz-filters">${cd.monthChips}${cd.catChips}</div>`
+    + `<div class="coach-sec-title">Resumen de mis alumnos</div>`
     + cd._rankCard
     + cd._radarAcc;
   if(charts['coachRadar']){ try{charts['coachRadar'].destroy();}catch(e){} }
@@ -4215,6 +4244,7 @@ function buildCoachPlanArea(){
   const cd=computeCoachData();
   if(!cd){ el.innerHTML='<div class="empty">No hay jugadores cargados.</div>'; return; }
   el.innerHTML = `<div class="cz-filters">${cd.monthChips}${cd.catChips}</div>`
+    + `<div class="coach-sec-title">Rendimiento por área</div>`
     + cd.areasCard
     + cd.areaCard;
   const _fab=document.getElementById('foco-area-body'); if(_fab) _fab.innerHTML=cd._focoAreaBody;
