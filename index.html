@@ -196,8 +196,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
 .card-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#fefefe;background:#2b2b2b;padding:8px 12px;border-radius:9px;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
 #content-liga .card-title{color:#fefefe;margin:-16px -16px 14px;padding:10px 16px;border-radius:var(--radius) var(--radius) 0 0;}
 #content-liga .card{overflow:hidden;}
-#coach-alumnos-content .card-title{color:#fefefe;margin:-16px -16px 14px;padding:10px 16px;border-radius:var(--radius) var(--radius) 0 0;}
-#coach-alumnos-content .card{overflow:hidden;}
 #content-resumen .card-title{color:#fefefe;margin:-16px -16px 14px;padding:10px 16px;border-radius:var(--radius) var(--radius) 0 0;}
 .cz-radar, .cz-rank-card, .cz-areas{overflow:hidden;}
 .cz-radar > .card-title, .cz-rank-card > .card-title, .cz-areas > .card-title{color:#fefefe;margin:-16px -16px 14px;padding:10px 16px;border-radius:var(--radius) var(--radius) 0 0;}
@@ -620,6 +618,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
 .acc.open .acc-chevron{transform:rotate(180deg);}
 .acc-body{max-height:0;overflow:hidden;transition:max-height .35s ease;}
 .acc.open .acc-body{max-height:3000px;}
+.rank-acc{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:10px;}
+.rank-acc .acc-head{padding:13px 16px;background:#2b2b2b;}
+.rank-acc .acc-head:hover{background:#3a3a3a;}
+.rank-acc .acc-title{font-size:15px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#fff;flex-wrap:wrap;}
+.rank-acc .acc-chevron{color:#ffde59;}
+.rank-acc .acc-body-inner{padding:10px 16px 6px;}
+.rank-cat-badge{display:inline-block;padding:3px 11px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.02em;}
+
 .acc-body-inner{padding:2px 16px 14px;}
 
 /* SEMÁFORO (Plan) */
@@ -752,6 +758,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
 /* Secciones "Atención requerida" / "Área a reforzar": línea divisoria + título oscuro + card negra */
 .coach-sec-hr{border:none;border-top:1px solid var(--border);margin:20px 0 14px;}
 .coach-sec-title{font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin:0 0 10px;}
+.coach-sec-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px;}
+.coach-sec-title-row .coach-sec-title{margin:0;}
+.sec-info-btn{flex-shrink:0;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--blue);background:transparent;color:var(--blue);font-size:11px;font-weight:800;font-style:italic;font-family:Georgia,serif;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;}
+.sec-info-btn:hover{background:var(--blue);color:#fff;}
 .risk-card{background:linear-gradient(135deg,#2b2b2b,#1a1a1a);border-radius:var(--radius);padding:4px 16px;box-shadow:0 12px 30px rgba(0,0,0,.22);}
 .risk-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.10);}
 .risk-row:last-child{border-bottom:none;}
@@ -2937,6 +2947,16 @@ function togglePlayerAcc(head){
   acc.classList.toggle('open', willOpen);
   if(willOpen){ try{ acc.scrollIntoView({behavior:'smooth', block:'nearest'}); }catch(e){} }
 }
+// Acordeón "desplazante" de las tablas de posiciones en Alumnos: al abrir una categoría se cierran las demás.
+function toggleRankAcc(head){
+  const acc=head.closest('.acc');
+  if(!acc) return;
+  const willOpen=!acc.classList.contains('open');
+  const scope=acc.closest('#coach-alumnos-content')||document;
+  scope.querySelectorAll('.rank-acc.open').forEach(a=>{ if(a!==acc) a.classList.remove('open'); });
+  acc.classList.toggle('open', willOpen);
+  if(willOpen){ try{ acc.scrollIntoView({behavior:'smooth', block:'nearest'}); }catch(e){} }
+}
 function toggleTip(btn){
   const w=btn.parentElement; if(!w) return;
   const cur=w.classList.contains('open');
@@ -4201,7 +4221,7 @@ function computeCoachData(){
   </div>`;
   const _rankCard=`<div class="acc open cz-rank-acc" style="margin-top:14px;"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">🏆 Ranking por rendimiento</span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="cz-rank-scroll">${studRows||'<div class="empty" style="color:var(--muted);">Sin alumnos en este filtro.</div>'}</div></div></div></div>`;
   const _radarAcc=`<div class="acc evo-acc" style="margin-top:14px;">
-    <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📊 Comparación por categoría</span><span class="acc-chevron">▾</span></div>
+    <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📊 Gráfico radar comparativo</span><span class="acc-chevron">▾</span></div>
     <div class="acc-body"><div class="acc-body-inner"><div class="chart-wrap" style="height:320px;margin-top:6px;"><canvas id="ch-coach-radar"></canvas></div></div></div>
   </div>`;
   return { monthChips, catChips, coachHero, atencionCard, areaCard, areasCard, _rankCard, _radarAcc, catData, cats, _focoAreaBody, _focoAlumBody };
@@ -4218,20 +4238,8 @@ function buildCoach(){
   el.innerHTML = `<div class="cz-filters">${cd.monthChips}${cd.catChips}</div>`
     + `<div class="coach-sec-title">Resumen de clases</div>`
     + cd.coachHero
-    + cd.atencionCard
-    + cd._radarAcc;
+    + cd.atencionCard;
   const _flb=document.getElementById('foco-alum-body'); if(_flb) _flb.innerHTML=cd._focoAlumBody;
-  if(charts['coachRadar']){ try{charts['coachRadar'].destroy();}catch(e){} }
-  const _cv=document.getElementById('ch-coach-radar');
-  if(_cv && cd.catData.length){
-    charts['coachRadar']=new Chart(_cv,{type:'radar',
-      data:{labels:['Técnica','Táctica','Físico','Mental'],datasets:cd.catData.map(c=>({label:c.label,data:c.data,borderColor:c.color,backgroundColor:hexA(c.color,0.18),fill:true,borderWidth:2,pointRadius:3,pointBackgroundColor:c.color}))},
-      options:{responsive:true,maintainAspectRatio:false,
-        plugins:{legend:{display:true,position:'bottom',labels:{color:'#2b2b2b',font:{size:11},boxWidth:10,padding:10,usePointStyle:true}}},
-        scales:{r:{min:0,max:3,ticks:{stepSize:1,backdropColor:'transparent',color:'rgba(43,43,43,0.55)',font:{size:9},callback:v=>['','Bien','Muy Bien','Excelente'][v]||''},grid:{color:'rgba(10,81,58,0.18)'},angleLines:{color:'rgba(10,81,58,0.18)'},pointLabels:{color:'#2b2b2b',font:{size:12,weight:'700'}}}}
-      }
-    });
-  }
 }
 // Alumnos: filtros + Ranking por puntos (migrado desde "Mi Ranking" de Escuela de Tenis, que se eliminó
 // de ahí — ver buildCoachRankingSection). Ya no muestra "Ranking por rendimiento" ni "Comparación por
@@ -4240,8 +4248,7 @@ function buildCoachAlumnos(){
   const el=document.getElementById('coach-alumnos-content'); if(!el) return;
   const cd=computeCoachData();
   if(!cd){ el.innerHTML='<div class="empty">No hay jugadores cargados.</div>'; return; }
-  el.innerHTML = `<div class="cz-filters">${cd.monthChips}${cd.catChips}</div>`
-    + `<div class="coach-sec-title">Resumen de mis alumnos</div>`
+  el.innerHTML = `<div class="coach-sec-title-row"><span class="coach-sec-title">Ranking de mis alumnos</span><button class="sec-info-btn" onclick="openLigaInfo()" aria-label="¿Cómo funciona el Ranking?">i</button></div>`
     + buildCoachRankingSection(cd.cats);
 }
 // Ranking por puntos (Asistencia + Actitud + Torneos) — misma lógica y puntaje que tenía "Mi Ranking"
@@ -4252,7 +4259,7 @@ function buildCoachAlumnos(){
 function buildCoachRankingSection(cats){
   const catOf=p=>{ const i=getInfo(p); return i?(i[INFO.categoria]||'').trim():''; };
   const allPlayers=[...new Set(allRows.map(r=>r[COL.alumno]))].filter(Boolean).filter(isAlumnoActivo);
-  const catsToShow = coachCat.length ? coachCat : cats;
+  const catsToShow = cats;
   if(!catsToShow.length){
     return '<div class="empty" style="color:var(--muted);">No hay categorías cargadas.</div>';
   }
@@ -4263,14 +4270,11 @@ function buildCoachRankingSection(cats){
     `<button class="lg-tg-btn ${ligaView==='mensual'?'active':''}" onclick="setLigaView('mensual')">📅 Ranking Mensual</button>`+
     `<button class="lg-tg-btn ${ligaView==='anual'?'active':''}" onclick="setLigaView('anual')">🏆 Ranking Anual</button>`+
   `</div>`;
-  const yearNote = ligaView==='anual'
-    ? `<div class="nota" style="margin-bottom:12px;">🏆 El <strong>Ranking Anual</strong> acumula los resultados de todos los meses del año. Al finalizar el año se premia al campeón de cada categoría.</div>`
-    : '';
-  const explain=`<button class="lg-info-btn" onclick="openLigaInfo()">ℹ️ ¿Cómo funciona el Ranking?</button>`;
 
   const avatarOf=name=>avatarColor(name);
   const iniOf=name=>name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
 
+  let firstOpen=true;
   const tablesHTML = catsToShow.map(cat=>{
     const catPlayers=allPlayers.filter(p=>catOf(p)===cat);
     if(!catPlayers.length) return '';
@@ -4289,10 +4293,13 @@ function buildCoachRankingSection(cats){
       ${i<3?`<div class="lg-medal-pos">${['🥇','🥈','🥉'][i]}</div>`:''}
       <div class="lg-pts">${s.total}<span> pts</span></div>
     </div>`).join('');
-    return `<div class="card"><div class="card-title">Tabla de posiciones · ${cat}</div>${rowsHTML||'<div class="empty" style="color:var(--muted);">Sin jugadores en este período.</div>'}</div>`;
+    const catHex=catColor(cat);
+    const openCls = firstOpen ? ' open' : '';
+    firstOpen=false;
+    return `<div class="acc rank-acc${openCls}"><div class="acc-head" onclick="toggleRankAcc(this)"><span class="acc-title">Tabla de posiciones <span class="rank-cat-badge" style="background:${catHex};color:${idealText(catHex)};">${cat}</span></span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner">${rowsHTML||'<div class="empty" style="color:var(--muted);">Sin jugadores en este período.</div>'}</div></div></div>`;
   }).join('');
 
-  return explain + toggleHTML + yearNote + (tablesHTML || '<div class="empty" style="color:var(--muted);">Sin alumnos en este filtro.</div>');
+  return toggleHTML + (tablesHTML || '<div class="empty" style="color:var(--muted);">Sin alumnos en este filtro.</div>');
 }
 // Planificación: filtros + Área a reforzar + Áreas del grupo
 function buildCoachPlanArea(){
@@ -4302,8 +4309,21 @@ function buildCoachPlanArea(){
   el.innerHTML = `<div class="cz-filters">${cd.monthChips}${cd.catChips}</div>`
     + `<div class="coach-sec-title">Rendimiento por área</div>`
     + cd.areasCard
-    + cd.areaCard;
+    + cd.areaCard
+    + `<hr class="coach-sec-hr"><div class="coach-sec-title">Comparación por categoría</div>`
+    + cd._radarAcc;
   const _fab=document.getElementById('foco-area-body'); if(_fab) _fab.innerHTML=cd._focoAreaBody;
+  if(charts['coachRadar']){ try{charts['coachRadar'].destroy();}catch(e){} }
+  const _cv=document.getElementById('ch-coach-radar');
+  if(_cv && cd.catData.length){
+    charts['coachRadar']=new Chart(_cv,{type:'radar',
+      data:{labels:['Técnica','Táctica','Físico','Mental'],datasets:cd.catData.map(c=>({label:c.label,data:c.data,borderColor:c.color,backgroundColor:hexA(c.color,0.18),fill:true,borderWidth:2,pointRadius:3,pointBackgroundColor:c.color}))},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:true,position:'bottom',labels:{color:'#2b2b2b',font:{size:11},boxWidth:10,padding:10,usePointStyle:true}}},
+        scales:{r:{min:0,max:3,ticks:{stepSize:1,backdropColor:'transparent',color:'rgba(43,43,43,0.55)',font:{size:9},callback:v=>['','Bien','Muy Bien','Excelente'][v]||''},grid:{color:'rgba(10,81,58,0.18)'},angleLines:{color:'rgba(10,81,58,0.18)'},pointLabels:{color:'#2b2b2b',font:{size:12,weight:'700'}}}}
+      }
+    });
+  }
 }
 // Rebuild de las 3 subpestañas a la vez (los filtros son compartidos entre las 3)
 function rebuildCoachAll(){
