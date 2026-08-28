@@ -756,6 +756,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
 /* Secciones "Atención requerida" / "Área a reforzar": línea divisoria + título oscuro + card negra */
 .coach-sec-hr{border:none;border-top:1px solid var(--border);margin:20px 0 14px;}
 .coach-sec-title{font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin:0 0 10px;}
+.coach-sec-title .sec-title-sub{font-weight:600;}
 .coach-sec-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px;}
 .coach-sec-title-row .coach-sec-title{margin:0;}
 .sec-info-btn{flex-shrink:0;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--blue);background:transparent;color:var(--blue);font-size:11px;font-weight:800;font-style:italic;font-family:Georgia,serif;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;}
@@ -1005,7 +1006,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
 .thumb.off{opacity:.22;filter:grayscale(1);}
 .lg-info-btn{background:var(--surf);border:1px solid var(--border);border-radius:999px;padding:8px 15px;font-size:12px;font-weight:600;color:var(--blue);font-family:'Inter',sans-serif;cursor:pointer;margin-bottom:14px;transition:background .15s;}
 @media(max-width:760px){
-  .lg-info-btn{display:block;width:fit-content;margin:0 auto 14px;font-size:13px;}
+  .lg-info-btn{display:block;width:fit-content;margin:0 0 14px;font-size:13px;}
 }
 /* === Mi Ranking: toggle Mensual / Anual === */
 .lg-toggle{display:flex;gap:8px;margin:10px 0 14px;}
@@ -4828,7 +4829,7 @@ function buildRubrica(){
     </div>`;
   };
 
-  const grid=`<div class="coach-sec-title">Evaluación de mis áreas - ${monthLabel(_curMk)}</div><div class="mt-tile-row">${RAREAS.map(kpiCard).join('')}</div>`;
+  const grid=`<div class="coach-sec-title">Evaluación de mis áreas - <span class="sec-title-sub">${monthLabel(_curMk)}</span></div><div class="mt-tile-row">${RAREAS.map(kpiCard).join('')}</div>`;
   const radarHTML=`<div class="acc evo-acc" style="margin-top:18px;">
     <div class="acc-head" onclick="toggleAcc(this)">
       <span class="acc-title">📊 Comparación de mis áreas</span>
