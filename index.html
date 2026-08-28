@@ -196,6 +196,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
 .card-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#fefefe;background:#2b2b2b;padding:8px 12px;border-radius:9px;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
 #content-liga .card-title{color:#fefefe;margin:-16px -16px 14px;padding:10px 16px;border-radius:var(--radius) var(--radius) 0 0;}
 #content-liga .card{overflow:hidden;}
+#coach-alumnos-content .card-title{color:#fefefe;margin:-16px -16px 14px;padding:10px 16px;border-radius:var(--radius) var(--radius) 0 0;}
+#coach-alumnos-content .card{overflow:hidden;}
 #content-resumen .card-title{color:#fefefe;margin:-16px -16px 14px;padding:10px 16px;border-radius:var(--radius) var(--radius) 0 0;}
 .cz-radar, .cz-rank-card, .cz-areas{overflow:hidden;}
 .cz-radar > .card-title, .cz-rank-card > .card-title, .cz-areas > .card-title{color:#fefefe;margin:-16px -16px 14px;padding:10px 16px;border-radius:var(--radius) var(--radius) 0 0;}
@@ -630,8 +632,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
 .evo-acc .acc-title{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;}
 .evo-acc .acc-chevron{color:#ffde59;font-size:20px;}
 .evo-acc .acc-body-inner{padding:0 18px 16px;}
-/* Modo Profe: mismo tamaño/estilo de fuente para los títulos de Áreas del grupo, Ranking de alumnos y
-   Comparación por categoría (viven en distintas subpestañas: Alumnos y Planificación) */
+/* Modo Profe: mismo tamaño/estilo de fuente para los títulos de Áreas del grupo (Planificación) y
+   Comparación por categoría (Inicio) */
 .coach-view .cz-areas .card-title, .coach-view .cz-rank-acc .acc-title, .coach-view .evo-acc .acc-title{font-size:11px !important;letter-spacing:.06em;}
 .coach-view .cz-rank-acc .acc-title{text-transform:uppercase;}
 .sem-group{margin-bottom:16px;}
@@ -1541,7 +1543,6 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
   <nav class="app-tabs" id="tabs-escuela">
       <button class="tab-btn active" onclick="switchTab('resumen',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span><span class="tb-lbl">Mi Perfil</span></button>
       <button class="tab-btn" onclick="switchTab('rubrica',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M4 9.5c4.5-3 6 8.5 16 5"></path></svg></span><span class="tb-lbl">Mi Tenis</span></button>
-      <button class="tab-btn" onclick="switchTab('liga',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg></span><span class="tb-lbl">Mi Ranking</span></button>
       <button class="tab-btn" onclick="switchTab('historial',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span><span class="tb-lbl">Informes</span></button>
     </nav>
   <nav class="app-tabs" id="tabs-torneos" style="display:none;">
@@ -1562,10 +1563,6 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
     <div class="tab-view" id="tab-historial">
       <div class="loading-view" id="loading-historial"><div class="spinner"></div><p>Cargando…</p></div>
       <div id="content-historial" style="display:none;"></div>
-    </div>
-    <div class="tab-view" id="tab-liga">
-      <div class="loading-view" id="loading-liga"><div class="spinner"></div><p>Cargando…</p></div>
-      <div id="content-liga" style="display:none;"></div>
     </div>
     <div class="tab-view" id="tab-partidos">
       <div class="loading-view" id="loading-partidos"><div class="spinner"></div><p>Cargando…</p></div>
@@ -1592,16 +1589,16 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
   </header>
   <nav class="app-tabs" id="tabs-coach">
       <button class="tab-btn active" onclick="switchCoachTab('resumen',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span><span class="tb-lbl">Inicio</span></button>
-      <button class="tab-btn" onclick="switchCoachTab('alumnos',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span><span class="tb-lbl">Alumnos</span></button>
       <button class="tab-btn" onclick="switchCoachTab('planificacion',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg></span><span class="tb-lbl">Planificación</span></button>
       <button class="tab-btn" onclick="switchCoachTab('historial',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span><span class="tb-lbl">Historial</span></button>
+      <button class="tab-btn" onclick="switchCoachTab('alumnos',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span><span class="tb-lbl">Alumnos</span></button>
     </nav>
   
   <main class="app-content">
     <div class="coach-view active" id="coach-view-resumen"><div id="coach-content"></div></div>
-    <div class="coach-view" id="coach-view-alumnos"><div id="coach-alumnos-content"></div></div>
     <div class="coach-view" id="coach-view-planificacion"><div id="coach-plan-content"></div></div>
     <div class="coach-view" id="coach-view-historial"><div id="coach-hist-content"></div></div>
+    <div class="coach-view" id="coach-view-alumnos"><div id="coach-alumnos-content"></div></div>
   </main>
 </div>
 
@@ -1982,7 +1979,6 @@ function setAvatarColor(name,color){
   try{ localStorage.setItem('mitenis_avatar', JSON.stringify(s)); }catch(e){}
   const h=document.getElementById('h-avatar'); if(h){ h.style.background=color; h.style.color=idealText(color); }
   try{ renderPlayers(); }catch(e){}
-  try{ buildLiga(); }catch(e){}
   document.querySelectorAll('.av-pick').forEach(b=>b.classList.toggle('active', b.getAttribute('data-c')===color));
 }
 function avatarPickerHTML(){
@@ -2992,16 +2988,15 @@ function openAvatarPicker(){
 function chooseAvatar(color){ if(currentPlayer) setAvatarColor(currentPlayer,color); closeAvatarPicker(); }
 function closeAvatarPicker(){ const ov=document.getElementById('av-overlay'); if(ov) ov.classList.remove('show'); }
 function openLigaInfo(){
-  const myCat=(getInfo(currentPlayer)?.[INFO.categoria]||'').trim() || 'Sin categoría';
   const b=document.getElementById('liga-info-body');
-  if(b) b.innerHTML=`<p style="margin-bottom:10px;">Mi Ranking es una <strong>competencia amistosa</strong> que premia la <strong>constancia, la buena actitud y la competencia</strong>. Te motiva a venir, a entrenar con la mejor energía y a animarte a jugar torneos.</p>
+  if(b) b.innerHTML=`<p style="margin-bottom:10px;">El Ranking es una <strong>competencia amistosa</strong> que premia la <strong>constancia, la buena actitud y la competencia</strong>. Motiva a los alumnos a venir, a entrenar con la mejor energía y a animarse a jugar torneos.</p>
     <p style="margin:0 0 6px;font-weight:600;">Cómo se suman los puntos:</p>
     <ul style="margin:0 0 0 18px;padding:0;">
-      <li style="margin-bottom:5px;"><strong>+${LG.ATTEND}</strong> por cada clase a la que asistís 📅</li>
-      <li style="margin-bottom:5px;">Sumás el <strong>promedio de Actitud</strong> que te puso el profe ese mes (1, 2 o 3) 💪</li>
-      <li><strong>+${LG.TORNEO}</strong> por cada torneo que jugaste en el mes 🏆</li>
+      <li style="margin-bottom:5px;"><strong>+${LG.ATTEND}</strong> por cada clase a la que asiste 📅</li>
+      <li style="margin-bottom:5px;">Suma el <strong>promedio de Actitud</strong> que le puso el profe ese mes (1, 2 o 3) 💪</li>
+      <li><strong>+${LG.TORNEO}</strong> por cada torneo que jugó en el mes 🏆</li>
     </ul>
-    <p style="margin:12px 0 0;padding-top:10px;border-top:1px solid var(--border);">🏷️ Competís en el ranking de tu categoría: <strong>${myCat}</strong>.</p>`;
+    <p style="margin:12px 0 0;padding-top:10px;border-top:1px solid var(--border);">🏷️ Cada alumno compite en el ranking de su propia categoría.</p>`;
   const ov=document.getElementById('liga-info-overlay'); if(ov) ov.classList.add('show');
 }
 function closeLigaInfo(){ const ov=document.getElementById('liga-info-overlay'); if(ov) ov.classList.remove('show'); }
@@ -4209,13 +4204,13 @@ function computeCoachData(){
     <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📊 Comparación por categoría</span><span class="acc-chevron">▾</span></div>
     <div class="acc-body"><div class="acc-body-inner"><div class="chart-wrap" style="height:320px;margin-top:6px;"><canvas id="ch-coach-radar"></canvas></div></div></div>
   </div>`;
-  return { monthChips, catChips, coachHero, atencionCard, areaCard, areasCard, _rankCard, _radarAcc, catData, _focoAreaBody, _focoAlumBody };
+  return { monthChips, catChips, coachHero, atencionCard, areaCard, areasCard, _rankCard, _radarAcc, catData, cats, _focoAreaBody, _focoAlumBody };
 }
 
 // ══════════════════════════════════════
-// PORTAL DEL PROFE — 3 subpestañas: Inicio / Alumnos / Planificación
+// PORTAL DEL PROFE — 4 subpestañas: Inicio / Planificación / Historial / Alumnos
 // ══════════════════════════════════════
-// Inicio: filtros + card negra de KPIs + card "Atención"
+// Inicio: filtros + card negra de KPIs + card "Atención" + Comparación por categoría (al final)
 function buildCoach(){
   const el=document.getElementById('coach-content'); if(!el) return;
   const cd=computeCoachData();
@@ -4223,18 +4218,9 @@ function buildCoach(){
   el.innerHTML = `<div class="cz-filters">${cd.monthChips}${cd.catChips}</div>`
     + `<div class="coach-sec-title">Resumen de clases</div>`
     + cd.coachHero
-    + cd.atencionCard;
-  const _flb=document.getElementById('foco-alum-body'); if(_flb) _flb.innerHTML=cd._focoAlumBody;
-}
-// Alumnos: filtros + Ranking de alumnos + Comparación por categoría
-function buildCoachAlumnos(){
-  const el=document.getElementById('coach-alumnos-content'); if(!el) return;
-  const cd=computeCoachData();
-  if(!cd){ el.innerHTML='<div class="empty">No hay jugadores cargados.</div>'; return; }
-  el.innerHTML = `<div class="cz-filters">${cd.monthChips}${cd.catChips}</div>`
-    + `<div class="coach-sec-title">Resumen de mis alumnos</div>`
-    + cd._rankCard
+    + cd.atencionCard
     + cd._radarAcc;
+  const _flb=document.getElementById('foco-alum-body'); if(_flb) _flb.innerHTML=cd._focoAlumBody;
   if(charts['coachRadar']){ try{charts['coachRadar'].destroy();}catch(e){} }
   const _cv=document.getElementById('ch-coach-radar');
   if(_cv && cd.catData.length){
@@ -4246,16 +4232,67 @@ function buildCoachAlumnos(){
       }
     });
   }
-  // Igualar la altura de la card del Ranking a la del gráfico (con scroll interno)
-  const _syncRank=()=>{
-    const rc=el.querySelector('.cz-radar'), kc=el.querySelector('.cz-rank-card');
-    if(rc && kc){
-      if(window.matchMedia('(min-width:760px)').matches){ kc.style.height=rc.offsetHeight+'px'; }
-      else { kc.style.height=''; }
-    }
-  };
-  if(typeof requestAnimationFrame==='function') requestAnimationFrame(_syncRank); else _syncRank();
-  if(!buildCoachAlumnos._rankResize){ buildCoachAlumnos._rankResize=true; window.addEventListener('resize', ()=>{ try{ const c=document.getElementById('coach'); if(c&&c.classList.contains('visible')) _syncRank(); }catch(e){} }); }
+}
+// Alumnos: filtros + Ranking por puntos (migrado desde "Mi Ranking" de Escuela de Tenis, que se eliminó
+// de ahí — ver buildCoachRankingSection). Ya no muestra "Ranking por rendimiento" ni "Comparación por
+// categoría" (esa se movió al final de Inicio, ver buildCoach).
+function buildCoachAlumnos(){
+  const el=document.getElementById('coach-alumnos-content'); if(!el) return;
+  const cd=computeCoachData();
+  if(!cd){ el.innerHTML='<div class="empty">No hay jugadores cargados.</div>'; return; }
+  el.innerHTML = `<div class="cz-filters">${cd.monthChips}${cd.catChips}</div>`
+    + `<div class="coach-sec-title">Resumen de mis alumnos</div>`
+    + buildCoachRankingSection(cd.cats);
+}
+// Ranking por puntos (Asistencia + Actitud + Torneos) — misma lógica y puntaje que tenía "Mi Ranking"
+// en Escuela de Tenis (scorePlayer/LG), migrada acá porque esa pestaña se eliminó. A diferencia de la
+// versión del alumno (que solo mostraba SU categoría y una card "Mi puntaje"), acá el profe ve una
+// tabla de posiciones por cada categoría (respeta el filtro de Categoría de arriba: si no hay ninguna
+// seleccionada, muestra todas). No hay "mi puntaje" porque no hay un alumno específico mirando.
+function buildCoachRankingSection(cats){
+  const catOf=p=>{ const i=getInfo(p); return i?(i[INFO.categoria]||'').trim():''; };
+  const allPlayers=[...new Set(allRows.map(r=>r[COL.alumno]))].filter(Boolean).filter(isAlumnoActivo);
+  const catsToShow = coachCat.length ? coachCat : cats;
+  if(!catsToShow.length){
+    return '<div class="empty" style="color:var(--muted);">No hay categorías cargadas.</div>';
+  }
+  const _now=new Date();
+  const curYear=String(_now.getFullYear());
+
+  const toggleHTML=`<div class="lg-toggle">`+
+    `<button class="lg-tg-btn ${ligaView==='mensual'?'active':''}" onclick="setLigaView('mensual')">📅 Ranking Mensual</button>`+
+    `<button class="lg-tg-btn ${ligaView==='anual'?'active':''}" onclick="setLigaView('anual')">🏆 Ranking Anual</button>`+
+  `</div>`;
+  const yearNote = ligaView==='anual'
+    ? `<div class="nota" style="margin-bottom:12px;">🏆 El <strong>Ranking Anual</strong> acumula los resultados de todos los meses del año. Al finalizar el año se premia al campeón de cada categoría.</div>`
+    : '';
+  const explain=`<button class="lg-info-btn" onclick="openLigaInfo()">ℹ️ ¿Cómo funciona el Ranking?</button>`;
+
+  const avatarOf=name=>avatarColor(name);
+  const iniOf=name=>name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+
+  const tablesHTML = catsToShow.map(cat=>{
+    const catPlayers=allPlayers.filter(p=>catOf(p)===cat);
+    if(!catPlayers.length) return '';
+    const catMonths=[...new Set(allRows.filter(r=>catOf(r[COL.alumno])===cat).map(monthKey).filter(Boolean))].sort();
+    const curMk = catMonths.length ? catMonths[catMonths.length-1] : (curYear+'-'+String(_now.getMonth()+1).padStart(2,'0'));
+    const period = ligaView==='anual' ? ('year:'+curYear) : curMk;
+    let board=catPlayers.map(p=>scorePlayer(p, period)).filter(s=>s.sesiones>0);
+    board.sort((a,b)=> b.total-a.total || b.asistencia-a.asistencia || b.actitud-a.actitud || b.torneos-a.torneos);
+    const rowsHTML=board.map((s,i)=>`<div class="lg-row">
+      <div class="lg-rank ${i<3?'top':''}">${i+1}</div>
+      <div class="lg-av" style="background:${avatarOf(s.name)};color:${idealText(avatarOf(s.name))};">${iniOf(s.name)}</div>
+      <div class="lg-info">
+        <div class="lg-name">${s.name}</div>
+        <div class="lg-sub">📅 ${s.asistencia} · 💪 ${s.actitud} · 🏆 ${s.torneos}</div>
+      </div>
+      ${i<3?`<div class="lg-medal-pos">${['🥇','🥈','🥉'][i]}</div>`:''}
+      <div class="lg-pts">${s.total}<span> pts</span></div>
+    </div>`).join('');
+    return `<div class="card"><div class="card-title">Tabla de posiciones · ${cat}</div>${rowsHTML||'<div class="empty" style="color:var(--muted);">Sin jugadores en este período.</div>'}</div>`;
+  }).join('');
+
+  return explain + toggleHTML + yearNote + (tablesHTML || '<div class="empty" style="color:var(--muted);">Sin alumnos en este filtro.</div>');
 }
 // Planificación: filtros + Área a reforzar + Áreas del grupo
 function buildCoachPlanArea(){
@@ -4401,11 +4438,11 @@ function rebuildAll(){
   Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}}); charts={};
   const tabs = appMode==='torneos'
     ? [['partidos',buildPartidos],['ranking',buildRankingTab],['calendario',buildCalendario]]
-    : [['resumen',buildResumen],['rubrica',buildRubrica],['liga',buildLiga],['historial',buildHistorial]];
+    : [['resumen',buildResumen],['rubrica',buildRubrica],['historial',buildHistorial]];
   tabs.forEach(([id,fn])=>{ try{ fn(); }catch(err){ const ld=document.getElementById('loading-'+id), ct=document.getElementById('content-'+id); if(ld) ld.style.display='none'; if(ct){ ct.style.display='block'; ct.innerHTML='<div class="err-box"><strong>No se pudo construir esta vista.</strong>'+(err&&err.message?err.message:err)+'</div>'; } } });
 }
 function setMonth(m){ selectedMonth=m; rebuildAll(); saveNav(); }
-function setLigaView(v){ ligaView=v; try{buildLiga();}catch(e){} }
+function setLigaView(v){ ligaView=v; try{buildCoachAlumnos();}catch(e){} }
 function filterByMonth(list){ if(selectedMonth==='all') return list; const f=list.filter(s=>monthKey(s)===selectedMonth); return f.length?f:list; }
 function monthChipsHTML(){
   const months=[...new Set(playerSessions.map(monthKey).filter(Boolean))].sort();
@@ -5796,105 +5833,6 @@ function renderResultadosCharts(errCounts, evoMonths, allMatches){
         } }
     });
   }
-}
-
-function buildLiga(){
-  const el=document.getElementById('content-liga');
-  const ldEl=document.getElementById('loading-liga');
-  const catOf=p=>{ const i=getInfo(p); return i?(i[INFO.categoria]||'').trim():''; };
-  const myCat=catOf(currentPlayer);
-  const catLbl = myCat || 'Sin categoría';
-  // ── Mi Ranking: alternar Mensual (mes actual) / Anual (acumulado del año) ──
-  const _now=new Date();
-  const curYear=String(_now.getFullYear());
-  const catMonths=[...new Set(allRows.filter(r=>catOf(r[COL.alumno])===myCat).map(monthKey).filter(Boolean))].sort();
-  const curMk = catMonths.length ? catMonths[catMonths.length-1] : (curYear+'-'+String(_now.getMonth()+1).padStart(2,'0'));
-  const period = ligaView==='anual' ? ('year:'+curYear) : curMk;
-  const periodLbl = ligaView==='anual' ? ('Anual '+curYear) : monthLabel(curMk);
-  const toggleHTML=`<div class="lg-toggle">`+
-    `<button class="lg-tg-btn ${ligaView==='mensual'?'active':''}" onclick="setLigaView('mensual')">📅 Ranking Mensual</button>`+
-    `<button class="lg-tg-btn ${ligaView==='anual'?'active':''}" onclick="setLigaView('anual')">🏆 Ranking Anual</button>`+
-  `</div>`;
-  const yearNote = ligaView==='anual'
-    ? `<div class="nota" style="margin-bottom:12px;">🏆 El <strong>Ranking Anual</strong> acumula los resultados de todos los meses del año. Al finalizar el año se premia al campeón de cada categoría.</div>`
-    : '';
-  // La Liga compara a cada jugador solo con sus compañeros de la misma categoría
-  const allPlayers=[...new Set(allRows.map(r=>r[COL.alumno]))].filter(Boolean).filter(isAlumnoActivo).filter(p=>catOf(p)===myCat);
-  if(!allPlayers.length){
-    ldEl.style.display='none'; el.style.display='block';
-    el.innerHTML=toggleHTML+'<div class="empty">Todavía no hay datos para armar la liga.</div>'; return;
-  }
-  const catNote=`<div class="nota" style="margin-bottom:12px;">🏷️ Competís en el ranking de tu categoría: <strong>${catLbl}</strong>.</div>`;
-  const avatarOf=name=>avatarColor(name);
-  const iniOf=name=>name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  let board=allPlayers.map(p=>scorePlayer(p, period)).filter(s=>s.sesiones>0);
-  board.sort((a,b)=> b.total-a.total || b.asistencia-a.asistencia || b.actitud-a.actitud || b.torneos-a.torneos);
-
-  const explain=`<button class="lg-info-btn" onclick="openLigaInfo()">ℹ️ ¿Cómo funciona Mi Ranking?</button>`;
-
-  const meScore=board.find(s=>s.name===currentPlayer);
-  let meHTML;
-  if(meScore){
-    const rank=board.findIndex(s=>s.name===currentPlayer)+1;
-    meHTML=`<div class="lg-me">
-      <div class="lg-me-top">
-        <div><div class="lg-me-lbl">Mi puntaje · ${periodLbl}</div><div class="lg-me-rank">${rank}º de ${board.length} · ${meScore.sesiones} ses.</div></div>
-        <div class="lg-me-score"><div class="lg-me-pts">${meScore.total}<span> pts</span></div></div>
-      </div>
-      <div class="lg-break lg-break-3">
-        <div class="lg-bk"><div class="lg-bk-ico">📅</div><div class="lg-bk-val">${meScore.asistencia}</div><div class="lg-bk-lbl">Asistencia</div></div>
-        <div class="lg-bk"><div class="lg-bk-ico">💪</div><div class="lg-bk-val">${meScore.actitud}</div><div class="lg-bk-lbl">Actitud</div></div>
-        <div class="lg-bk"><div class="lg-bk-ico">🏆</div><div class="lg-bk-val">${meScore.torneos}</div><div class="lg-bk-lbl">Torneos</div></div>
-      </div>
-    </div>`;
-  } else {
-    meHTML=`<div class="nota">No tenés sesiones en <strong>${periodLbl}</strong>. Sumá asistencia para entrar a la tabla.</div>`;
-  }
-
-  let podiumHTML='';
-  if(board.length>=2){
-    const order=[1,0,2], cls={0:'p1',1:'p2',2:'p3'}, medal={0:'🥇',1:'🥈',2:'🥉'};
-    podiumHTML='<div class="lg-podium">'+order.filter(i=>board[i]).map(i=>{
-      const s=board[i];
-      const isMe=s.name===currentPlayer;
-      return `<div class="lg-pod ${cls[i]}${isMe?' me':''}">
-        <div class="lg-pod-av" style="background:${avatarOf(s.name)};color:${idealText(avatarOf(s.name))};">${iniOf(s.name)}${champMedal(s.name)}</div>
-        <div class="lg-pod-name">${s.name.split(' ')[0]}${isMe?' <span class="lg-you">vos</span>':''}</div>
-        <div class="lg-pod-pts">${s.total} pts</div>
-        <div class="lg-pod-stand">${medal[i]}</div>
-      </div>`;
-    }).join('')+'</div>';
-  }
-
-  const rowsHTML=board.map((s,i)=>{
-    const isMe=s.name===currentPlayer;
-    return `<div class="lg-row ${isMe?'me':''}">
-      <div class="lg-rank ${i<3?'top':''}">${i+1}</div>
-      <div class="lg-av" style="background:${avatarOf(s.name)};color:${idealText(avatarOf(s.name))};">${iniOf(s.name)}${champMedal(s.name)}</div>
-      <div class="lg-info">
-        <div class="lg-name">${s.name}${isMe?'<span class="lg-you">vos</span>':''}</div>
-        <div class="lg-sub">📅 ${s.asistencia} · 💪 ${s.actitud} · 🏆 ${s.torneos}</div>
-      </div>
-      ${i<3?`<div class="lg-medal-pos">${['🥇','🥈','🥉'][i]}</div>`:''}
-      <div class="lg-pts">${s.total}<span> pts</span></div>
-    </div>`;
-  }).join('');
-
-  const areas=[['tecnica','Técnica'],['tactica','Táctica'],['fisico','Físico'],['mental','Mental']];
-  const medalsHTML=areas.map(([id,nombre])=>{
-    const t=areaTier(currentPlayer,id), m=TIER_MEDAL[t.tier];
-    return `<div class="lg-medal ${t.tier===0?'none':''}">
-      <div class="lg-medal-ic">${m.ic}</div>
-      <div class="lg-medal-tx">
-        <div class="lg-medal-area">${AREA_META[id].emoji} ${nombre}</div>
-        <div class="lg-medal-tier">${m.name}${t.avg?` · ${lvlLabel(Math.round(t.avg))}`:''}</div>
-      </div>
-    </div>`;
-  }).join('');
-
-  el.innerHTML = explain + toggleHTML + yearNote + meHTML
-    + `<div class="card"><div class="card-title">Tabla de posiciones · ${catLbl}</div>${rowsHTML||'<div class="empty" style="color:var(--muted);">Sin jugadores en este período.</div>'}</div>`;
-  ldEl.style.display='none'; el.style.display='block';
 }
 
 init();
