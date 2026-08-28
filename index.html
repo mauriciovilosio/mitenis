@@ -1328,6 +1328,19 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
   .filter-acc .acc-title{font-size:10px;gap:3px;}
   .filter-acc .acc-sub{font-size:9px;margin-left:2px;}
 }
+/* Portal del Profe (mobile): filtros de Mes/Categoría/Grupo con el mismo formato "pill" parejo que
+   el toggle Ranking Mensual/Anual de Alumnos (.lg-toggle/.lg-tg-btn), en vez del picker minimalista
+   que sigue usando Escuela de Tenis/Marketplace/Competencia abierta (por eso va escopeado a
+   .coach-view). El valor elegido se muestra solo, sin la palabra "Mes"/"Categoría"/"Grupo" adelante
+   (eso se resuelve en el JS que arma cada chip, no acá). */
+@media(max-width:760px){
+  .coach-view .cz-filters{display:flex;gap:8px;margin:10px 0 14px;}
+  .coach-view .filter-acc{flex:1;margin-bottom:0;}
+  .coach-view .filter-acc .acc-head{justify-content:center;gap:6px;padding:11px 10px;border-radius:12px;border:1.5px solid var(--border);background:var(--surf);transition:all .15s;}
+  .coach-view .filter-acc .acc-head:hover{background:var(--surf2);}
+  .coach-view .filter-acc.open .acc-head{border-color:var(--blue);}
+  .coach-view .filter-acc .acc-title{font-size:13px;font-weight:700;text-transform:none;letter-spacing:normal;color:var(--muted);}
+}
 
 /* === Historial: calendario de sesiones (tamaño fijo, sin desbordes) === */
 .cal-months{display:flex;flex-wrap:wrap;gap:14px;max-width:1494px;}
@@ -3364,7 +3377,7 @@ function setHistMes(m){
 function histMesChips(){
   const meses=[...new Set(histEntries().map(e=>e.mk).filter(Boolean))].sort();
   if(!meses.length) return '';
-  return `<div class="acc filter-acc" id="hist-mes-filter"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📅 Mes <span class="acc-sub">· ${histMes.length?monthLabel(histMes[0]):'Todos'}</span></span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
+  return `<div class="acc filter-acc" id="hist-mes-filter"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📅 ${histMes.length?monthLabel(histMes[0]):'Todos'}</span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
     <button class="mf-chip ${!histMes.length?'active':''}" onclick="setHistMes('all')">Todos</button>
     ${meses.map(m=>`<button class="mf-chip ${histMes.includes(m)?'active':''}" onclick="setHistMes('${m}')">${monthLabel(m)}</button>`).join('')}
   </div></div></div></div>`;
@@ -3380,7 +3393,7 @@ function histCatChips(){
 function histGrupoChips(){
   const grupos=[...new Set(histEntries().map(e=>e.grupo).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base',numeric:true}));
   if(!grupos.length) return '';
-  return `<div class="acc filter-acc" id="hist-grupo-filter"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">👥 Grupo <span class="acc-sub">· ${histGrupo.length?(histGrupo.length===1?histGrupo[0]:histGrupo.length+' seleccionados'):'Todos'}</span></span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
+  return `<div class="acc filter-acc" id="hist-grupo-filter"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">👥 ${histGrupo.length?(histGrupo.length===1?histGrupo[0]:histGrupo.length+' seleccionados'):'Todos'}</span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
     <button class="mf-chip ${!histGrupo.length?'active':''}" onclick="setHistGrupo('all')">Todos</button>
     ${grupos.map(g=>`<button class="mf-chip ${histGrupo.includes(g)?'active':''}" onclick="setHistGrupo('${g.replace(/'/g,"\\'")}')">${g}</button>`).join('')}
   </div></div></div></div>`;
@@ -3441,20 +3454,21 @@ function buildCoachHistorial(){
   if(histMes.length) entries=entries.filter(e=>histMes.includes(e.mk));
   if(histCat.length) entries=entries.filter(e=>e.categorias.some(c=>histCat.includes(c)));
   if(histGrupo.length) entries=entries.filter(e=>histGrupo.includes(e.grupo));
+  const secTitle=`<div class="coach-sec-title">Entrenamientos</div>`;
   const filters=`<div class="cz-filters">${histMesChips()}${histGrupoChips()}</div>`;
   // Card oscura "Entrenamientos": los 2 entrenamientos más repetidos, respetando los filtros de Mes y
   // Grupo activos arriba (usa `entries`, ya filtrado, en vez de todas las clases cargadas).
   const _topEnt=computeTopEntrenamientos(entries);
-  const entCard=`<div class="coach-sec-title">Entrenamientos</div><div class="perfil-hero coach-hero" style="margin-bottom:16px;"><div class="coach-kpi-row" style="grid-template-columns:repeat(2,1fr);margin-top:0;">
+  const entCard=`<div class="perfil-hero coach-hero" style="margin-bottom:16px;"><div class="coach-kpi-row" style="grid-template-columns:repeat(2,1fr);margin-top:0;">
     <div class="coach-kpi"><div class="coach-kpi-lbl">Más entrenado</div><div class="coach-kpi-val" style="font-size:17px;line-height:1.25;">${_topEnt[0]?esc(_topEnt[0].label):'—'}</div></div>
     <div class="coach-kpi"><div class="coach-kpi-lbl">2do más entrenado</div><div class="coach-kpi-val" style="font-size:17px;line-height:1.25;">${_topEnt[1]?esc(_topEnt[1].label):'—'}</div></div>
   </div></div>`;
   if(!entries.length){
-    el.innerHTML=`${filters}${entCard}<div class="empty" style="color:var(--muted);margin-top:12px;">No hay clases cargadas todavía para estos filtros.</div>`;
+    el.innerHTML=`${secTitle}${filters}${entCard}<div class="empty" style="color:var(--muted);margin-top:12px;">No hay clases cargadas todavía para estos filtros.</div>`;
     return;
   }
   // Timeline de clases (más recientes primero), mismo formato oscuro que Informes del alumno
-  el.innerHTML=`${filters}${entCard}<hr class="coach-sec-hr"><div class="coach-sec-title">Historial de clases</div><div class="hist-timeline-card">${histTimelineHTML(entries)}</div>`;
+  el.innerHTML=`${secTitle}${filters}${entCard}<hr class="coach-sec-hr"><div class="coach-sec-title">Historial de clases</div><div class="hist-timeline-card">${histTimelineHTML(entries)}</div>`;
 }
 // ── Historial de clases (Escuela de Tenis / Informes): timeline oscuro con las clases de la CATEGORÍA del alumno ──
 // Un alumno ve las sesiones cuyo grupo incluye su categoría (o sesiones sin categoría especificada, por defecto visibles a todos).
@@ -3993,11 +4007,11 @@ function computeCoachData(){
   const curMonth=(selectedMonth==='all'||allMonths.indexOf(selectedMonth)<0)?(allMonths[allMonths.length-1]||''):selectedMonth;
   const ci=allMonths.indexOf(curMonth); const prevMonth=ci>0?allMonths[ci-1]:null;
 
-  const monthChips=`<div class="acc filter-acc"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📅 Mes <span class="acc-sub">· ${selectedMonth==='all'?'Todos':mLabelFull(selectedMonth)}</span></span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
+  const monthChips=`<div class="acc filter-acc"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">📅 ${selectedMonth==='all'?'Todos':mLabelFull(selectedMonth)}</span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
     <button class="mf-chip ${selectedMonth==='all'?'active':''}" onclick="setMonthCoach('all')">Todos</button>
     ${allMonths.map(m=>`<button class="mf-chip ${selectedMonth===m?'active':''}" onclick="setMonthCoach('${m}')">${mLabelFull(m)}</button>`).join('')}
   </div></div></div></div>`;
-  const catChips = cats.length?`<div class="acc filter-acc" id="coach-cat-filter"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">🏷️ Categoría <span class="acc-sub">· ${coachCat.length?(coachCat.length===1?coachCat[0]:coachCat.length+' seleccionadas'):'Todas'}</span></span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
+  const catChips = cats.length?`<div class="acc filter-acc" id="coach-cat-filter"><div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">🏷️ ${coachCat.length?(coachCat.length===1?coachCat[0]:coachCat.length+' seleccionadas'):'Todas'}</span><span class="acc-chevron">▾</span></div><div class="acc-body"><div class="acc-body-inner"><div class="month-filter">
     <button class="mf-chip ${!coachCat.length?'active':''}" onclick="setCatCoach('all')">Todas</button>
     ${cats.map(ct=>`<button class="mf-chip ${coachCat.includes(ct)?'active':''}" onclick="setCatCoach('${ct.replace(/'/g,"\\'")}')">${ct}</button>`).join('')}
   </div></div></div></div>`:'';
@@ -4238,8 +4252,8 @@ function buildCoach(){
   const el=document.getElementById('coach-content'); if(!el) return;
   const cd=computeCoachData();
   if(!cd){ el.innerHTML='<div class="empty">No hay jugadores cargados.</div>'; return; }
-  el.innerHTML = `<div class="cz-filters">${cd.monthChips}${cd.catChips}</div>`
-    + `<div class="coach-sec-title">Resumen de clases</div>`
+  el.innerHTML = `<div class="coach-sec-title">Resumen de clases</div>`
+    + `<div class="cz-filters">${cd.monthChips}${cd.catChips}</div>`
     + cd.coachHero
     + cd.atencionCard;
   const _flb=document.getElementById('foco-alum-body'); if(_flb) _flb.innerHTML=cd._focoAlumBody;
@@ -4309,8 +4323,8 @@ function buildCoachPlanArea(){
   const el=document.getElementById('coach-plan-content'); if(!el) return;
   const cd=computeCoachData();
   if(!cd){ el.innerHTML='<div class="empty">No hay jugadores cargados.</div>'; return; }
-  el.innerHTML = `<div class="cz-filters">${cd.monthChips}${cd.catChips}</div>`
-    + `<div class="coach-sec-title">Rendimiento por área</div>`
+  el.innerHTML = `<div class="coach-sec-title">Rendimiento por área</div>`
+    + `<div class="cz-filters">${cd.monthChips}${cd.catChips}</div>`
     + cd.areasCard
     + cd.areaCard
     + `<hr class="coach-sec-hr"><div class="coach-sec-title">Comparación por categoría</div>`
