@@ -447,7 +447,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
 
 /* Mi Tenis: módulo unificado de las 4 áreas, estilo Portal del Profe (Dirección A) */
 .mt-tile-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
-.mt-tile-row.tiles-3{grid-template-columns:repeat(3,1fr);}
 .mt-tile{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:16px 16px 14px;min-width:0;overflow:hidden;box-shadow:0 4px 14px rgba(10,40,30,.05);}
 .mt-tile-h{display:flex;align-items:center;gap:8px;}
 .mt-tile-ic{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
@@ -459,7 +458,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
 .mt-tile-st{font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;margin-top:9px;}
 .mt-tile-st.st-up{color:var(--lv3);} .mt-tile-st.st-eq{color:var(--muted);} .mt-tile-st.st-dn{color:var(--lv1);}
 .mt-tile-dl{font-size:9px;font-weight:600;color:var(--muted);margin-top:1px;}
-.mt-tile-sub{font-size:10px;color:var(--muted);margin-top:6px;line-height:1.35;}
 .mt-tile-spark{margin-top:9px;height:24px;}
 .mt-tile-spark .area-spark{display:block;width:100%;height:24px;}
 .mt-tile .skills-acc{background:transparent;border:none;box-shadow:none;border-radius:0;margin:10px -16px -14px;border-top:1px solid var(--border);overflow:hidden;}
@@ -491,7 +489,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
 .mt-tile .skills-acc .vid-ico{font-size:10px;}
 .mt-tile .skills-acc .vid-sep{font-size:9px;}
 .mt-tile .skills-acc .ball-label{width:auto;min-width:0;flex:0 0 auto;padding:2px 7px;font-size:9.5px;white-space:nowrap;}
-@media(max-width:560px){ .mt-tile-row{grid-template-columns:repeat(2,1fr);} .mt-tile-row.tiles-3{grid-template-columns:repeat(2,1fr);} .mt-tile-val{font-size:23px;} }
+@media(max-width:560px){ .mt-tile-row{grid-template-columns:repeat(2,1fr);} .mt-tile-val{font-size:23px;} }
 
 
 .metric-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:13px;text-align:center;}
@@ -1359,12 +1357,10 @@ button.cal-cell{cursor:pointer;font-family:'Inter',sans-serif;transition:transfo
 button.cal-cell:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(10,81,58,.22);}
 .cal-cell.cal-has{background:var(--blue);color:#fff;border-color:var(--blue-d);}
 .cal-cell.cal-has .cal-dot{width:4px;height:4px;border-radius:50%;background:#fff;margin-top:2px;}
-.cal-cell.cal-has.cal-torneo{background:var(--lv1);border-color:#b91c1c;}
 .cal-badge{position:absolute;top:1px;right:1px;font-size:8px;font-weight:800;background:var(--ball);color:#5b5400;border-radius:99px;padding:0 3px;line-height:11px;min-width:11px;text-align:center;}
 .cal-cell.cal-dl{background:var(--ball);color:#5b5400;border-color:#e8c23e;}
 .cal-cell.cal-dl .cal-dlico{font-size:8px;line-height:1;margin-top:1px;}
 .cal-cell.cal-dl.has{box-shadow:inset 0 0 0 2px var(--blue);}
-.cal-cell.cal-dl.has.cal-torneo{box-shadow:inset 0 0 0 2px var(--lv1);}
 .cal-cell.cal-dl-lock{background:var(--surf2);color:var(--muted);border:1px dashed var(--border);}
 .cal-cell.cal-dl-lock .cal-dlico{font-size:8px;opacity:.7;}
 button.cal-cell.cal-dl-lock{cursor:pointer;}
@@ -1430,7 +1426,6 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
 .cal-dl-btn.cal-dl-btn-locked{background:var(--surf2);color:var(--muted);border:1px dashed var(--border);}
 .cal-dl-note{margin-top:8px;width:100%;min-height:36px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);background:var(--surf2);border:1px dashed var(--border);border-radius:10px;padding:6px 8px;text-align:center;line-height:1.3;}
 .hl-azul{background:#2b2b2b;color:#fff;padding:1px 7px;border-radius:5px;font-weight:600;}
-.hl-rojo{background:#dc2626;color:#fff;padding:1px 7px;border-radius:5px;font-weight:600;}
 .cal-legend{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;text-align:center;font-size:11px;color:var(--muted);margin-top:10px;}
 .cal-legend span{display:inline-flex;align-items:center;gap:6px;}
 .cal-legend .lg-swatch{width:13px;height:13px;border-radius:4px;flex-shrink:0;}
@@ -1570,7 +1565,6 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
   <nav class="app-tabs" id="tabs-escuela">
       <button class="tab-btn active" onclick="switchTab('resumen',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span><span class="tb-lbl">Mi Perfil</span></button>
       <button class="tab-btn" onclick="switchTab('rubrica',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M4 9.5c4.5-3 6 8.5 16 5"></path></svg></span><span class="tb-lbl">Mi Tenis</span></button>
-      <button class="tab-btn" onclick="switchTab('resultados',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="8.5" rx="6" ry="7"></ellipse><line x1="12" y1="4" x2="12" y2="13"></line><line x1="7.5" y1="8.5" x2="16.5" y2="8.5"></line><line x1="12" y1="15.5" x2="12" y2="22"></line></svg></span><span class="tb-lbl">Partidos</span></button>
       <button class="tab-btn" onclick="switchTab('historial',this)"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></span><span class="tb-lbl">Informes</span></button>
     </nav>
   <nav class="app-tabs" id="tabs-torneos" style="display:none;">
@@ -1587,10 +1581,6 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
     <div class="tab-view" id="tab-rubrica">
       <div class="loading-view" id="loading-rubrica"><div class="spinner"></div><p>Cargando…</p></div>
       <div id="content-rubrica" style="display:none;"></div>
-    </div>
-    <div class="tab-view" id="tab-resultados">
-      <div class="loading-view" id="loading-resultados"><div class="spinner"></div><p>Cargando…</p></div>
-      <div id="content-resultados" style="display:none;"></div>
     </div>
     <div class="tab-view" id="tab-historial">
       <div class="loading-view" id="loading-historial"><div class="spinner"></div><p>Cargando…</p></div>
@@ -1809,7 +1799,7 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
   <div class="pin-modal" style="max-width:380px;">
     <div class="pin-title">Cómo funcionan los Informes</div>
     <div style="font-size:14px;color:var(--text);line-height:1.7;text-align:left;margin-top:4px;">
-      <p style="margin:0;">Los días en <span class="hl-azul">oscuro</span> tienen una clase registrada donde los Profes evaluaron tu rendimiento, y los días en <span class="hl-rojo">rojo</span> tienen un Torneo registrado (tocalos para ver el detalle).</p>
+      <p style="margin:0;">Los días en <span class="hl-azul">oscuro</span> tienen una clase registrada donde los Profes evaluaron tu rendimiento (tocalos para ver el detalle).</p>
       <p style="margin:12px 0 0;">Al finalizar el mes, podés descargar un registro completo con más detalle de tu rendimiento evaluado por los Profes. En caso de querer obtener el registro mensual por favor contactar a Profe Mauri para la suscripción del mismo.</p>
     </div>
     <div class="pin-actions"><button class="pin-btn pin-ok" onclick="closeRegistroInfo()">Entendido</button></div>
@@ -2401,37 +2391,6 @@ function ctxLabel(tipo=''){
   return '🎾 Entrenamiento';
 }
 
-// ══════════════════════════════════════
-// RESULTADOS — registro de partidos (clase o torneo)
-// Desde ago-2026 cada evaluación se carga cuando el alumno juega un partido.
-// ══════════════════════════════════════
-// Una sesión cuenta como "partido" si la Descripción de la sesión dice "Partido".
-function isMatchRow(r){
-  return (r[COL.descripcion]||'').trim().toLowerCase().includes('partido');
-}
-// true=ganó, false=perdió, null=sin dato / indefinido
-function matchWon(r){
-  const v=normHeader(r[COL.matchResultado]||'');
-  if(!v) return null;
-  if(v.startsWith('gan')) return true;
-  if(v.startsWith('perd')) return false;
-  return null;
-}
-// 'alto'|'medio'|'bajo'|null
-function erroresLevel(r){
-  const v=normHeader(r[COL.matchErrores]||'');
-  if(v.startsWith('alto')) return 'alto';
-  if(v.startsWith('medio')) return 'medio';
-  if(v.startsWith('bajo')) return 'bajo';
-  return null;
-}
-function erroresLabel(lvl){ return lvl==='alto'?'Errores: Alto':lvl==='medio'?'Errores: Medio':lvl==='bajo'?'Errores: Bajo':''; }
-function matchCtxLabel(tipo=''){
-  const t=tipo.toLowerCase();
-  if(t.includes('torneo')) return '🏆 Torneo';
-  if(t.includes('clase')) return '🎓 Clase';
-  return '🎾 Partido';
-}
 
 function nivelPips(lv){
   return [1,2,3].map(i=>{
@@ -4481,7 +4440,7 @@ function rebuildAll(){
   Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}}); charts={};
   const tabs = appMode==='torneos'
     ? [['partidos',buildPartidos],['ranking',buildRankingTab],['calendario',buildCalendario]]
-    : [['resumen',buildResumen],['rubrica',buildRubrica],['resultados',buildResultados],['historial',buildHistorial]];
+    : [['resumen',buildResumen],['rubrica',buildRubrica],['historial',buildHistorial]];
   tabs.forEach(([id,fn])=>{ try{ fn(); }catch(err){ const ld=document.getElementById('loading-'+id), ct=document.getElementById('content-'+id); if(ld) ld.style.display='none'; if(ct){ ct.style.display='block'; ct.innerHTML='<div class="err-box"><strong>No se pudo construir esta vista.</strong>'+(err&&err.message?err.message:err)+'</div>'; } } });
 }
 function setMonth(m){ selectedMonth=m; rebuildAll(); saveNav(); }
@@ -5036,8 +4995,8 @@ function buildMonthCalendar(mk, monthSessions, pl, months, subscribed){
   let startDow=new Date(y, m-1, 1).getDay();   // 0=Dom..6=Sáb
   startDow=(startDow+6)%7;                       // semana arranca en Lunes
   const ended=monthEnded(mk);                    // reporte disponible solo si terminó el mes
-  const dayCount={}, dayTorneo={};
-  monthSessions.forEach(s=>{ const d=parseDate(s[COL.fecha]); if(!d) return; const dd=Number(d.slice(8,10)); dayCount[dd]=(dayCount[dd]||0)+1; if((s[COL.tipo]||'').toLowerCase().includes('torneo')) dayTorneo[dd]=true; });
+  const dayCount={};
+  monthSessions.forEach(s=>{ const d=parseDate(s[COL.fecha]); if(!d) return; const dd=Number(d.slice(8,10)); dayCount[dd]=(dayCount[dd]||0)+1; });
   const dows=['Lu','Ma','Mi','Ju','Vi','Sá','Do'];
   let cells='';
   for(let i=0;i<startDow;i++) cells+='<div class="cal-cell empty"></div>';
@@ -5046,18 +5005,18 @@ function buildMonthCalendar(mk, monthSessions, pl, months, subscribed){
     const isLast=day===lastDay;
     if(isLast && ended && !subscribed){
       // El mes terminó pero el alumno no tiene subscripción: puede ver el calendario igual, pero la descarga queda con candado
-      cells+=`<button class="cal-cell cal-dl-lock${has?' has':''}${dayTorneo[day]?' cal-torneo':''}" onclick="openSubsLock()" title="Para descargar el reporte, contactate con Profe Mauri">
+      cells+=`<button class="cal-cell cal-dl-lock${has?' has':''}" onclick="openSubsLock()" title="Para descargar el reporte, contactate con Profe Mauri">
         <span class="cal-num">${day}</span><span class="cal-dlico">🔒</span>
         ${dayCount[day]>1?`<span class="cal-badge">${dayCount[day]}</span>`:''}
       </button>`;
     } else if(isLast && ended){
       // El mes terminó: el último día permite descargar el reporte
-      cells+=`<button class="cal-cell cal-dl${has?' has':''}${dayTorneo[day]?' cal-torneo':''}" onclick="downloadMonthReport('${pl}','${mk}')" title="Descargar el reporte completo de ${monthLabel(mk)}">
+      cells+=`<button class="cal-cell cal-dl${has?' has':''}" onclick="downloadMonthReport('${pl}','${mk}')" title="Descargar el reporte completo de ${monthLabel(mk)}">
         <span class="cal-num">${day}</span><span class="cal-dlico">📄</span>
         ${dayCount[day]>1?`<span class="cal-badge">${dayCount[day]}</span>`:''}
       </button>`;
     } else if(has){
-      cells+=`<button class="cal-cell cal-has${dayTorneo[day]?' cal-torneo':''}" onclick="openHistDay('${pl}','${mk}',${day})" title="Ver sesión">
+      cells+=`<button class="cal-cell cal-has" onclick="openHistDay('${pl}','${mk}',${day})" title="Ver sesión">
         <span class="cal-num">${day}</span><span class="cal-dot"></span>
         ${dayCount[day]>1?`<span class="cal-badge">${dayCount[day]}</span>`:''}
       </button>`;
@@ -5082,7 +5041,6 @@ function buildMonthCalendar(mk, monthSessions, pl, months, subscribed){
   // los mismos 2 ítems — la descarga real sigue disponible tocando el último día del mes en el calendario.
   const legend=`<div class="cal-legend">
     <span><span class="lg-swatch" style="background:#2b2b2b;"></span> Día de evaluación</span>
-    <span><span class="lg-swatch" style="background:var(--lv1);"></span> Torneo</span>
     <span>${subscribed?'<span class="lg-swatch" style="background:var(--ball);"></span>':'<span class="lg-swatch lg-lock">🔒</span>'} Descargar reporte</span>
   </div>`;
   return `<div class="cal-card">
@@ -5719,154 +5677,6 @@ function areaTier(name, areaId){
 }
 const TIER_MEDAL={3:{ic:'🥇',name:'Oro'},2:{ic:'🥈',name:'Plata'},1:{ic:'🥉',name:'Bronce'},0:{ic:'⚪',name:'Sin medalla aún'}};
 
-// ══════════════════════════════════════
-// PARTIDOS — pestaña de partidos jugados (Escuela de Tenis · Alumno)
-// Fuente: hoja "Registro - Rubricas". Una sesión es un partido cuando
-// "Descripción de la sesión" dice "Partido" (isMatchRow, más arriba).
-// Si en "Rival" figura el nombre de OTRO alumno registrado en Mi Tenis, el
-// partido se refleja automáticamente en la pestaña Partidos de ese alumno
-// (resultado y marcador invertidos) para no tener que cargarlo dos veces.
-// ═════════════════════════════════════
-// Invierte un marcador de tenis seteo por seteo ("6-3, 4-6, 6-2" → "3-6, 6-4, 2-6")
-// para mostrarlo desde la perspectiva del rival. Si no matchea el patrón N-N
-// (texto libre atípico), esa parte queda tal cual — no se fuerza el parseo.
-function flipScore(score){
-  if(!score) return score;
-  return score.split(',').map(set=>{
-    const s=set.trim();
-    const m=s.match(/^(\d+)\s*-\s*(\d+)(\(\d+\))?$/);
-    if(!m) return s;
-    return m[2]+'-'+m[1]+(m[3]||'');
-  }).join(', ');
-}
-// Partidos de OTROS alumnos donde "Rival" coincide con este alumno — se devuelven
-// como filas espejo (mismo shape que una fila de allRows) con resultado/marcador
-// invertidos y Rival apuntando al alumno que efectivamente cargó la sesión.
-function mirroredMatchesFor(name){
-  const ownSigs=new Set(
-    (playerSessions||[]).filter(isMatchRow).map(m=>{
-      const d=parseDate(m[COL.fecha])||'';
-      const opp=(m[COL.matchRival]||'').trim().toLowerCase();
-      return d+'|'+[name.trim().toLowerCase(), opp].sort().join('|');
-    })
-  );
-  return allRows.filter(r=>isMatchRow(r) && r[COL.alumno]!==name && sameName(r[COL.matchRival], name))
-    .filter(r=>{
-      const d=parseDate(r[COL.fecha])||'';
-      const sig=d+'|'+[name.trim().toLowerCase(), (r[COL.alumno]||'').trim().toLowerCase()].sort().join('|');
-      return !ownSigs.has(sig); // evita duplicar si este alumno también cargó el mismo partido
-    })
-    .map(r=>{
-      const mirror=r.slice();
-      const wv=matchWon(r);
-      mirror[COL.matchResultado]= wv===true?'Perdió':(wv===false?'Ganó':(r[COL.matchResultado]||''));
-      mirror[COL.matchScore]=flipScore(r[COL.matchScore]);
-      mirror[COL.matchRival]=r[COL.alumno];
-      mirror.__mirrored=true;
-      return mirror;
-    });
-}
-function buildResultados(){
-  const el=document.getElementById('content-resultados');
-  const ldEl=document.getElementById('loading-resultados');
-  const ownMatches=(playerSessions||[]).filter(isMatchRow);
-  const mirrored=mirroredMatchesFor(currentPlayer);
-  const allMatches=ownMatches.concat(mirrored);
-
-  if(!allMatches.length){
-    ldEl.style.display='none'; el.style.display='block';
-    el.innerHTML='<div class="empty">Todavía no hay partidos registrados.<br>A partir de ahora, cada vez que juegues un partido en clase o en un torneo, tu profe va a cargar el resultado acá.</div>';
-    return;
-  }
-
-  const chips=monthChipsHTML();
-  const matches=filterByMonth(allMatches);
-  const sorted=matches.slice().sort((a,b)=>(parseDate(b[COL.fecha])||'').localeCompare(parseDate(a[COL.fecha])||''));
-
-  const decided=matches.filter(m=>matchWon(m)!==null);
-  const w=decided.filter(m=>matchWon(m)===true).length;
-  const l=decided.filter(m=>matchWon(m)===false).length;
-  const winPct=decided.length?Math.round(w/decided.length*100):0;
-  const pctCol=winPct>=60?'var(--lv3)':winPct>=40?'var(--lv2)':'var(--lv1)';
-  const pctBg=winPct>=60?'var(--lv3-bg)':winPct>=40?'var(--lv2-bg)':'var(--lv1-bg)';
-
-  const torneoCount=matches.filter(m=>(m[COL.tipo]||'').toLowerCase().includes('torneo')).length;
-  const claseCount=matches.length-torneoCount;
-
-  const tilesHTML=`<div class="mt-tile-row tiles-3">
-    <div class="mt-tile">
-      <div class="mt-tile-h"><div class="mt-tile-ic" style="background:#dcf3e7;">🎾</div><div class="mt-tile-nm">Partidos</div></div>
-      <div class="mt-tile-val">${matches.length}</div>
-      <div class="mt-tile-sub">${claseCount} en clase · ${torneoCount} en torneo</div>
-    </div>
-    <div class="mt-tile">
-      <div class="mt-tile-h"><div class="mt-tile-ic" style="background:#dcf3e7;">🏆</div><div class="mt-tile-nm">Récord G-P</div></div>
-      <div class="mt-tile-val"><span style="color:var(--lv3);">${w}</span><span style="color:var(--muted);">-</span><span style="color:var(--lv1);">${l}</span></div>
-      <div class="mt-tile-sub">${selectedMonth!=='all'?monthLabel(selectedMonth):'Historial completo'}</div>
-    </div>
-    <div class="mt-tile">
-      <div class="mt-tile-h"><div class="mt-tile-ic" style="background:${pctBg};">📈</div><div class="mt-tile-nm">% Victorias</div></div>
-      <div class="mt-tile-val" style="color:${pctCol};">${decided.length?winPct:'—'}${decided.length?'<span>%</span>':''}</div>
-      ${decided.length?`<div class="mt-tile-bar"><i style="width:${winPct}%;background:${pctCol};"></i></div>`:''}
-    </div>
-  </div>`;
-
-  // Evolución de resultados por mes (siempre a lo largo de todo el historial, no solo el mes filtrado)
-  const evoMonths=[...new Set(allMatches.map(monthKey).filter(Boolean))].sort();
-  const evoHTML = evoMonths.length>1 ? `<div class="coach-sec-title">Evolución de resultados</div>
-    <div class="card"><div style="position:relative;height:210px;"><canvas id="ch-resultados-evo"></canvas></div></div>` : '';
-
-  const listHTML=sorted.map(m=>{
-    const wv=matchWon(m);
-    const cls=wv===null?'tie':(wv?'win':'loss');
-    const badge=wv===null?'·':(wv?'G':'P');
-    const rival=(m[COL.matchRival]||'').trim();
-    const score=(m[COL.matchScore]||'').trim();
-    const obs=(m[COL.obs_profe]||'').trim();
-    const meta=[matchCtxLabel(m[COL.tipo]), fmtDate(m[COL.fecha])].filter(Boolean).join(' · ');
-    const mirroredTag=m.__mirrored?`<div class="match-meta" style="opacity:.7;">🪞 Partido cargado por ${rival||'otro alumno'}</div>`:'';
-    return `<div class="match-row ${cls}">
-      <div class="match-badge">${badge}</div>
-      <div class="match-mid">
-        <div class="match-opp">${rival?('vs '+rival):'Partido'}</div>
-        <div class="match-meta">${meta}</div>
-        ${mirroredTag}
-        ${obs?`<div class="match-obs">"${obs}"</div>`:''}
-      </div>
-      <div class="match-res">${score||'—'}</div>
-    </div>`;
-  }).join('');
-
-  el.innerHTML = chips
-    + `<div class="coach-sec-title">Resumen de partidos</div>`
-    + tilesHTML
-    + evoHTML
-    + `<div class="coach-sec-title">Historial de partidos</div><div class="match-list">${listHTML}</div>`;
-  ldEl.style.display='none'; el.style.display='block';
-  renderResultadosCharts(evoMonths, allMatches);
-}
-function renderResultadosCharts(evoMonths, allMatches){
-  if(typeof Chart==='undefined') return;
-  const cv2=document.getElementById('ch-resultados-evo');
-  if(cv2){
-    if(charts['resEvo']){ try{charts['resEvo'].destroy();}catch(e){} }
-    const wins=evoMonths.map(mk=>allMatches.filter(m=>monthKey(m)===mk && matchWon(m)===true).length);
-    const losses=evoMonths.map(mk=>allMatches.filter(m=>monthKey(m)===mk && matchWon(m)===false).length);
-    charts['resEvo']=new Chart(cv2,{ type:'bar',
-      data:{ labels:evoMonths.map(mk=>monthLabel(mk).split(' ')[0]),
-        datasets:[
-          {label:'Victorias', data:wins, backgroundColor:'#16a34a', borderRadius:4, stack:'s', maxBarThickness:34},
-          {label:'Derrotas', data:losses, backgroundColor:'#dc2626', borderRadius:4, stack:'s', maxBarThickness:34}
-        ] },
-      options:{ responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{ display:true, position:'bottom', labels:{color:'#2b2b2b',font:{size:11},boxWidth:10,padding:12} } },
-        scales:{
-          y:{ beginAtZero:true, ticks:{ stepSize:1, color:'#505050', font:{size:10} }, grid:{ color:'rgba(10,81,58,0.14)' } },
-          x:{ ticks:{ color:'#505050', font:{size:10} }, grid:{ display:false } }
-        } }
-    });
-  }
-}
 
 init();
 </script>
