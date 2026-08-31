@@ -447,6 +447,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
 
 /* Mi Tenis: módulo unificado de las 4 áreas, estilo Portal del Profe (Dirección A) */
 .mt-tile-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.mt-tile-row.tiles-3{grid-template-columns:repeat(3,1fr);}
 .mt-tile{background:var(--surf);border:1px solid var(--border);border-radius:14px;padding:16px 16px 14px;min-width:0;overflow:hidden;box-shadow:0 4px 14px rgba(10,40,30,.05);}
 .mt-tile-h{display:flex;align-items:center;gap:8px;}
 .mt-tile-ic{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
@@ -490,7 +491,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);heigh
 .mt-tile .skills-acc .vid-ico{font-size:10px;}
 .mt-tile .skills-acc .vid-sep{font-size:9px;}
 .mt-tile .skills-acc .ball-label{width:auto;min-width:0;flex:0 0 auto;padding:2px 7px;font-size:9.5px;white-space:nowrap;}
-@media(max-width:560px){ .mt-tile-row{grid-template-columns:repeat(2,1fr);} .mt-tile-val{font-size:23px;} }
+@media(max-width:560px){ .mt-tile-row{grid-template-columns:repeat(2,1fr);} .mt-tile-row.tiles-3{grid-template-columns:repeat(2,1fr);} .mt-tile-val{font-size:23px;} }
 
 
 .metric-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:13px;text-align:center;}
@@ -5722,11 +5723,55 @@ const TIER_MEDAL={3:{ic:'🥇',name:'Oro'},2:{ic:'🥈',name:'Plata'},1:{ic:'�
 // PARTIDOS — pestaña de partidos jugados (Escuela de Tenis · Alumno)
 // Fuente: hoja "Registro - Rubricas". Una sesión es un partido cuando
 // "Descripción de la sesión" dice "Partido" (isMatchRow, más arriba).
-// ══════════════════════════════════════
+// Si en "Rival" figura el nombre de OTRO alumno registrado en Mi Tenis, el
+// partido se refleja automáticamente en la pestaña Partidos de ese alumno
+// (resultado y marcador invertidos) para no tener que cargarlo dos veces.
+// ═════════════════════════════════════
+// Invierte un marcador de tenis seteo por seteo ("6-3, 4-6, 6-2" → "3-6, 6-4, 2-6")
+// para mostrarlo desde la perspectiva del rival. Si no matchea el patrón N-N
+// (texto libre atípico), esa parte queda tal cual — no se fuerza el parseo.
+function flipScore(score){
+  if(!score) return score;
+  return score.split(',').map(set=>{
+    const s=set.trim();
+    const m=s.match(/^(\d+)\s*-\s*(\d+)(\(\d+\))?$/);
+    if(!m) return s;
+    return m[2]+'-'+m[1]+(m[3]||'');
+  }).join(', ');
+}
+// Partidos de OTROS alumnos donde "Rival" coincide con este alumno — se devuelven
+// como filas espejo (mismo shape que una fila de allRows) con resultado/marcador
+// invertidos y Rival apuntando al alumno que efectivamente cargó la sesión.
+function mirroredMatchesFor(name){
+  const ownSigs=new Set(
+    (playerSessions||[]).filter(isMatchRow).map(m=>{
+      const d=parseDate(m[COL.fecha])||'';
+      const opp=(m[COL.matchRival]||'').trim().toLowerCase();
+      return d+'|'+[name.trim().toLowerCase(), opp].sort().join('|');
+    })
+  );
+  return allRows.filter(r=>isMatchRow(r) && r[COL.alumno]!==name && sameName(r[COL.matchRival], name))
+    .filter(r=>{
+      const d=parseDate(r[COL.fecha])||'';
+      const sig=d+'|'+[name.trim().toLowerCase(), (r[COL.alumno]||'').trim().toLowerCase()].sort().join('|');
+      return !ownSigs.has(sig); // evita duplicar si este alumno también cargó el mismo partido
+    })
+    .map(r=>{
+      const mirror=r.slice();
+      const wv=matchWon(r);
+      mirror[COL.matchResultado]= wv===true?'Perdió':(wv===false?'Ganó':(r[COL.matchResultado]||''));
+      mirror[COL.matchScore]=flipScore(r[COL.matchScore]);
+      mirror[COL.matchRival]=r[COL.alumno];
+      mirror.__mirrored=true;
+      return mirror;
+    });
+}
 function buildResultados(){
   const el=document.getElementById('content-resultados');
   const ldEl=document.getElementById('loading-resultados');
-  const allMatches=(playerSessions||[]).filter(isMatchRow);
+  const ownMatches=(playerSessions||[]).filter(isMatchRow);
+  const mirrored=mirroredMatchesFor(currentPlayer);
+  const allMatches=ownMatches.concat(mirrored);
 
   if(!allMatches.length){
     ldEl.style.display='none'; el.style.display='block';
@@ -5748,28 +5793,7 @@ function buildResultados(){
   const torneoCount=matches.filter(m=>(m[COL.tipo]||'').toLowerCase().includes('torneo')).length;
   const claseCount=matches.length-torneoCount;
 
-  // Distribución de errores no forzados (del período filtrado)
-  const errCounts={alto:0, medio:0, bajo:0};
-  matches.forEach(m=>{ const lv=erroresLevel(m); if(lv) errCounts[lv]++; });
-  const errTot=errCounts.alto+errCounts.medio+errCounts.bajo;
-  const winPctFor=(lvl)=>{ const ms=decided.filter(m=>erroresLevel(m)===lvl); return ms.length?Math.round(ms.filter(m=>matchWon(m)).length/ms.length*100):null; };
-  const bajoWin=winPctFor('bajo'), altoWin=winPctFor('alto');
-  let insight='';
-  if(bajoWin!==null && altoWin!==null && bajoWin!==altoWin){
-    insight=`<div class="nota" style="margin:10px 0 0;">Con <b>pocos errores no forzados</b> ganó el ${bajoWin}% de sus partidos decididos; con <b>muchos</b>, el ${altoWin}%.</div>`;
-  }
-  // Nivel de errores más frecuente del período (empate → el del partido más reciente entre los empatados)
-  const ERR_COL={alto:'var(--lv1)', medio:'var(--lv2)', bajo:'var(--lv3)'};
-  const ERR_BG={alto:'var(--lv1-bg)', medio:'var(--lv2-bg)', bajo:'var(--lv3-bg)'};
-  const ERR_LBL={alto:'Alto', medio:'Medio', bajo:'Bajo'};
-  let errDom=null;
-  if(errTot){
-    const max=Math.max(errCounts.alto, errCounts.medio, errCounts.bajo);
-    const top=['bajo','medio','alto'].filter(k=>errCounts[k]===max);
-    errDom = top.length===1 ? top[0] : (sorted.map(erroresLevel).find(lv=>lv&&top.includes(lv)) || top[0]);
-  }
-
-  const tilesHTML=`<div class="mt-tile-row">
+  const tilesHTML=`<div class="mt-tile-row tiles-3">
     <div class="mt-tile">
       <div class="mt-tile-h"><div class="mt-tile-ic" style="background:#dcf3e7;">🎾</div><div class="mt-tile-nm">Partidos</div></div>
       <div class="mt-tile-val">${matches.length}</div>
@@ -5785,17 +5809,6 @@ function buildResultados(){
       <div class="mt-tile-val" style="color:${pctCol};">${decided.length?winPct:'—'}${decided.length?'<span>%</span>':''}</div>
       ${decided.length?`<div class="mt-tile-bar"><i style="width:${winPct}%;background:${pctCol};"></i></div>`:''}
     </div>
-    <div class="mt-tile">
-      <div class="mt-tile-h"><div class="mt-tile-ic" style="background:${errDom?ERR_BG[errDom]:'#dcf3e7'};">⚠️</div><div class="mt-tile-nm">Errores no forz.</div></div>
-      <div class="mt-tile-val" style="color:${errDom?ERR_COL[errDom]:'var(--muted)'};font-size:19px;">${errDom?ERR_LBL[errDom]:'—'}</div>
-      ${errTot?`<div class="acc skills-acc">
-        <div class="acc-head" onclick="toggleAcc(this)"><span class="acc-title">Ver detalle</span><span class="acc-chevron">▾</span></div>
-        <div class="acc-body"><div class="acc-body-inner">
-          <div style="position:relative;height:160px;"><canvas id="ch-errores"></canvas></div>
-          ${insight}
-        </div></div>
-      </div>`:''}
-    </div>
   </div>`;
 
   // Evolución de resultados por mes (siempre a lo largo de todo el historial, no solo el mes filtrado)
@@ -5809,15 +5822,15 @@ function buildResultados(){
     const badge=wv===null?'·':(wv?'G':'P');
     const rival=(m[COL.matchRival]||'').trim();
     const score=(m[COL.matchScore]||'').trim();
-    const lvl=erroresLevel(m);
     const obs=(m[COL.obs_profe]||'').trim();
     const meta=[matchCtxLabel(m[COL.tipo]), fmtDate(m[COL.fecha])].filter(Boolean).join(' · ');
+    const mirroredTag=m.__mirrored?`<div class="match-meta" style="opacity:.7;">🪞 Partido cargado por ${rival||'otro alumno'}</div>`:'';
     return `<div class="match-row ${cls}">
       <div class="match-badge">${badge}</div>
       <div class="match-mid">
         <div class="match-opp">${rival?('vs '+rival):'Partido'}</div>
         <div class="match-meta">${meta}</div>
-        ${lvl?`<span class="session-pill err-${lvl}">${erroresLabel(lvl)}</span>`:''}
+        ${mirroredTag}
         ${obs?`<div class="match-obs">"${obs}"</div>`:''}
       </div>
       <div class="match-res">${score||'—'}</div>
@@ -5830,21 +5843,10 @@ function buildResultados(){
     + evoHTML
     + `<div class="coach-sec-title">Historial de partidos</div><div class="match-list">${listHTML}</div>`;
   ldEl.style.display='none'; el.style.display='block';
-  renderResultadosCharts(errCounts, evoMonths, allMatches);
+  renderResultadosCharts(evoMonths, allMatches);
 }
-function renderResultadosCharts(errCounts, evoMonths, allMatches){
+function renderResultadosCharts(evoMonths, allMatches){
   if(typeof Chart==='undefined') return;
-  const cv=document.getElementById('ch-errores');
-  if(cv){
-    if(charts['errores']){ try{charts['errores'].destroy();}catch(e){} }
-    charts['errores']=new Chart(cv,{ type:'doughnut',
-      data:{ labels:['Bajo (-25%)','Medio','Alto (+75%)'],
-        datasets:[{ data:[errCounts.bajo, errCounts.medio, errCounts.alto], backgroundColor:['#16a34a','#e0a200','#dc2626'], borderWidth:0 }] },
-      options:{ responsive:true, maintainAspectRatio:false, cutout:'62%',
-        plugins:{ legend:{ display:true, position:'bottom', labels:{color:'#2b2b2b',font:{size:11},boxWidth:10,padding:12} },
-          tooltip:{ callbacks:{ label:c=>`${c.label}: ${c.raw} partido${c.raw!==1?'s':''}` } } } }
-    });
-  }
   const cv2=document.getElementById('ch-resultados-evo');
   if(cv2){
     if(charts['resEvo']){ try{charts['resEvo'].destroy();}catch(e){} }
