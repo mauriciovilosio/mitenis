@@ -1487,6 +1487,34 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
   .hist-fecha,.hist-grupo-lbl{font-size:11px;}
   .hist-row{font-size:11.5px;}
 }
+/* === Circuito interno: pestaña "Torneos" (cuadro de eliminación doble) === */
+.pz-seg{display:flex;gap:8px;margin-bottom:14px;}
+.pz-seg-btn{flex:1;padding:10px 12px;border-radius:12px;border:1.5px solid var(--border);background:var(--surf);color:var(--muted);font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-align:center;}
+.pz-seg-btn.active{background:#2b2b2b;color:#fff;border-color:#2b2b2b;}
+.pz-brackets{display:flex;flex-direction:column;gap:18px;}
+.pz-round-title{font-size:13px;font-weight:800;color:var(--blue);margin-bottom:9px;letter-spacing:.04em;text-transform:uppercase;}
+.pz-round-matches{display:flex;flex-direction:column;gap:10px;}
+.pz-match{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;}
+.pz-match.pz-bye-card{opacity:.85;}
+.pz-match.pz-pending{border-style:dashed;}
+.pz-row{display:flex;align-items:center;gap:10px;padding:4px 0;}
+.pz-row-tbd{opacity:.5;}
+.pz-avatar{width:26px;height:26px;border-radius:50%;background:var(--surf2);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;}
+.pz-avatar-win{background:#0a513a;color:#fff;}
+.pz-nm{font-weight:700;font-size:14px;color:var(--text);}
+.pz-row-win .pz-nm{color:#0a513a;}
+.pz-tbd{font-style:italic;font-weight:600;color:var(--muted);}
+.pz-vs{font-size:10px;font-weight:800;color:var(--muted);text-align:center;padding-left:36px;}
+.pz-score{font-size:12px;color:var(--muted);margin-top:4px;padding-left:36px;}
+.pz-pending-badge{display:inline-block;margin-top:4px;margin-left:36px;font-size:11px;font-weight:700;color:var(--muted);background:var(--surf2);padding:3px 8px;border-radius:99px;width:fit-content;}
+.pz-bye-badge{display:inline-block;margin-top:4px;margin-left:36px;font-size:11px;font-weight:700;color:var(--hint);width:fit-content;}
+.pz-final-card{margin-top:18px;background:var(--surf);border:1.5px solid var(--border);border-radius:14px;padding:14px;}
+.pz-final-row{display:flex;align-items:center;gap:8px;padding:6px 0;}
+.pz-final-tag{font-size:11px;font-weight:800;padding:3px 8px;border-radius:99px;flex-shrink:0;}
+.pz-final-tag.gold{background:#fff3cd;color:#8a6d00;}
+.pz-final-tag.silver{background:#eef1f4;color:#54606b;}
+.pz-final-note{font-size:11.5px;color:var(--muted);font-style:italic;margin-top:6px;}
+.pz-champion{margin-top:10px;font-size:15px;font-weight:800;color:#0a513a;background:var(--lv3-bg);padding:10px 12px;border-radius:10px;text-align:center;}
 </style>
 </head>
 <body>
@@ -1638,6 +1666,7 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
       <button class="tab-btn active" onclick="setCircuitoTab('torneos')"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span><span class="tb-lbl">Inicio</span></button>
       <button class="tab-btn" onclick="setCircuitoTab('ranking')"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg></span><span class="tb-lbl">Ranking</span></button>
       <button class="tab-btn" onclick="setCircuitoTab('jugadores')"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span><span class="tb-lbl">Jugadores</span></button>
+      <button class="tab-btn" onclick="setCircuitoTab('pizarra')"><span class="tb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v6a2 2 0 0 0 2 2h2"></path><path d="M18 3v6a2 2 0 0 1-2 2h-2"></path><path d="M12 12v9"></path><circle cx="6" cy="3" r="2"></circle><circle cx="18" cy="3" r="2"></circle><circle cx="12" cy="21" r="2"></circle></svg></span><span class="tb-lbl">Torneos</span></button>
     </nav>
   
   <main class="app-content"><div id="circuito-content"></div></main>
@@ -1879,6 +1908,7 @@ const PLAN_SHEET = 'Planificacion'; // golpe | actividad | categoria | descripci
 const HIST_SHEET = 'historial'; // fecha | grupo | categorias | objetivo del entrenamiento | ejercicios realizados
 const MERCADO_SHEET = 'Mercado'; // nombre | estado | precio | caracteristicas | link foto 1 | link foto 2 | link foto 3
 const MATCH_WIN_PTS = 25;        // puntaje por victoria para el ranking interno
+const INSC_SHEET = 'Torneos - Inscriptos';   // Categoria | Jugador | Ranking | id Torneo
 
 // ══════════════════════════════════════
 // COLUMNAS — exactamente como las renombró el usuario
@@ -1931,10 +1961,15 @@ const VID_DEFAULT = { alumno:0, golpe:1, fecha:2, link:3 };
 let VID = {...VID_DEFAULT};
 const ADULT_DEFAULT = { alumno:0, categoria:1, edad:2, brazo:3, pin:4 };
 let ADULT = {...ADULT_DEFAULT};
-const MATCH_DEFAULT = { fecha:0, categoria:1, jugadorA:2, jugadorB:3, resultado:4, ganador:2, torneo:-1, fase:-1 };
+const MATCH_DEFAULT = { fecha:0, categoria:1, jugadorA:2, jugadorB:3, resultado:4, ganador:2, torneo:-1, fase:-1, idTorneo:-1 };
 let MATCH = {...MATCH_DEFAULT};
 const EV_DEFAULT = { nombre:0, categoria:1, fecha:2, estado:3, link:4 };
 let EV = {...EV_DEFAULT};
+const INSC_DEFAULT = { categoria:0, jugador:1, ranking:2, idTorneo:3 };
+let INSC = {...INSC_DEFAULT};
+let inscRows = [];
+let pizarraCat = null;
+let pizarraLlave = 'oro';
 // Planificación: índices resueltos por encabezado (no por posición fija). -1 = ausente.
 let PLAN = { golpe:-1, actividad:-1, categoria:-1, descripcion:-1, objetivo:-1, material:-1, duracion:-1, nivel:-1 };
 const PLAN_ALIASES = {
@@ -2081,7 +2116,8 @@ const MATCH_ALIASES = {
   jugadorB:['jugador b','jugadorb','jugador 2','jugador2','visitante','rival','jugador visitante'],
   resultado:['resultado','marcador','score','sets','games','tanteo'],
   ganador:['ganador','quien gano','quién ganó','quien ganó','winner','gana','ganó'],
-  fase:['fase','ronda','etapa','instancia','fase del torneo','ronda del torneo','fase de la competencia']
+  fase:['fase','ronda','etapa','instancia','fase del torneo','ronda del torneo','fase de la competencia'],
+  idTorneo:['id torneo','idtorneo','id del torneo','id de torneo','codigo torneo','código torneo','id evento','torneo id']
 };
 const EV_ALIASES = {
   nombre:['torneo','nombre','nombre del torneo','evento'],
@@ -2089,6 +2125,12 @@ const EV_ALIASES = {
   fecha:['fecha','día','dia','marca temporal'],
   estado:['estado','status','situación','situacion'],
   link:['link de inscripcion','link de inscripción','link inscripcion','link inscripción','link','inscripcion','inscripción','url','url de inscripcion','url de inscripción']
+};
+const INSC_ALIASES = {
+  categoria:['categoria','categoría','cat','nivel'],
+  jugador:['jugador','jugadora','nombre','alumno','participante'],
+  ranking:['ranking','ranking inicial','seed','semilla','posicion','posición','puesto'],
+  idTorneo:['id torneo','idtorneo','id del torneo','id de torneo','codigo torneo','código torneo','id evento','torneo id']
 };
 
 // ══════════════════════════════════════
@@ -2566,7 +2608,7 @@ function __navCurrentScreen(){
 })();
 function fmtUpdated(ts){ const d=new Date(ts); return isNaN(d)?'':d.toLocaleString('es-AR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }
 function setUpdated(ts){ const e=document.getElementById('last-update'); if(e) e.textContent = ts ? ('Última actualización: '+fmtUpdated(ts)) : ''; }
-function applyData(dataMatrix, infoMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix, asistOkMatrix){
+function applyData(dataMatrix, infoMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix, asistOkMatrix, inscMatrix){
   if(dataMatrix.length) COL  = buildColMap(dataMatrix[0], COL_DEFAULT,  HEADER_ALIASES);
   if(infoMatrix && infoMatrix.length){
     INFO = buildColMap(infoMatrix[0], INFO_DEFAULT, INFO_ALIASES);
@@ -2580,6 +2622,7 @@ function applyData(dataMatrix, infoMatrix, videosMatrix, adultsMatrix, matchesMa
   if(adultsMatrix && adultsMatrix.length) ADULT = buildColMap(adultsMatrix[0], ADULT_DEFAULT, ADULT_ALIASES);
   if(matchesMatrix && matchesMatrix.length) MATCH = buildColMap(matchesMatrix[0], MATCH_DEFAULT, MATCH_ALIASES);
   if(eventsMatrix && eventsMatrix.length) EV = buildColMap(eventsMatrix[0], EV_DEFAULT, EV_ALIASES);
+  if(inscMatrix && inscMatrix.length) INSC = buildColMap(inscMatrix[0], INSC_DEFAULT, INSC_ALIASES);
   allRows  = dataMatrix.slice(1).filter(r=>r[COL.alumno] && r[COL.alumno].length>0);
   infoRows = (infoMatrix && infoMatrix.length) ? infoMatrix.slice(1).filter(r=>r[INFO.alumno] && r[INFO.alumno].length>0) : [];
   asistOkMap = parseAsistOk(asistOkMatrix);
@@ -2603,6 +2646,8 @@ function applyData(dataMatrix, infoMatrix, videosMatrix, adultsMatrix, matchesMa
     });
   }
   eventRows = (eventsMatrix && eventsMatrix.length) ? eventsMatrix.slice(1).filter(r=>r[EV.nombre] && r[EV.nombre].length>0) : [];
+  // 'Torneos - Inscriptos' define quienes juegan cada torneo y en que orden de siembra (columna "Ranking").
+  inscRows = (inscMatrix && inscMatrix.length) ? inscMatrix.slice(1).filter(r=>r[INSC.jugador] && r[INSC.jugador].trim().length>0) : [];
   // Planificación: resolver columnas por encabezado (las ausentes quedan en -1)
   if(planMatrix && planMatrix.length){
     planHeader=planMatrix[0]||[];
@@ -2698,7 +2743,7 @@ function renderPlayers(){
 // NOTA: la hoja vieja "asistencia" (fecha/jugador/cumplidas/objetivo/torneos) ya NO se trae — Asistencia
 // migró a "asistencia ok" y Torneos jugados migró a "Registro - Rubricas" (Tipo de sesión = Torneo).
 async function fetchAndApplyLive(){
-  const [dataMatrix, infoMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix, asistOkMatrix] = await Promise.all([
+  const [dataMatrix, infoMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix, asistOkMatrix, inscMatrix] = await Promise.all([
     fetchSheet(DATA_SHEET),
     fetchSheet(INFO_SHEET).catch(()=>[]),
     fetchVideosSheet().catch(()=>[]),
@@ -2708,11 +2753,12 @@ async function fetchAndApplyLive(){
     fetchByNames([PLAN_SHEET,'Planificacion','Planificación','planificacion','planificación']).catch(()=>[]),
     fetchByNames([HIST_SHEET,'historial','Historial','Historial de clases','historial de clases']).catch(()=>[]),
     fetchByNames([MERCADO_SHEET,'mercado','Marketplace','marketplace']).catch(()=>[]),
-    fetchSheet(ASIST_OK_SHEET).catch(()=>[])
+    fetchSheet(ASIST_OK_SHEET).catch(()=>[]),
+    fetchByNames([INSC_SHEET,'Torneos - Inscriptos','torneos - inscriptos']).catch(()=>[])
   ]);
-  applyData(dataMatrix, infoMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix, asistOkMatrix);
+  applyData(dataMatrix, infoMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix, asistOkMatrix, inscMatrix);
   const ts=Date.now();
-  try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ts, data:dataMatrix, info:infoMatrix, videos:videosMatrix, adults:adultsMatrix, matches:matchesMatrix, events:eventsMatrix, plan:planMatrix, hist:histMatrix, mercado:mercadoMatrix, asistOk:asistOkMatrix})); }catch(e){}
+  try{ localStorage.setItem(CACHE_KEY, JSON.stringify({ts, data:dataMatrix, info:infoMatrix, videos:videosMatrix, adults:adultsMatrix, matches:matchesMatrix, events:eventsMatrix, plan:planMatrix, hist:histMatrix, mercado:mercadoMatrix, asistOk:asistOkMatrix, insc:inscMatrix})); }catch(e){}
   return ts;
 }
 async function init(){
@@ -2720,7 +2766,7 @@ async function init(){
   // 1) Cache para pintado instantáneo
   try{
     const raw=localStorage.getItem(CACHE_KEY);
-    if(raw){ const cc=JSON.parse(raw); if(cc && cc.data){ applyData(cc.data, cc.info||[], cc.videos||[], cc.adults||[], cc.matches||[], cc.events||[], cc.plan||[], cc.hist||[], cc.mercado||[], cc.asistOk||[]); renderPlayers(); setUpdated(cc.ts); } }
+    if(raw){ const cc=JSON.parse(raw); if(cc && cc.data){ applyData(cc.data, cc.info||[], cc.videos||[], cc.adults||[], cc.matches||[], cc.events||[], cc.plan||[], cc.hist||[], cc.mercado||[], cc.asistOk||[], cc.insc||[]); renderPlayers(); setUpdated(cc.ts); } }
   }catch(e){}
   try{ restoreNav(); }catch(e){}
   // 2) Refresco en vivo desde el Sheet
@@ -3838,10 +3884,11 @@ function buildMercado(){
   el.innerHTML=`${filtersHTML}<div class="mkt-count">${entries.length} artículo${entries.length!==1?'s':''} publicado${entries.length!==1?'s':''}</div><div class="mkt-grid">${entries.map(mercadoCardHTML).join('')}</div>`;
 }
 function buildCircuito(){
-  const order=['torneos','ranking','jugadores'];
+  const order=['torneos','ranking','jugadores','pizarra'];
   document.querySelectorAll('#tabs-circuito .tab-btn').forEach((b,i)=>b.classList.toggle('active', order[i]===circuitoTab));
   if(circuitoTab==='jugadores') buildCircuitoJugadores();
   else if(circuitoTab==='ranking') buildCircuitoRanking();
+  else if(circuitoTab==='pizarra') buildCircuitoPizarra();
   else buildCircuitoTorneos();
 }
 function setCircuitoTab(t){ circuitoTab=t; buildCircuito(); scrollAppTop(); saveNav(); }
@@ -3861,6 +3908,250 @@ function setCircuitoPlayer(name){
   }
   circuitoPlayer=name; buildCircuitoJugadores();
 }
+// ══════════════════════════════════════
+// TORNEOS — cuadro de eliminación doble (Llave de Oro / Llave de Plata), a partir de
+// 'Torneos - Inscriptos' (quiénes juegan y su siembra) y 'Torneos - Resultados' (partidos
+// ya cargados). Semántica de los cruces: null = BYE estructural (posición de siembra sin
+// jugador, por haber menos inscriptos que el tamaño de cuadro). undefined = "pendiente"
+// (todavía no se sabe quién ocupa ese lugar porque el cruce anterior no fue cargado).
+function nextPow2(n){ let p=1; while(p<n) p*=2; return p; }
+function seedOrder(size){
+  if(size===1) return [1];
+  const prev=seedOrder(size/2);
+  const out=[];
+  for(const s of prev){ out.push(s); out.push(size+1-s); }
+  return out;
+}
+function resolveMatch(a, b, ctx){
+  if(a===undefined || b===undefined) return {a,b,winner:undefined,loser:undefined,played:false,isBye:false};
+  if(a===null && b===null) return {a,b,winner:null,loser:null,played:false,isBye:true};
+  if(a===null || b===null){ const w=a===null?b:a; return {a,b,winner:w,loser:null,played:false,isBye:true}; }
+  const found=ctx.findMatch(a,b);
+  if(!found) return {a,b,winner:undefined,loser:undefined,played:false,isBye:false};
+  const loser=ctx.sameName(found.winner,a)?b:a;
+  return {a,b,winner:found.winner,loser,played:true,isBye:false,fecha:found.fecha,resultado:found.resultado};
+}
+// Arma el cuadro completo para una lista de jugadores ya ordenada por semilla (players[0] =
+// semilla 1). ctx.findMatch(a,b) devuelve el SIGUIENTE partido aún no consumido entre a y b
+// (por fecha) y lo marca consumido — así una revancha (mismo cruce dos veces) toma el
+// partido cronológicamente siguiente en vez de repetir el mismo resultado.
+function buildBracket(players, ctx){
+  const n=players.length;
+  if(n<2) return null;
+  const size=nextPow2(n);
+  const order=seedOrder(size);
+  const slots=order.map(seed=>players[seed-1]!==undefined ? players[seed-1] : null);
+  const k=Math.log2(size);
+
+  const goldRounds=[];
+  const wbLosers=[];
+  let current=slots;
+  for(let r=0;r<k;r++){
+    const round=[]; const losers=[];
+    for(let i=0;i<current.length;i+=2){
+      const res=resolveMatch(current[i], current[i+1], ctx);
+      round.push(res);
+      if(!res.isBye) losers.push(res.loser);
+    }
+    goldRounds.push(round);
+    wbLosers.push(losers);
+    current=round.map(m=>m.winner);
+  }
+  const goldFinalist=current[0];
+
+  const silverRounds=[];
+  let silverFinalist;
+  if(k<=1){
+    silverFinalist = wbLosers[0] ? wbLosers[0][0] : undefined;
+  } else {
+    let survivors=wbLosers[0];
+    for(let j=1;j<k;j++){
+      const consRound=[]; const consSurv=[];
+      for(let i=0;i<survivors.length;i+=2){
+        const b = (i+1<survivors.length) ? survivors[i+1] : null;
+        const res=resolveMatch(survivors[i], b, ctx);
+        consRound.push(res); consSurv.push(res.winner);
+      }
+      silverRounds.push(consRound);
+      survivors=consSurv;
+
+      const incoming=wbLosers[j].slice().reverse();
+      const mergeRound=[]; const mergeSurv=[];
+      const m=Math.max(survivors.length, incoming.length);
+      for(let i=0;i<m;i++){
+        const a = i<survivors.length ? survivors[i] : null;
+        const b = i<incoming.length ? incoming[i] : null;
+        const res=resolveMatch(a, b, ctx);
+        mergeRound.push(res); mergeSurv.push(res.winner);
+      }
+      silverRounds.push(mergeRound);
+      survivors=mergeSurv;
+    }
+    silverFinalist=survivors[0];
+  }
+
+  let final=null;
+  if(goldFinalist!==undefined && silverFinalist!==undefined && goldFinalist!==null && silverFinalist!==null){
+    const g1=resolveMatch(goldFinalist, silverFinalist, ctx);
+    final={ partido1:g1, partido2:null, campeon:undefined };
+    if(g1.played){
+      if(ctx.sameName(g1.winner, goldFinalist)){
+        final.campeon=goldFinalist;
+      } else {
+        const g2=resolveMatch(goldFinalist, silverFinalist, ctx);
+        final.partido2=g2;
+        if(g2.played) final.campeon=g2.winner;
+      }
+    }
+  }
+  return { size, k, slots, goldRounds, goldFinalist, silverRounds, silverFinalist, final };
+}
+// id de torneo vigente para una categoría: por diseño se espera un único id cargado en
+// 'Torneos - Inscriptos' por categoría (el usuario limpia/reemplaza los inscriptos de la
+// categoría cuando arranca un torneo nuevo). Si no hay columna "id Torneo", devuelve ''.
+function currentTorneoId(cat){
+  if(INSC.idTorneo<0) return '';
+  const ids=inscRows.filter(r=>normCat(r[INSC.categoria])===normCat(cat)).map(r=>(r[INSC.idTorneo]||'').trim()).filter(Boolean);
+  return ids[0]||'';
+}
+// Jugadores inscriptos de una categoría, ordenados por siembra (columna "Ranking" ascendente;
+// si ningún inscripto tiene un ranking numérico cargado, se respeta el orden de la hoja).
+function inscPlayersFor(cat){
+  const idT=currentTorneoId(cat);
+  let rows=inscRows.filter(r=>normCat(r[INSC.categoria])===normCat(cat));
+  if(idT && INSC.idTorneo>=0) rows=rows.filter(r=>(r[INSC.idTorneo]||'').trim()===idT);
+  rows=rows.map(r=>({ nombre:(r[INSC.jugador]||'').trim(), rk:parseFloat((r[INSC.ranking]||'').toString().replace(',','.')) })).filter(r=>r.nombre);
+  const hasRanking=rows.some(r=>!isNaN(r.rk));
+  if(hasRanking) rows.sort((a,b)=>{ const ra=isNaN(a.rk)?Infinity:a.rk, rb=isNaN(b.rk)?Infinity:b.rk; return ra-rb || a.nombre.localeCompare(b.nombre,'es'); });
+  return rows.map(r=>r.nombre);
+}
+// Contexto de resolución de partidos para el cuadro de una categoría: solo partidos de esa
+// categoría (y, si hay id de torneo, del torneo vigente), ordenados por fecha. Sin columna
+// "id Torneo" cargada, se usan todos los partidos de la categoría (compatible con datos viejos).
+function bracketCtxFor(cat, idT){
+  const pool=matchRows.filter(m=>{
+    if(normCat(m[MATCH.categoria])!==normCat(cat)) return false;
+    if(idT && MATCH.idTorneo>=0) return (m[MATCH.idTorneo]||'').trim()===idT;
+    return true;
+  }).slice().sort((x,y)=>(parseDate(x[MATCH.fecha])||'').localeCompare(parseDate(y[MATCH.fecha])||''));
+  const used=new Set();
+  return {
+    sameName,
+    findMatch(a,b){
+      for(let i=0;i<pool.length;i++){
+        if(used.has(i)) continue;
+        const m=pool[i];
+        if((sameName(m[MATCH.jugadorA],a)&&sameName(m[MATCH.jugadorB],b)) || (sameName(m[MATCH.jugadorA],b)&&sameName(m[MATCH.jugadorB],a))){
+          used.add(i);
+          return { winner:matchWinner(m), fecha:m[MATCH.fecha], resultado:m[MATCH.resultado] };
+        }
+      }
+      return null;
+    }
+  };
+}
+function pzInitials(name){
+  const parts=(name||'').trim().split(/\s+/).filter(Boolean);
+  return (parts.map(p=>p[0]).slice(0,2).join('')||'?').toUpperCase();
+}
+function pzRoundName(i, total, llave){
+  const fromEnd=total-1-i;
+  if(llave==='oro'){
+    if(fromEnd===0) return 'Final de Oro';
+    if(fromEnd===1) return 'Semifinal';
+    if(fromEnd===2) return 'Cuartos de final';
+    if(fromEnd===3) return 'Octavos de final';
+    return `Ronda ${i+1}`;
+  }
+  if(fromEnd===0) return 'Final de Plata';
+  return `Ronda ${i+1}`;
+}
+function pzMatchHTML(m){
+  const esc=v=>String(v||'').replace(/"/g,'&quot;');
+  if(m.isBye){
+    const nm=m.winner;
+    return `<div class="pz-match pz-bye-card">
+      <div class="pz-row pz-row-win"><span class="pz-avatar pz-avatar-win">${pzInitials(nm)}</span><span class="pz-nm">${esc(nm)||'—'}</span></div>
+      <div class="pz-bye-badge">BYE — pasa directo</div>
+    </div>`;
+  }
+  const rowHTML=(name, isWinner)=>{
+    if(name===undefined) return `<div class="pz-row pz-row-tbd"><span class="pz-avatar">?</span><span class="pz-nm pz-tbd">Por definir</span></div>`;
+    if(name===null) return `<div class="pz-row pz-row-tbd"><span class="pz-avatar">—</span><span class="pz-nm pz-tbd">—</span></div>`;
+    return `<div class="pz-row${isWinner?' pz-row-win':''}"><span class="pz-avatar${isWinner?' pz-avatar-win':''}">${pzInitials(name)}</span><span class="pz-nm">${esc(name)}</span></div>`;
+  };
+  const played=m.played;
+  const cls=played?'pz-match pz-played':'pz-match pz-pending';
+  const bothKnown=(m.a!==undefined && m.b!==undefined);
+  return `<div class="${cls}">
+    ${rowHTML(m.a, played && sameName(m.winner,m.a))}
+    <div class="pz-vs">vs</div>
+    ${rowHTML(m.b, played && sameName(m.winner,m.b))}
+    ${played ? `<div class="pz-score">${esc(m.resultado||'')}</div>` : (bothKnown ? '<div class="pz-pending-badge">Sin jugar</div>' : '')}
+  </div>`;
+}
+function pzFinalHTML(br){
+  if(!br.final) return '';
+  const esc=v=>String(v||'').replace(/"/g,'&quot;');
+  const g=br.final.partido1, r=br.final.partido2;
+  const rows=`<div class="pz-final-row"><span class="pz-final-tag gold">🥇 Oro</span><span class="pz-nm">${esc(br.goldFinalist)}</span></div>
+    <div class="pz-vs">vs</div>
+    <div class="pz-final-row"><span class="pz-final-tag silver">🥈 Plata</span><span class="pz-nm">${esc(br.silverFinalist)}</span></div>`;
+  let statusHTML='';
+  if(g && g.played){
+    statusHTML+=`<div class="pz-score">${esc(g.resultado||'')} · ganó ${esc(g.winner)}</div>`;
+    if(r){
+      statusHTML+=`<div class="pz-final-note">⚔️ Revancha (la Plata ganó el primer cruce)</div>`;
+      statusHTML+= r.played ? `<div class="pz-score">${esc(r.resultado||'')} · ganó ${esc(r.winner)}</div>` : `<div class="pz-pending-badge">Revancha sin jugar</div>`;
+    }
+  } else {
+    statusHTML='<div class="pz-pending-badge">Gran Final sin jugar</div>';
+  }
+  const championHTML=br.final.campeon ? `<div class="pz-champion">🏆 Campeón: ${esc(br.final.campeon)}</div>` : '';
+  return `<div class="pz-final-card">
+    <div class="pz-round-title">Gran Final</div>
+    ${rows}
+    ${statusHTML}
+    ${championHTML}
+  </div>`;
+}
+function buildCircuitoPizarra(){
+  const el=document.getElementById('circuito-content');
+  const cats=[...new Set(inscRows.map(r=>(r[INSC.categoria]||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
+  if(!cats.length){ el.innerHTML='<div class="empty">Todavía no hay inscriptos cargados en "Torneos - Inscriptos".</div>'; return; }
+  if(!pizarraCat || !cats.some(c=>normCat(c)===normCat(pizarraCat))) pizarraCat=cats[0];
+
+  const chips=`<div class="cz-filter">
+    <div class="cz-filter-title">Seleccioná una categoría</div>
+    <div class="cz-cats">`+cats.map(c=>`<button class="cz-cat${normCat(pizarraCat)===normCat(c)?' active':''}" onclick="setPizarraCat('${c.replace(/'/g,"\\'")}')">${catLabel(c)}</button>`).join('')+`</div>
+  </div>`;
+
+  const players=inscPlayersFor(pizarraCat);
+  if(players.length<2){
+    el.innerHTML=chips+`<div class="empty">Necesitás al menos 2 inscriptos en "${catLabel(pizarraCat)}" para armar el cuadro.</div>`;
+    return;
+  }
+  const idT=currentTorneoId(pizarraCat);
+  const ctx=bracketCtxFor(pizarraCat, idT);
+  const br=buildBracket(players, ctx);
+  if(!br){ el.innerHTML=chips+'<div class="empty">No se pudo armar el cuadro.</div>'; return; }
+
+  const seg=`<div class="pz-seg">
+    <button class="pz-seg-btn${pizarraLlave==='oro'?' active':''}" onclick="setPizarraLlave('oro')">🥇 Llave de Oro</button>
+    <button class="pz-seg-btn${pizarraLlave==='plata'?' active':''}" onclick="setPizarraLlave('plata')">🥈 Llave de Plata</button>
+  </div>`;
+
+  const rounds=pizarraLlave==='oro' ? br.goldRounds : br.silverRounds;
+  const roundsHTML=rounds.map((round,i)=>`
+    <div class="pz-round">
+      <div class="pz-round-title">${pzRoundName(i, rounds.length, pizarraLlave)}</div>
+      <div class="pz-round-matches">${round.map(m=>pzMatchHTML(m)).join('')}</div>
+    </div>`).join('');
+
+  el.innerHTML=chips+seg+`<div class="pz-brackets">${roundsHTML}</div>`+pzFinalHTML(br);
+}
+function setPizarraCat(c){ pizarraCat=c; buildCircuitoPizarra(); }
+function setPizarraLlave(v){ pizarraLlave=v; buildCircuitoPizarra(); }
 function buildCircuitoTorneos(){
   const el=document.getElementById('circuito-content');
   const cats=[...new Set([...adultRows.map(r=>(r[ADULT.categoria]||'').trim()), ...matchRows.map(m=>(m[MATCH.categoria]||'').trim())].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
