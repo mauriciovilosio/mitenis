@@ -2657,6 +2657,22 @@ function applyData(dataMatrix, infoMatrix, videosMatrix, adultsMatrix, matchesMa
       if(INSC.jugador>=0 && r[INSC.jugador]) r[INSC.jugador]=resolveShortName(r[INSC.jugador], _shortNameCacheInsc);
     });
   }
+  // Filtro de robustez: hay filas viejas/mal cargadas en 'Torneos - Inscriptos'/'Torneos - Resultados'
+  // donde la columna Categoria terminó con la fecha del torneo (formato d/m/aaaa) o con el nombre de un
+  // jugador pegado por error, en vez del nombre real de la categoria (ej. "Masc. A"). Esas filas no son
+  // una categoria válida de Competencia Abierta y se excluyen para que no aparezcan como chips falsos.
+  {
+    const _looksLikeDMY = v => { const t=(v||'').toString().trim().split(' ')[0]; const p=t.split('/'); return p.length===3 && p.every(x=>/^\d{1,4}$/.test(x)); };
+    const _knownNames = new Set([
+      ...matchRows.map(r=>(r[MATCH.jugadorA]||'').trim()),
+      ...matchRows.map(r=>(r[MATCH.jugadorB]||'').trim()),
+      ...inscRows.map(r=>(r[INSC.jugador]||'').trim()),
+      ...adultRows.map(r=>(r[ADULT.alumno]||'').trim())
+    ].filter(Boolean).map(n=>n.toLowerCase()));
+    const _catBad = v => { const t=(v||'').toString().trim(); if(!t) return false; if(_looksLikeDMY(t)) return true; if(_knownNames.has(t.toLowerCase())) return true; return false; };
+    matchRows = matchRows.filter(r=>!_catBad(r[MATCH.categoria]));
+    inscRows = inscRows.filter(r=>!_catBad(r[INSC.categoria]));
+  }
   // Planificación: resolver columnas por encabezado (las ausentes quedan en -1)
   if(planMatrix && planMatrix.length){
     planHeader=planMatrix[0]||[];
