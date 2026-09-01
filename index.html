@@ -2648,6 +2648,15 @@ function applyData(dataMatrix, infoMatrix, videosMatrix, adultsMatrix, matchesMa
   eventRows = (eventsMatrix && eventsMatrix.length) ? eventsMatrix.slice(1).filter(r=>r[EV.nombre] && r[EV.nombre].length>0) : [];
   // 'Torneos - Inscriptos' define quienes juegan cada torneo y en que orden de siembra (columna "Ranking").
   inscRows = (inscMatrix && inscMatrix.length) ? inscMatrix.slice(1).filter(r=>r[INSC.jugador] && r[INSC.jugador].trim().length>0) : [];
+  // 'Torneos - Inscriptos' tambien usa nombres cortos "Apellido I." en Jugador (mismo formato que
+  // 'Torneos - Resultados'); los resolvemos contra el roster para que inscPlayersFor() devuelva nombres
+  // completos, consistentes con matchRows/adultRows.
+  if(inscRows.length){
+    const _shortNameCacheInsc=new Map();
+    inscRows.forEach(r=>{
+      if(INSC.jugador>=0 && r[INSC.jugador]) r[INSC.jugador]=resolveShortName(r[INSC.jugador], _shortNameCacheInsc);
+    });
+  }
   // Planificación: resolver columnas por encabezado (las ausentes quedan en -1)
   if(planMatrix && planMatrix.length){
     planHeader=planMatrix[0]||[];
@@ -3627,7 +3636,7 @@ function playerRecord(name,cat){
 // hasta esa fecha inclusive — sirve para reconstruir una "foto" del ranking en el pasado (ver posDeltaCard).
 function rankingForCat(cat, cutoffIso){
   const names=new Set();
-  adultRows.forEach(r=>{ if(normCat(r[ADULT.categoria])===normCat(cat)) names.add((r[ADULT.alumno]||'').trim()); });
+  inscRows.forEach(r=>{ if(normCat(r[INSC.categoria])===normCat(cat)) names.add((r[INSC.jugador]||'').trim()); });
   const catMatches=matchRows.filter(m=>normCat(m[MATCH.categoria])===normCat(cat) && (!cutoffIso || (parseDate(m[MATCH.fecha])||'')<=cutoffIso));
   catMatches.forEach(m=>{ if(m[MATCH.jugadorA]) names.add(m[MATCH.jugadorA].trim()); if(m[MATCH.jugadorB]) names.add(m[MATCH.jugadorB].trim()); });
   const arr=[...names].filter(Boolean).map(n=>{
@@ -3647,9 +3656,9 @@ function rankingForCat(cat, cutoffIso){
 // Adultos y los nombres cargados en Partidos Torneos (getAdultInfo() exige coincidencia exacta y puede
 // no encontrar al jugador). Si no aparece en Adultos, usa la categoría más frecuente entre sus partidos.
 function getPlayerCategoryLoose(name){
-  let info = adultRows.find(r=>(r[ADULT.alumno]||'').trim()===name.trim());
-  if(!info) info = adultRows.find(r=>normCat(r[ADULT.alumno])===normCat(name));
-  let cat=(info?info[ADULT.categoria]:'')||'';
+  let info = inscRows.find(r=>(r[INSC.jugador]||'').trim()===name.trim());
+  if(!info) info = inscRows.find(r=>normCat(r[INSC.jugador])===normCat(name));
+  let cat=(info?info[INSC.categoria]:'')||'';
   if(!cat){
     const freq={};
     playerMatches(name).forEach(m=>{ const c=(m[MATCH.categoria]||'').trim(); if(c) freq[c]=(freq[c]||0)+1; });
@@ -4154,7 +4163,7 @@ function setPizarraCat(c){ pizarraCat=c; buildCircuitoPizarra(); }
 function setPizarraLlave(v){ pizarraLlave=v; buildCircuitoPizarra(); }
 function buildCircuitoTorneos(){
   const el=document.getElementById('circuito-content');
-  const cats=[...new Set([...adultRows.map(r=>(r[ADULT.categoria]||'').trim()), ...matchRows.map(m=>(m[MATCH.categoria]||'').trim())].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
+  const cats=[...new Set([...inscRows.map(r=>(r[INSC.categoria]||'').trim()), ...matchRows.map(m=>(m[MATCH.categoria]||'').trim())].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
   if(!cats.length){ el.innerHTML='<div class="empty">No hay categorías de torneos cargadas todavía.</div>'; return; }
 
   // ── Sin filtro de categoría: siempre alcance total ──
@@ -4162,12 +4171,14 @@ function buildCircuitoTorneos(){
   const playersOf = list => new Set([].concat(...list.map(m=>[(m[MATCH.jugadorA]||'').trim(),(m[MATCH.jugadorB]||'').trim()])).filter(Boolean));
 
   // KPIs totales (todos los torneos jugados)
-  const totT = new Set(sel.map(m=>(m[MATCH.torneo]||'').trim()||'Torneo interno')).size;
+  const totT = MATCH.idTorneo>=0
+    ? new Set(sel.map(m=>(m[MATCH.idTorneo]||'').trim()).filter(Boolean)).size
+    : new Set(sel.map(m=>(m[MATCH.torneo]||'').trim()||'Torneo interno')).size;
   const totM = sel.length;
-  const totP = playersOf(sel).size;
+  const totP = new Set([...playersOf(sel), ...inscRows.map(r=>(r[INSC.jugador]||'').trim())].filter(Boolean)).size;
 
-  // ── Categorías: valor fijo (no calculado desde los datos) ──
-  const catsTxt = 'A / B / C';
+  // ── Categorías: cantidad real de categorías con datos (Torneos - Inscriptos / Resultados) ──
+  const catsTxt = cats.length;
 
   const cards = `<div class="metrics-row cz-kpis">
     <div class="metric-card"><div class="mc-label">🏆 Torneos hechos</div><div class="mc-body"><div class="mc-value">${totT}</div></div></div>
@@ -4203,7 +4214,7 @@ function buildCircuitoTorneos(){
 }
 function buildCircuitoRanking(){
   const el=document.getElementById('circuito-content');
-  const cats=[...new Set([...adultRows.map(r=>(r[ADULT.categoria]||'').trim()), ...matchRows.map(m=>(m[MATCH.categoria]||'').trim())].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
+  const cats=[...new Set([...inscRows.map(r=>(r[INSC.categoria]||'').trim()), ...matchRows.map(m=>(m[MATCH.categoria]||'').trim())].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
   if(!cats.length){ el.innerHTML='<div class="empty">No hay categorías de torneos cargadas todavía.</div>'; return; }
 
   // Sin filtro "Todas": siempre hay una categoría específica activa.
@@ -4233,7 +4244,7 @@ function buildCircuitoRanking(){
 function buildCircuitoJugadores(){
   const el=document.getElementById('circuito-content');
   const names=new Set();
-  adultRows.forEach(r=>{ const n=(r[ADULT.alumno]||'').trim(); if(n) names.add(n); });
+  inscRows.forEach(r=>{ const n=(r[INSC.jugador]||'').trim(); if(n) names.add(n); });
   matchRows.forEach(m=>{ [m[MATCH.jugadorA],m[MATCH.jugadorB]].forEach(x=>{ const n=(x||'').trim(); if(n) names.add(n); }); });
   const list=[...names].filter(Boolean).sort((a,b)=>a.localeCompare(b,'es',{sensitivity:'base'}));
   if(!list.length){ el.innerHTML='<div class="empty">No hay jugadores de torneos cargados todavía.</div>'; return; }
