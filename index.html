@@ -1873,7 +1873,7 @@ const INFO_SHEET = 'informacion';
 const ASIST_OK_SHEET = 'asistencia ok';
 const VIDEOS_SHEET = 'Videos';   // hoja: alumno | golpe | fecha | link
 const ADULTS_SHEET = 'informacion adultos'; // alumno | categoria | edad | brazo | pin
-const MATCHES_SHEET = 'Partidos Torneos';   // torneo | categoria | fecha | jugadorA | jugadorB | resultado | ganador | fase
+const MATCHES_SHEET = 'Torneos - Resultados';   // Marca temporal | Categoria | Ganador | Rival | Marcador (Ganador/Rival en formato "Apellido I.")
 const EVENTS_SHEET = 'Torneos';  // (opcional) torneo | categoria | fecha | estado
 const PLAN_SHEET = 'Planificacion'; // golpe | actividad | categoria | descripcion | (opcionales: objetivo | material | duracion | nivel)
 const HIST_SHEET = 'historial'; // fecha | grupo | categorias | objetivo del entrenamiento | ejercicios realizados
@@ -1931,7 +1931,7 @@ const VID_DEFAULT = { alumno:0, golpe:1, fecha:2, link:3 };
 let VID = {...VID_DEFAULT};
 const ADULT_DEFAULT = { alumno:0, categoria:1, edad:2, brazo:3, pin:4 };
 let ADULT = {...ADULT_DEFAULT};
-const MATCH_DEFAULT = { torneo:0, categoria:1, fecha:2, jugadorA:3, jugadorB:4, resultado:5, ganador:6, fase:7 };
+const MATCH_DEFAULT = { fecha:0, categoria:1, jugadorA:2, jugadorB:3, resultado:4, ganador:2, torneo:-1, fase:-1 };
 let MATCH = {...MATCH_DEFAULT};
 const EV_DEFAULT = { nombre:0, categoria:1, fecha:2, estado:3, link:4 };
 let EV = {...EV_DEFAULT};
@@ -2077,7 +2077,7 @@ const MATCH_ALIASES = {
   torneo:['torneo','nombre del torneo','nombre torneo','evento','copa','competencia'],
   categoria:['categoria','categoría','cat','nivel'],
   fecha:['fecha','marca temporal','timestamp','día','dia'],
-  jugadorA:['jugador a','jugadora','jugador 1','jugador1','local','jugador local'],
+  jugadorA:['ganador','jugador a','jugadora','jugador 1','jugador1','local','jugador local'],
   jugadorB:['jugador b','jugadorb','jugador 2','jugador2','visitante','rival','jugador visitante'],
   resultado:['resultado','marcador','score','sets','games','tanteo'],
   ganador:['ganador','quien gano','quién ganó','quien ganó','winner','gana','ganó'],
@@ -2584,8 +2584,24 @@ function applyData(dataMatrix, infoMatrix, videosMatrix, adultsMatrix, matchesMa
   infoRows = (infoMatrix && infoMatrix.length) ? infoMatrix.slice(1).filter(r=>r[INFO.alumno] && r[INFO.alumno].length>0) : [];
   asistOkMap = parseAsistOk(asistOkMatrix);
   videoRows = (videosMatrix && videosMatrix.length) ? videosMatrix.slice(1).filter(r=>r[VID.alumno] && r[VID.alumno].length>0 && r[VID.link] && r[VID.link].length>0) : [];
-  adultRows = (adultsMatrix && adultsMatrix.length) ? adultsMatrix.slice(1).filter(r=>r[ADULT.alumno] && r[ADULT.alumno].length>0) : [];
+  adultRows = (adultsMatrix && adultsMatrix.length) ? adultsMatrix.slice(1).filter(r=>{
+    const nombre=(r[ADULT.alumno]||'').trim();
+    if(!nombre) return false;
+    // Filas mal cargadas (p.ej. alumnos de Escuela de Tenis que terminaron en 'informacion adultos' por error):
+    // la categoria quedo igual al propio nombre -> no es un jugador valido de Competencia abierta, se excluye.
+    if(r[ADULT.categoria] && normCat(r[ADULT.categoria])===normCat(nombre)) return false;
+    return true;
+  }) : [];
   matchRows = (matchesMatrix && matchesMatrix.length) ? matchesMatrix.slice(1).filter(r=>(r[MATCH.jugadorA]&&r[MATCH.jugadorA].length>0)&&(r[MATCH.jugadorB]&&r[MATCH.jugadorB].length>0)) : [];
+  // 'Torneos - Resultados' usa nombres cortos "Apellido I." en Ganador/Rival; los resolvemos contra
+  // el roster de 'informacion adultos' para que el resto del código (que compara nombres completos) siga funcionando.
+  if(matchRows.length){
+    const _shortNameCache=new Map();
+    matchRows.forEach(r=>{
+      if(MATCH.jugadorA>=0 && r[MATCH.jugadorA]) r[MATCH.jugadorA]=resolveShortName(r[MATCH.jugadorA], _shortNameCache);
+      if(MATCH.jugadorB>=0 && r[MATCH.jugadorB]) r[MATCH.jugadorB]=resolveShortName(r[MATCH.jugadorB], _shortNameCache);
+    });
+  }
   eventRows = (eventsMatrix && eventsMatrix.length) ? eventsMatrix.slice(1).filter(r=>r[EV.nombre] && r[EV.nombre].length>0) : [];
   // Planificación: resolver columnas por encabezado (las ausentes quedan en -1)
   if(planMatrix && planMatrix.length){
@@ -2687,7 +2703,7 @@ async function fetchAndApplyLive(){
     fetchSheet(INFO_SHEET).catch(()=>[]),
     fetchVideosSheet().catch(()=>[]),
     fetchByNames([ADULTS_SHEET,'informacion adultos','Informacion Adultos','información adultos']).catch(()=>[]),
-    fetchByNames([MATCHES_SHEET,'Partidos Torneos','partidos torneos','Partidos','partidos']).catch(()=>[]),
+    fetchByNames([MATCHES_SHEET,'Torneos - Resultados','torneos - resultados']).catch(()=>[]),
     fetchByNames([EVENTS_SHEET,'Torneos','torneos']).catch(()=>[]),
     fetchByNames([PLAN_SHEET,'Planificacion','Planificación','planificacion','planificación']).catch(()=>[]),
     fetchByNames([HIST_SHEET,'historial','Historial','Historial de clases','historial de clases']).catch(()=>[]),
@@ -3472,6 +3488,39 @@ function catLetter(c){
 function joinEs(arr){ arr=(arr||[]).filter(Boolean); if(!arr.length) return ''; if(arr.length===1) return arr[0]; return arr.slice(0,-1).join(', ')+' y '+arr[arr.length-1]; }
 // Mes (YYYY-MM) de un partido
 function matchMonthKey(m){ const d=parseDate(m[MATCH.fecha])||''; return d?d.slice(0,7):''; }
+// Resuelve nombres cortos "Apellido I." (formato de 'Torneos - Resultados', ej. 'Rubiola A.') contra el
+// nombre completo del roster ('informacion adultos', formato "Nombre Apellido"). Si dos jugadores distintos
+// coinciden en apellido+inicial, se queda con el primero que aparece en el roster (limite conocido).
+function parseShortName(s){
+  const t=(s||'').toString().trim();
+  if(!t) return null;
+  const parts=t.split(/\s+/).filter(Boolean);
+  if(parts.length<2) return null;
+  const inicial=normHeader(parts[parts.length-1]).slice(0,1);
+  const apellido=normHeader(parts.slice(0,-1).join(' '));
+  if(!inicial||!apellido) return null;
+  return { apellido, inicial };
+}
+function resolveShortName(s, cache){
+  const key=(s||'').toString().trim();
+  if(!key) return key;
+  if(cache.has(key)) return cache.get(key);
+  const parsed=parseShortName(key);
+  let resolved=key; // si no se puede resolver contra el roster, se deja el nombre corto tal cual
+  if(parsed){
+    for(const r of adultRows){
+      const full=(r[ADULT.alumno]||'').trim();
+      if(!full) continue;
+      const toks=full.split(/\s+/).filter(Boolean);
+      if(toks.length<2) continue;
+      const nombreIni=normHeader(toks[0]).slice(0,1);
+      const apellidoFull=normHeader(toks.slice(1).join(' '));
+      if(apellidoFull===parsed.apellido && nombreIni===parsed.inicial){ resolved=full; break; }
+    }
+  }
+  cache.set(key, resolved);
+  return resolved;
+}
 function sameName(a,b){ return (a||'').toString().trim().toLowerCase()===(b||'').toString().trim().toLowerCase(); }
 function matchWinner(m){ return (m[MATCH.ganador]||'').toString().trim(); }
 function playerMatches(name){ return matchRows.filter(m=> sameName(m[MATCH.jugadorA],name)||sameName(m[MATCH.jugadorB],name)); }
@@ -3822,7 +3871,7 @@ function buildCircuitoTorneos(){
   const playersOf = list => new Set([].concat(...list.map(m=>[(m[MATCH.jugadorA]||'').trim(),(m[MATCH.jugadorB]||'').trim()])).filter(Boolean));
 
   // KPIs totales (todos los torneos jugados)
-  const totT = new Set(sel.map(m=>(m[MATCH.torneo]||'').trim()).filter(Boolean)).size;
+  const totT = new Set(sel.map(m=>(m[MATCH.torneo]||'').trim()||'Torneo interno')).size;
   const totM = sel.length;
   const totP = playersOf(sel).size;
 
