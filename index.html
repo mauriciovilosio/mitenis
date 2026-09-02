@@ -1491,32 +1491,23 @@ button.cal-cell.cal-dl-lock{cursor:pointer;}
 .pz-seg{display:flex;gap:8px;margin-bottom:14px;}
 .pz-seg-btn{flex:1;padding:10px 12px;border-radius:12px;border:1.5px solid var(--border);background:var(--surf);color:var(--muted);font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-align:center;}
 .pz-seg-btn.active{background:#2b2b2b;color:#fff;border-color:#2b2b2b;}
-.pz-live{display:flex;align-items:center;gap:8px;background:#fdeaea;border-radius:14px;padding:10px 14px;margin-bottom:14px;}
-.pz-live-dot{width:8px;height:8px;border-radius:50%;background:#e0433f;flex-shrink:0;animation:pzPulse 1.6s infinite;}
-.pz-live-txt{font-weight:800;font-size:12.5px;color:#c0342f;letter-spacing:.03em;}
-.pz-live-time{margin-left:auto;font-size:12px;color:var(--muted);}
-@keyframes pzPulse{0%,100%{opacity:1;}50%{opacity:.35;}}
-.pz-round-tabs{display:flex;gap:8px;overflow-x:auto;margin-bottom:12px;padding-bottom:2px;}
-.pz-round-pill{flex-shrink:0;padding:8px 14px;border-radius:99px;border:1.5px solid var(--border);background:var(--surf);color:var(--muted);font-family:'Inter',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap;}
-.pz-round-pill.active{background:#2b2b2b;color:#fff;border-color:#2b2b2b;}
+.pz-brackets{display:flex;flex-direction:column;gap:18px;}
+.pz-round-title{font-size:13px;font-weight:800;color:var(--blue);margin-bottom:9px;letter-spacing:.04em;text-transform:uppercase;}
 .pz-round-matches{display:flex;flex-direction:column;gap:10px;}
 .pz-match{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;}
-.pz-match.pz-bye-card{opacity:.85;flex-direction:row;align-items:center;justify-content:space-between;}
+.pz-match.pz-bye-card{opacity:.85;}
 .pz-match.pz-pending{border-style:dashed;}
-.pz-match-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .pz-row{display:flex;align-items:center;gap:10px;padding:4px 0;}
 .pz-row-tbd{opacity:.5;}
 .pz-avatar{width:26px;height:26px;border-radius:50%;background:var(--surf2);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;}
 .pz-avatar-win{background:#0a513a;color:#fff;}
 .pz-nm{font-weight:700;font-size:14px;color:var(--text);}
 .pz-row-win .pz-nm{color:#0a513a;}
-.pz-nm-loser{color:var(--muted);font-weight:600;}
 .pz-tbd{font-style:italic;font-weight:600;color:var(--muted);}
 .pz-vs{font-size:10px;font-weight:800;color:var(--muted);text-align:center;padding-left:36px;}
 .pz-score{font-size:12px;color:var(--muted);margin-top:4px;padding-left:36px;}
-.pz-score-inline{font-size:13px;font-weight:800;color:#0a7a4f;flex-shrink:0;}
-.pz-pending-badge{margin-top:6px;font-size:12px;font-weight:700;color:#8a6100;background:#fff1cc;padding:8px 10px;border-radius:10px;text-align:center;}
-.pz-bye-badge{display:inline-block;font-size:11px;font-weight:800;color:#0a7a4f;background:#e3f5ea;padding:4px 10px;border-radius:99px;flex-shrink:0;}
+.pz-pending-badge{display:inline-block;margin-top:4px;margin-left:36px;font-size:11px;font-weight:700;color:var(--muted);background:var(--surf2);padding:3px 8px;border-radius:99px;width:fit-content;}
+.pz-bye-badge{display:inline-block;margin-top:4px;margin-left:36px;font-size:11px;font-weight:700;color:var(--hint);width:fit-content;}
 .pz-final-card{margin-top:18px;background:var(--surf);border:1.5px solid var(--border);border-radius:14px;padding:14px;}
 .pz-final-row{display:flex;align-items:center;gap:8px;padding:6px 0;}
 .pz-final-tag{font-size:11px;font-weight:800;padding:3px 8px;border-radius:99px;flex-shrink:0;}
@@ -1979,8 +1970,6 @@ let INSC = {...INSC_DEFAULT};
 let inscRows = [];
 let pizarraCat = null;
 let pizarraLlave = 'oro';
-let pizarraRound = 0;
-let lastUpdateTs = null;
 // Planificación: índices resueltos por encabezado (no por posición fija). -1 = ausente.
 let PLAN = { golpe:-1, actividad:-1, categoria:-1, descripcion:-1, objetivo:-1, material:-1, duracion:-1, nivel:-1 };
 const PLAN_ALIASES = {
@@ -2618,21 +2607,7 @@ function __navCurrentScreen(){
   });
 })();
 function fmtUpdated(ts){ const d=new Date(ts); return isNaN(d)?'':d.toLocaleString('es-AR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }
-// Texto relativo tipo "Actualizado hace 2 min" para el indicador "EN VIVO" de la pizarra de Torneos.
-function timeAgo(ts){
-  if(!ts) return '';
-  const diffMs=Date.now()-ts;
-  const min=Math.floor(diffMs/60000);
-  if(min<1) return 'Actualizado recién';
-  if(min===1) return 'Actualizado hace 1 min';
-  if(min<60) return 'Actualizado hace '+min+' min';
-  const hr=Math.floor(min/60);
-  if(hr===1) return 'Actualizado hace 1 hora';
-  if(hr<24) return 'Actualizado hace '+hr+' horas';
-  const dias=Math.floor(hr/24);
-  return 'Actualizado hace '+dias+(dias===1?' día':' días');
-}
-function setUpdated(ts){ lastUpdateTs=ts||null; const e=document.getElementById('last-update'); if(e) e.textContent = ts ? ('Última actualización: '+fmtUpdated(ts)) : ''; }
+function setUpdated(ts){ const e=document.getElementById('last-update'); if(e) e.textContent = ts ? ('Última actualización: '+fmtUpdated(ts)) : ''; }
 function applyData(dataMatrix, infoMatrix, videosMatrix, adultsMatrix, matchesMatrix, eventsMatrix, planMatrix, histMatrix, mercadoMatrix, asistOkMatrix, inscMatrix){
   if(dataMatrix.length) COL  = buildColMap(dataMatrix[0], COL_DEFAULT,  HEADER_ALIASES);
   if(infoMatrix && infoMatrix.length){
@@ -4116,39 +4091,28 @@ function pzRoundName(i, total, llave){
   if(fromEnd===0) return 'Final de Plata';
   return `Ronda ${i+1}`;
 }
-function pzMatchHTML(m, seedOf){
+function pzMatchHTML(m){
   const esc=v=>String(v||'').replace(/"/g,'&quot;');
-  const seedTxt=name=>(name && seedOf && seedOf.has(name)) ? String(seedOf.get(name)) : '';
   if(m.isBye){
     const nm=m.winner;
     return `<div class="pz-match pz-bye-card">
-      <div class="pz-row pz-row-win"><span class="pz-avatar pz-avatar-win">${seedTxt(nm)||pzInitials(nm)}</span><span class="pz-nm">${esc(nm)||'—'}</span></div>
-      <span class="pz-bye-badge">BYE</span>
+      <div class="pz-row pz-row-win"><span class="pz-avatar pz-avatar-win">${pzInitials(nm)}</span><span class="pz-nm">${esc(nm)||'—'}</span></div>
+      <div class="pz-bye-badge">BYE — pasa directo</div>
     </div>`;
   }
   const rowHTML=(name, isWinner)=>{
     if(name===undefined) return `<div class="pz-row pz-row-tbd"><span class="pz-avatar">?</span><span class="pz-nm pz-tbd">Por definir</span></div>`;
     if(name===null) return `<div class="pz-row pz-row-tbd"><span class="pz-avatar">—</span><span class="pz-nm pz-tbd">—</span></div>`;
-    return `<div class="pz-row${isWinner?' pz-row-win':''}"><span class="pz-avatar${isWinner?' pz-avatar-win':''}">${seedTxt(name)||pzInitials(name)}</span><span class="pz-nm${isWinner?'':' pz-nm-loser'}">${esc(name)}</span></div>`;
+    return `<div class="pz-row${isWinner?' pz-row-win':''}"><span class="pz-avatar${isWinner?' pz-avatar-win':''}">${pzInitials(name)}</span><span class="pz-nm">${esc(name)}</span></div>`;
   };
   const played=m.played;
+  const cls=played?'pz-match pz-played':'pz-match pz-pending';
   const bothKnown=(m.a!==undefined && m.b!==undefined);
-  if(played){
-    const aWon=sameName(m.winner,m.a);
-    const winnerName=aWon?m.a:m.b, loserName=aWon?m.b:m.a;
-    return `<div class="pz-match pz-played">
-      <div class="pz-match-top">
-        ${rowHTML(winnerName, true)}
-        <span class="pz-score-inline">${esc(m.resultado||'')}</span>
-      </div>
-      ${rowHTML(loserName, false)}
-    </div>`;
-  }
-  return `<div class="pz-match pz-pending">
-    ${rowHTML(m.a, false)}
-    ${bothKnown ? '<div class="pz-vs">vs</div>' : ''}
-    ${rowHTML(m.b, false)}
-    ${bothKnown ? '<div class="pz-pending-badge">Pendiente</div>' : ''}
+  return `<div class="${cls}">
+    ${rowHTML(m.a, played && sameName(m.winner,m.a))}
+    <div class="pz-vs">vs</div>
+    ${rowHTML(m.b, played && sameName(m.winner,m.b))}
+    ${played ? `<div class="pz-score">${esc(m.resultado||'')}</div>` : (bothKnown ? '<div class="pz-pending-badge">Sin jugar</div>' : '')}
   </div>`;
 }
 function pzFinalHTML(br){
@@ -4178,10 +4142,8 @@ function pzFinalHTML(br){
 }
 function buildCircuitoPizarra(){
   const el=document.getElementById('circuito-content');
-  const title=`<div class="coach-sec-title">Torneos</div>`;
-  const live=`<div class="pz-live"><span class="pz-live-dot"></span><span class="pz-live-txt">EN VIVO</span><span class="pz-live-time">${timeAgo(lastUpdateTs)}</span></div>`;
   const cats=[...new Set(inscRows.map(r=>(r[INSC.categoria]||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
-  if(!cats.length){ el.innerHTML=title+live+'<div class="empty">Todavía no hay inscriptos cargados en "Torneos - Inscriptos".</div>'; return; }
+  if(!cats.length){ el.innerHTML='<div class="empty">Todavía no hay inscriptos cargados en "Torneos - Inscriptos".</div>'; return; }
   if(!pizarraCat || !cats.some(c=>normCat(c)===normCat(pizarraCat))) pizarraCat=cats[0];
 
   const chips=`<div class="cz-filter">
@@ -4191,46 +4153,30 @@ function buildCircuitoPizarra(){
 
   const players=inscPlayersFor(pizarraCat);
   if(players.length<2){
-    el.innerHTML=title+live+chips+`<div class="empty">Necesitás al menos 2 inscriptos en "${catLabel(pizarraCat)}" para armar el cuadro.</div>`;
+    el.innerHTML=chips+`<div class="empty">Necesitás al menos 2 inscriptos en "${catLabel(pizarraCat)}" para armar el cuadro.</div>`;
     return;
   }
   const idT=currentTorneoId(pizarraCat);
   const ctx=bracketCtxFor(pizarraCat, idT);
   const br=buildBracket(players, ctx);
-  if(!br){ el.innerHTML=title+live+chips+'<div class="empty">No se pudo armar el cuadro.</div>'; return; }
-
-  // Mapa nombre → número de semilla (siembra original), para mostrarlo en el avatar de cada
-  // jugador en vez de sus iniciales — el orden de siembra sale de la misma función que usó
-  // buildBracket() para armar br.slots, así que coincide siempre.
-  const seedOf=new Map();
-  seedOrder(br.size).forEach((seed,i)=>{ const p=br.slots[i]; if(p) seedOf.set(p, seed); });
+  if(!br){ el.innerHTML=chips+'<div class="empty">No se pudo armar el cuadro.</div>'; return; }
 
   const seg=`<div class="pz-seg">
-    <button class="pz-seg-btn${pizarraLlave==='oro'?' active':''}" onclick="setPizarraLlave('oro')">Llave de Oro</button>
-    <button class="pz-seg-btn${pizarraLlave==='plata'?' active':''}" onclick="setPizarraLlave('plata')">Llave de Plata</button>
-    <button class="pz-seg-btn${pizarraLlave==='final'?' active':''}" onclick="setPizarraLlave('final')">Final</button>
+    <button class="pz-seg-btn${pizarraLlave==='oro'?' active':''}" onclick="setPizarraLlave('oro')">🥇 Llave de Oro</button>
+    <button class="pz-seg-btn${pizarraLlave==='plata'?' active':''}" onclick="setPizarraLlave('plata')">🥈 Llave de Plata</button>
   </div>`;
 
-  let body;
-  if(pizarraLlave==='final'){
-    body = pzFinalHTML(br) || '<div class="empty">Todavía no hay Gran Final para mostrar en esta categoría.</div>';
-  } else {
-    const rounds=pizarraLlave==='oro' ? br.goldRounds : br.silverRounds;
-    if(!rounds.length){
-      body = '<div class="empty">Esta categoría todavía no tiene Llave de Plata (con 2 inscriptos no hace falta).</div>';
-    } else {
-      if(pizarraRound<0 || pizarraRound>=rounds.length) pizarraRound=0;
-      const roundTabs=`<div class="pz-round-tabs">`+rounds.map((r,i)=>`<button class="pz-round-pill${i===pizarraRound?' active':''}" onclick="setPizarraRound(${i})">${pzRoundName(i, rounds.length, pizarraLlave)}</button>`).join('')+`</div>`;
-      const matchesHTML=rounds[pizarraRound].map(m=>pzMatchHTML(m, seedOf)).join('');
-      body = roundTabs+`<div class="pz-round-matches">${matchesHTML}</div>`;
-    }
-  }
+  const rounds=pizarraLlave==='oro' ? br.goldRounds : br.silverRounds;
+  const roundsHTML=rounds.map((round,i)=>`
+    <div class="pz-round">
+      <div class="pz-round-title">${pzRoundName(i, rounds.length, pizarraLlave)}</div>
+      <div class="pz-round-matches">${round.map(m=>pzMatchHTML(m)).join('')}</div>
+    </div>`).join('');
 
-  el.innerHTML=title+live+chips+seg+body;
+  el.innerHTML=chips+seg+`<div class="pz-brackets">${roundsHTML}</div>`+pzFinalHTML(br);
 }
-function setPizarraCat(c){ pizarraCat=c; pizarraRound=0; buildCircuitoPizarra(); }
-function setPizarraLlave(v){ pizarraLlave=v; pizarraRound=0; buildCircuitoPizarra(); }
-function setPizarraRound(i){ pizarraRound=i; buildCircuitoPizarra(); }
+function setPizarraCat(c){ pizarraCat=c; buildCircuitoPizarra(); }
+function setPizarraLlave(v){ pizarraLlave=v; buildCircuitoPizarra(); }
 function buildCircuitoTorneos(){
   const el=document.getElementById('circuito-content');
   // "Torneo - Estado" trae una fila por (id Torneo, Categoria); se suma como fuente de categorías
