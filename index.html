@@ -1903,7 +1903,7 @@ const ASIST_OK_SHEET = 'asistencia ok';
 const VIDEOS_SHEET = 'Videos';   // hoja: alumno | golpe | fecha | link
 const ADULTS_SHEET = 'informacion adultos'; // alumno | categoria | edad | brazo | pin
 const MATCHES_SHEET = 'Torneos - Resultados';   // Marca temporal | Categoria | Ganador | Rival | Marcador (Ganador/Rival en formato "Apellido I.")
-const EVENTS_SHEET = 'Torneos';  // (opcional) torneo | categoria | fecha | estado
+const EVENTS_SHEET = 'Torneo - Estado';  // id Torneo | Categoria | Fecha Inicio | Estado | Link de inscripcion
 const PLAN_SHEET = 'Planificacion'; // golpe | actividad | categoria | descripcion | (opcionales: objetivo | material | duracion | nivel)
 const HIST_SHEET = 'historial'; // fecha | grupo | categorias | objetivo del entrenamiento | ejercicios realizados
 const MERCADO_SHEET = 'Mercado'; // nombre | estado | precio | caracteristicas | link foto 1 | link foto 2 | link foto 3
@@ -2120,9 +2120,9 @@ const MATCH_ALIASES = {
   idTorneo:['id torneo','idtorneo','id del torneo','id de torneo','codigo torneo','código torneo','id evento','torneo id']
 };
 const EV_ALIASES = {
-  nombre:['torneo','nombre','nombre del torneo','evento'],
+  nombre:['id torneo','idtorneo','id del torneo','id de torneo','codigo torneo','código torneo','torneo','nombre','nombre del torneo','evento'],
   categoria:['categoria','categoría','cat','nivel'],
-  fecha:['fecha','día','dia','marca temporal'],
+  fecha:['fecha inicio','fecha de inicio','fecha','día','dia','marca temporal'],
   estado:['estado','status','situación','situacion'],
   link:['link de inscripcion','link de inscripción','link inscripcion','link inscripción','link','inscripcion','inscripción','url','url de inscripcion','url de inscripción']
 };
@@ -2774,7 +2774,7 @@ async function fetchAndApplyLive(){
     fetchVideosSheet().catch(()=>[]),
     fetchByNames([ADULTS_SHEET,'informacion adultos','Informacion Adultos','información adultos']).catch(()=>[]),
     fetchByNames([MATCHES_SHEET,'Torneos - Resultados','torneos - resultados']).catch(()=>[]),
-    fetchByNames([EVENTS_SHEET,'Torneos','torneos']).catch(()=>[]),
+    fetchByNames([EVENTS_SHEET,'Torneo - Estado','torneo - estado','Torneos - Estado','torneos - estado','Torneos','torneos']).catch(()=>[]),
     fetchByNames([PLAN_SHEET,'Planificacion','Planificación','planificacion','planificación']).catch(()=>[]),
     fetchByNames([HIST_SHEET,'historial','Historial','Historial de clases','historial de clases']).catch(()=>[]),
     fetchByNames([MERCADO_SHEET,'mercado','Marketplace','marketplace']).catch(()=>[]),
@@ -4179,21 +4179,28 @@ function setPizarraCat(c){ pizarraCat=c; buildCircuitoPizarra(); }
 function setPizarraLlave(v){ pizarraLlave=v; buildCircuitoPizarra(); }
 function buildCircuitoTorneos(){
   const el=document.getElementById('circuito-content');
-  const cats=[...new Set([...inscRows.map(r=>(r[INSC.categoria]||'').trim()), ...matchRows.map(m=>(m[MATCH.categoria]||'').trim())].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
+  // "Torneo - Estado" trae una fila por (id Torneo, Categoria); se suma como fuente de categorías
+  // además de Inscriptos/Resultados para que una categoría recién anunciada (todavía sin inscriptos
+  // cargados) también cuente.
+  const cats=[...new Set([...inscRows.map(r=>(r[INSC.categoria]||'').trim()), ...matchRows.map(m=>(m[MATCH.categoria]||'').trim()), ...eventRows.map(e=>(e[EV.categoria]||'').trim())].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
   if(!cats.length){ el.innerHTML='<div class="empty">No hay categorías de torneos cargadas todavía.</div>'; return; }
 
   // ── Sin filtro de categoría: siempre alcance total ──
   const sel = matchRows;
   const playersOf = list => new Set([].concat(...list.map(m=>[(m[MATCH.jugadorA]||'').trim(),(m[MATCH.jugadorB]||'').trim()])).filter(Boolean));
 
-  // KPIs totales (todos los torneos jugados)
-  const totT = MATCH.idTorneo>=0
-    ? new Set(sel.map(m=>(m[MATCH.idTorneo]||'').trim()).filter(Boolean)).size
-    : new Set(sel.map(m=>(m[MATCH.torneo]||'').trim()||'Torneo interno')).size;
+  // "Torneos hechos": si hay hoja "Torneo - Estado" cargada, se cuenta desde ahí (id Torneo con
+  // Estado = "Finalizado"), que es la fuente de verdad del estado de cada edición. Si todavía no
+  // está cargada, se usa el cálculo anterior (torneos distintos con partidos jugados).
+  const totT = eventRows.length
+    ? new Set(eventRows.filter(e=>/finaliz/i.test(e[EV.estado]||'')).map(e=>(e[EV.nombre]||'').trim()).filter(Boolean)).size
+    : (MATCH.idTorneo>=0
+        ? new Set(sel.map(m=>(m[MATCH.idTorneo]||'').trim()).filter(Boolean)).size
+        : new Set(sel.map(m=>(m[MATCH.torneo]||'').trim()||'Torneo interno')).size);
   const totM = sel.length;
   const totP = new Set([...playersOf(sel), ...inscRows.map(r=>(r[INSC.jugador]||'').trim())].filter(Boolean)).size;
 
-  // ── Categorías: cantidad real de categorías con datos (Torneos - Inscriptos / Resultados) ──
+  // ── Categorías: cantidad real de categorías con datos (Torneo - Estado / Inscriptos / Resultados) ──
   const catsTxt = cats.length;
 
   const cards = `<div class="metrics-row cz-kpis">
@@ -4203,10 +4210,12 @@ function buildCircuitoTorneos(){
     <div class="metric-card"><div class="mc-label">🏷️ Categorías</div><div class="mc-body"><div class="mc-value cz-cats-val">${catsTxt}</div></div></div>
   </div>`;
 
-  // ── Próximo torneo (hoja "Torneos"), debajo de las 4 cards ──
+  // ── Próximos torneos (hoja "Torneo - Estado"), debajo de las 4 cards ──
+  // La hoja trae una fila por (id Torneo, Categoria): se agrupan por id Torneo + fecha para
+  // mostrar una sola tarjeta por edición, con todas sus categorías juntas.
   const _today=new Date().toISOString().slice(0,10);
   const esc=v=>String(v||'').replace(/"/g,'&quot;');
-  const _upcoming=eventRows.map(e=>({
+  const _evRows=eventRows.map(e=>({
       nombre:(e[EV.nombre]||'').trim(),
       cat:(e[EV.categoria]||'').trim(),
       estado:(e[EV.estado]||'').trim(),
@@ -4214,23 +4223,34 @@ function buildCircuitoTorneos(){
       raw:e[EV.fecha]||'',
       link:(e[EV.link]||'').trim()
     }))
-    .filter(e=>e.nombre && e.iso && e.iso>=_today && !/cancel|suspend/i.test(e.estado))
-    .sort((a,b)=>a.iso.localeCompare(b.iso));
-  const _nextEv=_upcoming[0]||null;
-  const _linkOk = _nextEv && /^https?:\/\//i.test(_nextEv.link);
-  const nextSection = `<hr class="coach-sec-hr"><div class="coach-sec-title">📅 Próximo torneo</div><div class="card cz-next-card">
-    ${_nextEv
-      ? `<div class="cz-next-name">${_nextEv.nombre}</div>
-         <div class="cz-next-date">${fmtDate(_nextEv.raw)}${_nextEv.cat?' · '+catLabel(_nextEv.cat):''}</div>
-         ${_linkOk?`<a class="cz-next-link" href="${esc(_nextEv.link)}" target="_blank" rel="noopener">Inscribirme →</a>`:''}`
-      : `<div class="cz-next-empty">Sin torneos próximos</div>`}
-  </div>`;
+    .filter(e=>e.nombre && e.iso && e.iso>=_today && !/cancel|suspend/i.test(e.estado));
+  const _grouped={};
+  _evRows.forEach(e=>{
+    const key=e.nombre+'|'+e.iso;
+    if(!_grouped[key]) _grouped[key]={nombre:e.nombre, iso:e.iso, raw:e.raw, link:'', cats:new Set()};
+    if(e.cat) _grouped[key].cats.add(e.cat);
+    if(!_grouped[key].link && e.link) _grouped[key].link=e.link;
+  });
+  const _upcoming=Object.values(_grouped).sort((a,b)=>a.iso.localeCompare(b.iso));
+  const nextCardHTML=(ev)=>{
+    const _linkOk=/^https?:\/\//i.test(ev.link);
+    const catsTxt2=joinEs([...ev.cats].sort((a,b)=>a.localeCompare(b,'es',{numeric:true})).map(catLabel));
+    return `<div class="card cz-next-card">
+      <div class="cz-next-name">${esc(ev.nombre)}</div>
+      <div class="cz-next-date">${fmtDate(ev.raw)}${catsTxt2?' · '+catsTxt2:''}</div>
+      ${_linkOk?`<a class="cz-next-link" href="${esc(ev.link)}" target="_blank" rel="noopener">Inscribirme →</a>`:''}
+    </div>`;
+  };
+  const nextSection = `<hr class="coach-sec-hr"><div class="coach-sec-title">📅 Próximo torneo</div>`
+    + (_upcoming.length ? _upcoming.map(nextCardHTML).join('') : `<div class="card cz-next-card"><div class="cz-next-empty">Sin torneos próximos</div></div>`);
 
   el.innerHTML = `<div class="coach-sec-title">RESUMEN DE LOS TORNEOS RELÁMPAGOS</div>` + cards + nextSection;
 }
 function buildCircuitoRanking(){
   const el=document.getElementById('circuito-content');
-  const cats=[...new Set([...inscRows.map(r=>(r[INSC.categoria]||'').trim()), ...matchRows.map(m=>(m[MATCH.categoria]||'').trim())].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
+  // Categorías de Ranking: fuente única = "Torneos - Inscriptos" (allí se define qué categorías
+  // existen en cada edición del torneo).
+  const cats=[...new Set(inscRows.map(r=>(r[INSC.categoria]||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
   if(!cats.length){ el.innerHTML='<div class="empty">No hay categorías de torneos cargadas todavía.</div>'; return; }
 
   // Sin filtro "Todas": siempre hay una categoría específica activa.
