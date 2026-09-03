@@ -2678,6 +2678,9 @@ function applyData(dataMatrix, infoMatrix, videosMatrix, adultsMatrix, matchesMa
     if(r[ADULT.categoria] && normCat(r[ADULT.categoria])===normCat(nombre)) return false;
     return true;
   }) : [];
+  // Ronda 10: el roster puede cambiar en cada refresco de datos — recalcular el ranking base
+  // resuelto (RANKING_SEED_RAW, nombres cortos -> nombres completos) la próxima vez que se use.
+  _rankingSeedCache=null;
   matchRows = (matchesMatrix && matchesMatrix.length) ? matchesMatrix.slice(1).filter(r=>(r[MATCH.jugadorA]&&r[MATCH.jugadorA].length>0)&&(r[MATCH.jugadorB]&&r[MATCH.jugadorB].length>0)) : [];
   // 'Torneos - Resultados' usa nombres cortos "Apellido I." en Ganador/Rival; los resolvemos contra
   // el roster de 'informacion adultos' para que el resto del código (que compara nombres completos) siga funcionando.
@@ -2982,8 +2985,13 @@ function openPlayer(name){
     const _now=new Date(); const _cmk=_now.getFullYear()+'-'+String(_now.getMonth()+1).padStart(2,'0');
     selectedMonth = _ms.includes(_cmk) ? _cmk : (_ms[_ms.length-1]||'all');
   })();
-  // Informes: el calendario arranca en el último mes con registro de clase (navegable con flechas)
-  informesMonth = [...new Set(allRows.filter(r=>r[COL.alumno]===name).map(monthKey).filter(Boolean))].sort().pop() || null;
+  // Informes: el calendario arranca en el último mes con registro — de evaluación (Registro - Rubricas)
+  // O de clase dictada (hoja "historial"), lo que sea más reciente (Ronda 10: antes solo miraba
+  // evaluaciones, así que un mes con clases cargadas pero sin evaluación todavía quedaba afuera).
+  informesMonth = [...new Set([
+    ...allRows.filter(r=>r[COL.alumno]===name).map(monthKey),
+    ...studentHistorialEntries(name).map(e=>e.mk)
+  ])].filter(Boolean).sort().pop() || null;
   const color=avatarColor(name);
   const ini=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   const av=document.getElementById('h-avatar');
@@ -3672,7 +3680,9 @@ function h2hWinner(nameX,nameY,scopeMatches){
   });
   return best ? (matchWinner(best)||null) : null;
 }
-// Comparador de ranking: 1) puntos, 2) enfrentamiento directo en la fase más avanzada, 3) récord G-P, 4) nombre.
+// Comparador de ranking: 1) puntos, 2) enfrentamiento directo en la fase más avanzada, 3) récord G-P,
+// 4) posición del ranking base (Ronda 10, ver RANKING_SEED_RAW — solo desempata si AMBOS jugadores
+// tienen una posición de arranque cargada, para no reordenar jugadores nuevos entre sí), 5) nombre.
 function compareRanking(x,y,scopeMatches){
   if(y.pts!==x.pts) return y.pts-x.pts;
   const h2h=h2hWinner(x.name,y.name,scopeMatches);
@@ -3680,7 +3690,10 @@ function compareRanking(x,y,scopeMatches){
     if(sameName(h2h,x.name)) return -1;
     if(sameName(h2h,y.name)) return 1;
   }
-  return y.w-x.w || x.l-y.l || x.name.localeCompare(y.name,'es');
+  if(y.w-x.w) return y.w-x.w;
+  if(x.l-y.l) return x.l-y.l;
+  if(x._seedPos!=null && y._seedPos!=null) return x._seedPos-y._seedPos;
+  return x.name.localeCompare(y.name,'es');
 }
 function playerRecord(name,cat){
   let w=0,l=0,tot=0;
@@ -3701,6 +3714,10 @@ function rankingForCat(cat, cutoffIso){
   inscRows.forEach(r=>{ if(normCat(r[INSC.categoria])===normCat(cat)) names.add((r[INSC.jugador]||'').trim()); });
   const catMatches=matchRows.filter(m=>normCat(m[MATCH.categoria])===normCat(cat) && (!cutoffIso || (parseDate(m[MATCH.fecha])||'')<=cutoffIso));
   catMatches.forEach(m=>{ if(m[MATCH.jugadorA]) names.add(m[MATCH.jugadorA].trim()); if(m[MATCH.jugadorB]) names.add(m[MATCH.jugadorB].trim()); });
+  // Ronda 10: los jugadores del ranking base (RANKING_SEED_RAW) entran al ranking de su categoría
+  // aunque todavía no estén inscriptos en el torneo vigente ni tengan partidos cargados en la app.
+  const seed=rankingSeedFor(cat);
+  if(seed) Object.keys(seed).forEach(n=>names.add(n));
   const totals=categoryEditionPoints(cat, cutoffIso);
   const arr=[...names].filter(Boolean).map(n=>{
     let w=0,l=0,tot=0;
@@ -3710,7 +3727,7 @@ function rankingForCat(cat, cutoffIso){
       const win=matchWinner(m);
       if(win){ if(sameName(win,n)) w++; else l++; }
     });
-    return {name:n,w,l,p:tot,dec:w+l,pts:totals[n]||0};
+    return {name:n,w,l,p:tot,dec:w+l,pts:totals[n]||0,_seedPos:(seed&&seed[n]!=null)?seed[n].pos:null};
   });
   arr.sort((x,y)=>compareRanking(x,y,catMatches));
   return arr;
@@ -4106,6 +4123,57 @@ function editionPoints(players, ctx, matchesForEdition){
   }
   return pts;
 }
+// Ronda 10 (3-sep-2026): ranking "de arranque" para categorías que ya tenían resultados jugados
+// antes de activar este sistema de puntos por resultado — el usuario pasó la posición y el puntaje
+// ya vigentes de cada categoría (según el mismo modelo de puntos de la Ronda 9: 100/75/50/40/25) para
+// que las ediciones de torneo que se carguen de acá en más SUMEN sobre esta base, en vez de arrancar
+// todos en cero. Las categorías Fem. no están acá a propósito: arrancan de cero, tal como pidió el
+// usuario. `pos` es solo para desempatar entre jugadores con el mismo puntaje (ver compareRanking) —
+// no afecta el puntaje que se muestra. Nombres en formato corto "Apellido I.", igual que el resto de
+// las hojas del Sheet; se resuelven contra el roster (informacion adultos) la primera vez que se usan.
+const RANKING_SEED_RAW = {
+  'Masc. A': {
+    'Perino G.':   {pos:1, pts:100},
+    'Rubiola A.':  {pos:2, pts:75},
+    'Silva A.':    {pos:3, pts:50},
+    'Ciancia D.':  {pos:4, pts:50},
+    'Moiso J.':    {pos:5, pts:25},
+    'Prunesti G.': {pos:6, pts:25},
+    'Aznaran S.':  {pos:7, pts:25}
+  },
+  'Masc. B': {
+    'Cordoba M.':  {pos:1, pts:100},
+    'Bravo J.':    {pos:2, pts:75},
+    'Brandana P.': {pos:3, pts:50},
+    'Medrano E.':  {pos:4, pts:50},
+    'Carnero R.':  {pos:5, pts:25},
+    'Medrano J.':  {pos:6, pts:25}
+  },
+  'Masc. C': {
+    'Ardiles J.':   {pos:1, pts:25},
+    'Belbruno J.':  {pos:2, pts:25},
+    'Dominguez M.': {pos:3, pts:25}
+  }
+};
+let _rankingSeedCache=null;
+// Resuelve RANKING_SEED_RAW (nombres cortos) contra el roster una sola vez y cachea el resultado —
+// devuelve {nombreCompleto:{pos,pts}} para la categoría pedida, o null si esa categoría no tiene ranking base.
+function rankingSeedFor(cat){
+  if(!_rankingSeedCache){
+    _rankingSeedCache={};
+    const nameCache=new Map();
+    Object.keys(RANKING_SEED_RAW).forEach(c=>{
+      const resolved={};
+      Object.keys(RANKING_SEED_RAW[c]).forEach(shortName=>{
+        const full=resolveShortName(shortName, nameCache);
+        resolved[full]=RANKING_SEED_RAW[c][shortName];
+      });
+      _rankingSeedCache[c]=resolved;
+    });
+  }
+  const key=Object.keys(_rankingSeedCache).find(c=>normCat(c)===normCat(cat));
+  return key ? _rankingSeedCache[key] : null;
+}
 // Puntos acumulados de una categoría, sumando el resultado de CADA edición de torneo jugada
 // (agrupadas por "id Torneo" en Torneos - Resultados) — pedido explícito del usuario: el
 // Ranking es un acumulado histórico entre ediciones, no solo el torneo vigente. Para la edición
@@ -4121,6 +4189,10 @@ function categoryEditionPoints(cat, cutoffIso){
   const ids = MATCH.idTorneo>=0 ? [...new Set(catMatches.map(m=>(m[MATCH.idTorneo]||'').trim()))] : [''];
   const curId=currentTorneoId(cat);
   const totals={};
+  // Ronda 10: arranca desde el ranking base de la categoría (si tiene uno cargado, ver
+  // RANKING_SEED_RAW) en vez de 0 — los resultados de los torneos siguientes se SUMAN sobre esta base.
+  const seed=rankingSeedFor(cat);
+  if(seed) Object.keys(seed).forEach(n=>{ totals[n]=seed[n].pts; });
   const add=(name,val)=>{ if(!name) return; totals[name]=(totals[name]||0)+val; };
   ids.forEach(id=>{
     const editionMatches = MATCH.idTorneo>=0 ? catMatches.filter(m=>(m[MATCH.idTorneo]||'').trim()===id) : catMatches;
@@ -4153,6 +4225,13 @@ function pointsForPlayerInCat(cat, name, cutoffIso){
 function playerTotalPoints(name){
   const cats=new Set();
   matchRows.forEach(m=>{ if(sameName(m[MATCH.jugadorA],name)||sameName(m[MATCH.jugadorB],name)){ const c=(m[MATCH.categoria]||'').trim(); if(c) cats.add(c); } });
+  // Ronda 10: sumar también las categorías donde el jugador solo tiene ranking base todavía (sin
+  // ningún partido cargado en la app) — si no, "Mi resumen en torneos" mostraría 0 puntos pese a
+  // tener un ranking base vigente.
+  Object.keys(RANKING_SEED_RAW).forEach(c=>{
+    const seed=rankingSeedFor(c);
+    if(seed && Object.keys(seed).some(n=>sameName(n,name))) cats.add(c);
+  });
   let total=0;
   cats.forEach(c=>{ total+=pointsForPlayerInCat(c,name); });
   return total;
@@ -4394,9 +4473,13 @@ function buildCircuitoTorneos(){
 }
 function buildCircuitoRanking(){
   const el=document.getElementById('circuito-content');
-  // Categorías de Ranking: fuente única = "Torneos - Inscriptos" (allí se define qué categorías
-  // existen en cada edición del torneo).
-  const cats=[...new Set(inscRows.map(r=>(r[INSC.categoria]||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
+  // Categorías de Ranking: fuente principal = "Torneos - Inscriptos" (allí se define qué categorías
+  // existen en cada edición del torneo) + las categorías con un ranking base cargado (Ronda 10,
+  // RANKING_SEED_RAW) aunque no tengan inscriptos en el torneo vigente — si no, ese chip ni aparecería.
+  const cats=[...new Set([
+    ...inscRows.map(r=>(r[INSC.categoria]||'').trim()),
+    ...Object.keys(RANKING_SEED_RAW)
+  ])].filter(Boolean).sort((a,b)=>a.localeCompare(b,'es',{numeric:true}));
   if(!cats.length){ el.innerHTML='<div class="empty">No hay categorías de torneos cargadas todavía.</div>'; return; }
 
   // Sin filtro "Todas": siempre hay una categoría específica activa.
@@ -5489,7 +5572,14 @@ function monthEnded(mk){
 }
 // Un solo mes por vez, con flechas ← → para navegar entre los meses con registro (playerInformesMonths())
 function playerInformesMonths(){
-  return [...new Set(playerSessions.map(monthKey).filter(Boolean))].sort();
+  // Meses navegables del calendario de Informes: evaluación (playerSessions) UNIDOS a clases
+  // dictadas en "historial" (Ronda 10) — antes un mes con solo clases cargadas y ninguna
+  // evaluación quedaba directamente afuera de la lista y no se podía ver ni en el calendario ni
+  // en la card "Historial de clases".
+  return [...new Set([
+    ...playerSessions.map(monthKey),
+    ...studentHistorialEntries(currentPlayer).map(e=>e.mk)
+  ])].filter(Boolean).sort();
 }
 function goInformesMonth(dir){
   const months=playerInformesMonths();
@@ -5605,14 +5695,18 @@ function buildHistorial(){
   // (ver buildMonthCalendar: día final del mes con candado 🔒 en vez de descarga para quienes no la tienen).
   const subscribed=!currentPlayer || isSubscribed(currentPlayer);
   const infoBtn=`<button class="lg-info-btn" onclick="openRegistroInfo()">ℹ️ ¿Cómo funcionan los Informes?</button>`;
-  if(!playerSessions.length){
+  // Un solo mes por vez: arranca en el último con registro (fijado en openPlayer), navegable con flechas.
+  // RONDA 10: antes el corte para mostrar "sin datos" era "el alumno no tiene NINGUNA evaluación
+  // cargada jamás" (playerSessions.length) — un alumno con clases en "historial" pero sin evaluaciones
+  // todavía no veía ni calendario ni card filtrada por mes. Ahora el corte es "no hay ningún mes con
+  // datos, de evaluación O de clase dictada" (playerInformesMonths ya une ambas fuentes).
+  const months=playerInformesMonths();
+  if(!months.length){
     const timelineHTML=renderHistorialClases(studentHistorialEntries(currentPlayer));
     ldEl.style.display='none'; el.style.display='block';
     el.innerHTML=infoBtn+'<div class="empty" style="margin-top:14px;">No hay sesiones registradas.</div>'+timelineHTML;
     return;
   }
-  // Un solo mes por vez: arranca en el último con registro (fijado en openPlayer), navegable con flechas
-  const months=playerInformesMonths();
   if(!informesMonth || !months.includes(informesMonth)) informesMonth=months[months.length-1];
   const monthSessions=playerSessions.filter(s=>monthKey(s)===informesMonth);
   const pl=currentPlayer.replace(/'/g,"\\'");
